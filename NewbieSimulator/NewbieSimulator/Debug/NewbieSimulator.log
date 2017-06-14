@@ -1,3 +1,4 @@
-﻿  engine.c
-  NewbieSimulator.vcxproj -> c:\users\kuicat\documents\visual studio 2015\Projects\NewbieSimulator\Debug\NewbieSimulator.exe
-  NewbieSimulator.vcxproj -> c:\users\kuicat\documents\visual studio 2015\Projects\NewbieSimulator\Debug\NewbieSimulator.pdb (Partial PDB)
+﻿  core.cpp
+  engine.c
+  NewbieSimulator.vcxproj -> C:\Users\KUICAT\Documents\2017-1-KUNewbieSimulator\NewbieSimulator\Debug\NewbieSimulator.exe
+  NewbieSimulator.vcxproj -> C:\Users\KUICAT\Documents\2017-1-KUNewbieSimulator\NewbieSimulator\Debug\NewbieSimulator.pdb (Partial PDB)
