@@ -2,18 +2,25 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <allegro5\allegro.h>
+#include <allegro5\allegro_image.h>
 
 typedef struct tag_position {
 	float x, y;
 }Position;
 
 typedef struct tag_object {
-
 	ALLEGRO_BITMAP *image;
-	float width, height;
 	Position pos;
 
 }Object;
+
+typedef struct tag_animation {
+	int num;
+	float speed;
+	ALLEGRO_BITMAP *images;
+	Position pos;
+
+}Animation;
 
 //--------------------------------------------------------
 
@@ -35,11 +42,14 @@ typedef struct tag_objstack {
 }ObjStack;
 
 
+
+
 //--------------------------------------------------------
 
 // Static Variables
 static ObjStack Stack;
 
+Object SetObject(char* imgpath, float x, float y);
 
 void initialization();
 

@@ -48,6 +48,20 @@ int pull_stack(ObjStack *stack) {
 	}
 }
 
+Object SetObject(char* imgpath, float x, float y) {
+
+	Object obj;
+
+	obj.image = al_load_bitmap(imgpath);
+	if (obj.image == NULL) {	
+		printf("failed load bitmap image! \n");
+	}
+	obj.pos.x = x;
+	obj.pos.y = y;
+
+	return obj;
+}
+
 void initialization() {
 	Stack.counter = 0;
 	Stack.isStackFull = isStackFull;

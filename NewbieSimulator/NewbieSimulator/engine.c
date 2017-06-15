@@ -21,7 +21,12 @@ static int engine() {
 		fprintf(stderr, "failed to initialize allegro!\n");
 		return -1;
 	}
-	
+
+	if (!al_init_image_addon()) {
+		fprintf(stderr, "failed to initialize al_innit_image_addon!\n");
+		return -1;
+	}
+
 	timer = al_create_timer(1.0 / FPS);
 	if (!timer) {
 		fprintf(stderr, "failed to create timer!\n");
@@ -44,12 +49,12 @@ static int engine() {
 	}
 
 //-------------------------
-
+	
 	while (1) {
 
-		engine_action();
-		engine_draw();
-		al_destroy_display(display);
+	//	engine_action();
+	//	engine_draw();
+		al_flip_display();
 
 	}
 
@@ -96,3 +101,6 @@ int start() {
 	return engine();
 }
 
+int main() {
+	return start();
+}
