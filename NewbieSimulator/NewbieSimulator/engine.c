@@ -83,7 +83,7 @@ void engine_draw_objs() {
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
 		Object o = Stack.objs[i];
-		al_draw_bitmap(o.image, o.width, o.height, 0);
+		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
 	}
 }
 
