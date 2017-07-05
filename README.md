@@ -40,3 +40,4 @@ Add-on을 활성화/비활성화시킬 때에는 모든 구성 (Debug/Release), 
 * Image
 * Audio
 * Dialog
+* Primitive
