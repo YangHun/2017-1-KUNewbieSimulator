@@ -21,10 +21,22 @@
     <ClCompile Include="engine.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="scene_1.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="core.cpp">
+    <ClCompile Include="scene_0.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_2.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="core.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="fsm.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,6 +45,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="core.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scenes.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="fsms.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

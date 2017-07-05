@@ -1,14 +1,26 @@
-#include "engine.h"
 #include "core.h"
+#include "engine.h"
+#include "scenes.h"
+#include "fsms.h"
+
 
 #define FPS 60
-#define SCREEN_W 1280
+#define SCREEN_W 1024
 #define SCREEN_H 720
 #define BOUNCER_SIZE 64
 
-void engine_action();
-void engine_draw();
-int start();
+extern ObjStack Stack;
+extern SceneArray Scenes;
+extern FSMArray FSMs;
+
+extern int state_num = 0;
+
+extern FSM prev;
+extern FSM next;
+
+extern Scene current;
+
+int redraw = 0; //1일때마다 다시 그린다
 
 static int engine() {
 
@@ -16,6 +28,7 @@ static int engine() {
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer = NULL;
 	ALLEGRO_BITMAP *bouncer = NULL;
+	ALLEGRO_TIMEOUT timeout;
 
 	if (!al_init()) {
 		fprintf(stderr, "failed to initialize allegro!\n");
@@ -24,6 +37,11 @@ static int engine() {
 
 	if (!al_init_image_addon()) {
 		fprintf(stderr, "failed to initialize al_innit_image_addon!\n");
+		return -1;
+	}
+
+	if (!al_install_mouse()) {
+		fprintf(stderr, "failed to initialize the mouse!\n");
 		return -1;
 	}
 
@@ -48,14 +66,42 @@ static int engine() {
 		return -1;
 	}
 
+	event_queue = al_create_event_queue();
+	if (!event_queue) {
+		fprintf(stderr, "failed to create event_queue!\n");
+		al_destroy_bitmap(bouncer);
+		al_destroy_display(display);
+		al_destroy_timer(timer);
+		return -1;
+	}
+
+	al_register_event_source(event_queue, al_get_display_event_source(display));
+	al_register_event_source(event_queue, al_get_mouse_event_source());
+
+	al_init_timeout(&timeout, 0.1);
+
+	//core initialization
+	initialization();
+
 //-------------------------
-	
+
+
 	while (1) {
 
-	//	engine_action();
-	//	engine_draw();
-		al_flip_display();
+		ALLEGRO_EVENT ev;
+		al_wait_for_event_until(event_queue, &ev, &timeout);
 
+		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			break;
+		}
+
+		engine_action(ev);
+		engine_draw();
+
+		if (redraw) {
+			al_flip_display();
+			redraw = 0;
+		}
 	}
 
 //-------------------------
@@ -63,20 +109,115 @@ static int engine() {
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 
 	al_flip_display();
-
-	al_rest(10.0);
-
+	
 	al_destroy_display(display);
 
 	return 0;
 }
 
-void engine_action() {
-	// 매 프레임마다 호출된다
+
+void scene_manage() {
+
+	// Plz add a new case when new scene is added
+	if (current.isFirst) {
+		if (!redraw) {
+			redraw = 1;
+		}
+		current.init();
+		current.isFirst = 0;
+	}
+	else {
+		current.act();
+	}
 }
 
+void state_manage(ALLEGRO_EVENT ev) {
+	
+
+	if (next.adress >= 0) {
+		prev = next;
+		next = NULLFSM;
+	}
+
+	switch (prev.state_num) {
+
+	//--------------------------------------
+	// Scene 0
+	//--------------------------------------
+	
+	case 0: //when app starts : initialization
+		if (prev.isFirst) {
+			prev.firstframe();
+			prev.isFirst = 0;
+		}
+		else {
+			prev.action();
+			prev.lateupdate();
+
+			//transition
+			// if mouse clicked, change scene 0 --> 1
+			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+				
+				printf("mouse click \n");
+				
+				transition_scene_0();
+				current = Scenes.scenes[1];
+			}
+		}
+		break;
+
+	//--------------------------------------
+	// Scene 1
+	//--------------------------------------
+	
+	case 100:
+		if (prev.isFirst) {
+			prev.firstframe();
+			prev.isFirst = 0;
+		}
+		else {
+			prev.action();
+			prev.lateupdate();
+		}
+		break;
+
+		
+		/*
+
+		TODO : Generate Game Flow FSM
+		rule :
+		scene_0 --> 000, 001, 002, ...
+		scene_1 --> 100, 101, 102, ...
+		scene_2 --> 200, 201, 202, ...
+
+		*/
+
+
+	case 9999: //when app ends
+		break;
+	}
+}
+
+void engine_action(ALLEGRO_EVENT ev) {
+
+	if (current.num >= 0) {
+		
+		//1. check scene and execute current scene
+		scene_manage();
+	
+		if (prev.state_num >= 0) {
+	
+			//2. manage Game States; execute current state	
+			state_manage(ev);			
+		}
+	
+	}
+}
+
+
+
 void engine_draw_background() {
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_draw_bitmap(Background.image, 0 , 0, 0);
 }
 
 void engine_draw_objs() {
@@ -102,5 +243,7 @@ int start() {
 }
 
 int main() {
+
 	return start();
+
 }
