@@ -2,10 +2,35 @@
 #include "scenes.h"
 #include "fsms.h"
 
+static int isStackFull(objstack_t *stack);
+static int isStackEmpty(objstack_t *stack);
+static int push_stack(objstack_t *stack, object_t obj);
+static int pull_stack(objstack_t *stack);
+
+static int isSceneStackFull(scenearray_t *stack);
+static int isSceneStackEmpty(scenearray_t *stack);
+static int scene_push_stack(scenearray_t *stack, scene_t obj);
+static int scene_pull_stack(scenearray_t *stack);
+
+//--------------------------------------------------------
+// Core Variables
+//--------------------------------------------------------
+objstack_t Stack;
+scenearray_t Scenes;
+fsmarray_t FSMs;
+
+fsm_t prev;
+fsm_t next;
+fsm_t NULLFSM;
+
+scene_t current;
+
+int state_num = 0;
+
 //---------------------------------------------------
 // Stack functions
 //---------------------------------------------------
-int isStackFull(ObjStack *stack) {
+int isStackFull(objstack_t *stack) {
 	if (stack->counter == STACK_SIZE) {
 		return 1;
 	}
@@ -17,7 +42,7 @@ int isStackFull(ObjStack *stack) {
 	}
 }
 
-int isStackEmpty(ObjStack *stack) {
+int isStackEmpty(objstack_t *stack) {
 	if (stack->counter == 0) {
 		return 1;
 	}
@@ -29,8 +54,8 @@ int isStackEmpty(ObjStack *stack) {
 	}
 }
 
-int push_stack(ObjStack *stack, Object obj) {
-	if (!(stack->isStackFull(stack))) {
+int push_stack(objstack_t *stack, object_t obj) {
+	if (!(stack->is_full(stack))) {
 		stack->objs[stack->counter - 1] = obj;
 		stack->counter++;
 		return 0;
@@ -41,9 +66,9 @@ int push_stack(ObjStack *stack, Object obj) {
 	}
 }
 
-int pull_stack(ObjStack *stack) {
+int pull_stack(objstack_t *stack) {
 
-	if (!(stack->isStackEmpty(stack))) {
+	if (!(stack->is_empty(stack))) {
 		stack->counter--;
 		return 0;
 	}
@@ -57,7 +82,7 @@ int pull_stack(ObjStack *stack) {
 // Scene Stack functions
 //---------------------------------------------------
 
-int isSceneStackFull(SceneArray *arr) {
+int isSceneStackFull(scenearray_t *arr) {
 	if (arr->counter == SCENE_SIZE) {
 		return 1;
 	}
@@ -69,7 +94,7 @@ int isSceneStackFull(SceneArray *arr) {
 	}
 }
 
-int isSceneStackEmpty(SceneArray *arr) {
+int isSceneStackEmpty(scenearray_t *arr) {
 	if (arr->counter == 0) {
 		return 1;
 	}
@@ -81,8 +106,8 @@ int isSceneStackEmpty(SceneArray *arr) {
 	}
 }
 
-int scene_push_stack(SceneArray *arr, Scene obj) {
-	if (!(arr->isArrayFull(arr))) {
+int scene_push_stack(scenearray_t *arr, scene_t obj) {
+	if (!(arr->is_full(arr))) {
 		arr->scenes[arr->counter - 1] = obj;
 		arr->counter++;
 		return 0;
@@ -93,9 +118,9 @@ int scene_push_stack(SceneArray *arr, Scene obj) {
 	}
 }
 
-int scene_pull_stack(SceneArray *arr) {
+int scene_pull_stack(scenearray_t *arr) {
 
-	if (!(arr->isArrayEmpty(arr))) {
+	if (!(arr->is_empty(arr))) {
 		arr->counter--;
 		return 0;
 	}
@@ -109,9 +134,9 @@ int scene_pull_stack(SceneArray *arr) {
 // Object functions
 //---------------------------------------------------
 
-Object SetObject(char* imgpath, float x, float y) {
+object_t create_object(char* imgpath, float x, float y) {
 
-	Object obj;
+	object_t obj;
 
 	obj.image = al_load_bitmap(imgpath);
 	if (obj.image == NULL) {
@@ -134,11 +159,11 @@ int register_scenes(int n) {
 	int i;
 
 	for (i = 0; i < n; i++) {
-		Scene s;
+		scene_t s;
 		s.num = i;
 		s.isFirst = 1;
 
-		if (!(Scenes.isArrayFull(&Scenes))) {
+		if (!(Scenes.is_full(&Scenes))) {
 			Scenes.push(&Scenes, s);
 		}
 		else {
@@ -151,11 +176,11 @@ int register_scenes(int n) {
 	return 0;
 }
 
-int init_scene_obj(Scene *s, int ((*init)()), int ((*act)()), int ((*transit)())) {
+int init_scene_obj(scene_t *s, int ((*init)()), int ((*act)()), int ((*transit)())) {
 
 	s->init = init;
 	s->act = act;
-	s->transit = transit;
+	s->fin = transit;
 
 	return 0;
 }
@@ -165,7 +190,7 @@ int init_scene_obj(Scene *s, int ((*init)()), int ((*act)()), int ((*transit)())
 //---------------------------------------------------
 
 
-int transit_state(FSM p, FSM n) {
+int transit_state(fsm_t p, fsm_t n) {
 
 	p.transition(p, n);
 	prev = p;
@@ -182,7 +207,7 @@ int register_states(int n) {
 
 	for (i = 0; i < n; i++) {
 		
-		FSM fsm;
+		fsm_t fsm;
 		fsm.state_num = 0;
 		fsm.adress = i;
 		fsm.isFirst = 1;
@@ -194,7 +219,7 @@ int register_states(int n) {
 	return 0;
 }
 
-int init_fsm(FSM *f, int ((*firstframe)()), int((*action)()), int((*lateupdate)())) {
+int init_fsm(fsm_t *f, int ((*firstframe)()), int((*action)()), int((*lateupdate)())) {
 
 	f->firstframe = firstframe;
 	f->action = action;
@@ -214,14 +239,14 @@ void initialization() {
 	//-------------------------------------------
 	
 	Stack.counter = 0;
-	Stack.isStackFull = isStackFull;
-	Stack.isStackEmpty = isStackEmpty;
+	Stack.is_full = isStackFull;
+	Stack.is_empty = isStackEmpty;
 	Stack.push = push_stack;
 	Stack.pull = pull_stack;
 
 	Scenes.counter = 0;
-	Scenes.isArrayFull = isSceneStackFull;
-	Scenes.isArrayEmpty = isSceneStackEmpty;
+	Scenes.is_full = isSceneStackFull;
+	Scenes.is_empty = isSceneStackEmpty;
 	Scenes.push = scene_push_stack;
 	Scenes.pull = scene_pull_stack;
 
@@ -269,9 +294,9 @@ void initialization() {
 	//2. init each scene
 	//Plz add functions and call init() when new scene has been added. 
 	//please add "all the" functions whether the function is empty or not. 
-	init_scene_obj(&Scenes.scenes[0], init_scene_0, main_scene_0, transition_scene_0);
-	init_scene_obj(&Scenes.scenes[1], init_scene_1, main_scene_1, transition_scene_1);
-	init_scene_obj(&Scenes.scenes[2], init_scene_2, main_scene_2, transition_scene_2);
+	init_scene_obj(&Scenes.scenes[0], scene_0_init, scene_0_update, scene_0_fin);
+	init_scene_obj(&Scenes.scenes[1], scene_1_init, scene_1_update, scene_1_fin);
+	init_scene_obj(&Scenes.scenes[2], scene_2_init, scene_2_update, scene_2_fin);
 
 
 	//3. init variables

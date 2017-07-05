@@ -9,16 +9,8 @@
 #define SCREEN_H 720
 #define BOUNCER_SIZE 64
 
-extern ObjStack Stack;
-extern SceneArray Scenes;
-extern FSMArray FSMs;
-
-extern int state_num = 0;
-
-extern FSM prev;
-extern FSM next;
-
-extern Scene current;
+object_t Background;
+ALLEGRO_EVENT ev;
 
 int redraw = 0; //1일때마다 다시 그린다
 
@@ -216,7 +208,7 @@ void engine_draw_background() {
 void engine_draw_objs() {
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
-		Object o = Stack.objs[i];
+		object_t o = Stack.objs[i];
 		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
 	}
 }
@@ -231,12 +223,6 @@ void engine_draw() {
 	engine_draw_UI();
 }
 
-int start() {
+int game() {
 	return engine();
-}
-
-int main() {
-
-	return start();
-
 }

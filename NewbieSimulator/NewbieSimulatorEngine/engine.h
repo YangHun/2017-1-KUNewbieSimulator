@@ -8,7 +8,7 @@ static int engine();
 int register_scenes(int n);
 void engine_action(ALLEGRO_EVENT ev);
 void engine_draw();
-int start();
+int game();
 
-Object Background;
-ALLEGRO_EVENT ev;
+extern object_t Background;
+extern ALLEGRO_EVENT ev;
