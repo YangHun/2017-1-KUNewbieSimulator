@@ -88,7 +88,6 @@ static int engine() {
 
 	while (1) {
 
-		ALLEGRO_EVENT ev;
 		al_wait_for_event_until(event_queue, &ev, &timeout);
 
 		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -96,21 +95,24 @@ static int engine() {
 		}
 
 		engine_action(ev);
-		engine_draw();
-
+		
 		if (redraw) {
+
+			engine_draw();
 			al_flip_display();
 			redraw = 0;
+		
 		}
 	}
 
 //-------------------------
 
 	al_clear_to_color(al_map_rgb(0, 0, 0));
-
 	al_flip_display();
 	
 	al_destroy_display(display);
+	al_destroy_event_queue(event_queue);
+	al_destroy_timer(timer);
 
 	return 0;
 }
@@ -154,15 +156,6 @@ void state_manage(ALLEGRO_EVENT ev) {
 			prev.action();
 			prev.lateupdate();
 
-			//transition
-			// if mouse clicked, change scene 0 --> 1
-			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-				
-				printf("mouse click \n");
-				
-				transition_scene_0();
-				current = Scenes.scenes[1];
-			}
 		}
 		break;
 

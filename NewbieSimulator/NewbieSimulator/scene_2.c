@@ -12,8 +12,8 @@ int init_scene_2() {
 
 int main_scene_2() {
 
-	//Scene 1의 Main문
-
+	//Scene 2의 Main문
+	//while문 안에 있다 --> 매 frame마다 실행됨
 
 
 	return 0;
@@ -29,3 +29,7 @@ int transition_scene_2() {
 
 	return 0;
 }
+
+
+
+

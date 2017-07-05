@@ -11,3 +11,4 @@ void engine_draw();
 int start();
 
 Object Background;
+ALLEGRO_EVENT ev;

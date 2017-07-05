@@ -16,7 +16,7 @@ int init_scene_1(){
 int main_scene_1() {
 
 	//Scene 1의 Main문
-
+	//while문 안에 있다 --> 매 frame마다 실행됨
 	printf("Scene 1 act! \n");
 
 
