@@ -19,15 +19,6 @@ int scene_0_update() {
 	//while문 안에 있다 --> 매 frame마다 실행됨
 	printf("Scene 0 act! \n");
 
-	//transition
-	// if mouse clicked, change scene 0 --> 1
-	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-
-		printf("mouse click \n");
-
-		current = Scenes.scenes[1];
-	}
-
 	return 0;
 }
 

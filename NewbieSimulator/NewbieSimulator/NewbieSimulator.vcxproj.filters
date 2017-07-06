@@ -24,8 +24,22 @@
     <ClCompile Include="scene_2.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="gamemanager.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NewbieSimulatorEngine\fsm.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\NewbieSimulatorEngine\scenes.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NewbieSimulatorEngine\fsms.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

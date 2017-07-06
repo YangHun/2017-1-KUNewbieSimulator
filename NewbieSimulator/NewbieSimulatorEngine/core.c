@@ -12,6 +12,9 @@ static int isSceneStackEmpty(scenearray_t *stack);
 static int scene_push_stack(scenearray_t *stack, scene_t obj);
 static int scene_pull_stack(scenearray_t *stack);
 
+extern void start();
+extern void end();
+
 //--------------------------------------------------------
 // Core Variables
 //--------------------------------------------------------
@@ -148,47 +151,11 @@ object_t create_object(char* imgpath, float x, float y) {
 	return obj;
 }
 
-//---------------------------------------------------
-// Managing Scene functions
-//---------------------------------------------------
 
-int register_scenes(int n) {
-
-	//register scenes at this function!
-
-	int i;
-
-	for (i = 0; i < n; i++) {
-		scene_t s;
-		s.num = i;
-		s.isFirst = 1;
-
-		if (!(Scenes.is_full(&Scenes))) {
-			Scenes.push(&Scenes, s);
-		}
-		else {
-			break;
-			printf("error : scene stack is full!!");
-			return i;
-		}
-	}
-
-	return 0;
-}
-
-int init_scene_obj(scene_t *s, int ((*init)()), int ((*act)()), int ((*transit)())) {
-
-	s->init = init;
-	s->act = act;
-	s->fin = transit;
-
-	return 0;
-}
 
 //---------------------------------------------------
 // FSM functions & Managing FSM functions
 //---------------------------------------------------
-
 
 int transit_state(fsm_t p, fsm_t n) {
 
@@ -197,35 +164,6 @@ int transit_state(fsm_t p, fsm_t n) {
 	next = n;
 
 	return n.state_num;
-}
-
-int register_states(int n) {
-
-	//register states at this function!
-
-	int i;
-
-	for (i = 0; i < n; i++) {
-		
-		fsm_t fsm;
-		fsm.state_num = 0;
-		fsm.adress = i;
-		fsm.isFirst = 1;
-
-
-		FSMs.states[i] = fsm;
-	}
-
-	return 0;
-}
-
-int init_fsm(fsm_t *f, int ((*firstframe)()), int((*action)()), int((*lateupdate)())) {
-
-	f->firstframe = firstframe;
-	f->action = action;
-	f->lateupdate = lateupdate;
-
-	return 0;
 }
 
 //---------------------------------------------------
@@ -252,56 +190,23 @@ void initialization() {
 
 	FSMs.transition = transit_state;
 
+
 	//-------------------------------------------
-	// FSM init
+	// FSM & State register
 	//-------------------------------------------
 	
-#define EXIST_STATE_NUM 30 
+	start();
 
-	//1. register
-	if (register_states(EXIST_STATE_NUM)) {
-		printf("error : register scene crash");
-		return;
-	}
-
-	//2. init - link function pointer
-	//Plz add functions and call init() when new state has been added.
-	//please add "all the" functions whether the function is empty or not. 
-	init_fsm(&FSMs.states[0], first_frame_0, action_0, late_update_0);
-	init_fsm(&FSMs.states[1], first_frame_1, action_1, late_update_1);
-	init_fsm(&FSMs.states[2], first_frame_100, action_100, late_update_100);
-
-
-	//3. init variables
+	//-------------------------------------------
+	// Init variables
+	//-------------------------------------------
 	NULLFSM.adress = -1;
 	NULLFSM.state_num = -1;
 
 	prev = FSMs.states[0];
 	next = NULLFSM;
 
-	//-------------------------------------------
-	// Scene init
-	//-------------------------------------------
-
-#define EXIST_SCENE_NUM 3
-
-	//1. register
-	if (register_scenes(EXIST_SCENE_NUM)) {
-		printf("error : register scene crash");
-		return;
-	}
-
-	//2. init each scene
-	//Plz add functions and call init() when new scene has been added. 
-	//please add "all the" functions whether the function is empty or not. 
-	init_scene_obj(&Scenes.scenes[0], scene_0_init, scene_0_update, scene_0_fin);
-	init_scene_obj(&Scenes.scenes[1], scene_1_init, scene_1_update, scene_1_fin);
-	init_scene_obj(&Scenes.scenes[2], scene_2_init, scene_2_update, scene_2_fin);
-
-
-	//3. init variables
 	current = Scenes.scenes[0];
-
 }
 
 

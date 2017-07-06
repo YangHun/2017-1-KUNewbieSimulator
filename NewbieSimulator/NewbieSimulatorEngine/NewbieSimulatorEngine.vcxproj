@@ -146,14 +146,11 @@
   <ItemGroup>
     <ClCompile Include="core.c" />
     <ClCompile Include="engine.c" />
-    <ClCompile Include="fsm.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="engine.h" />
-    <ClInclude Include="fsms.h" />
-    <ClInclude Include="scenes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,10 @@
 
 static int engine();
 
-int register_scenes(int n);
+extern void state_manage(ALLEGRO_EVENT ev);
+extern void start();
+extern void end();
+
 void engine_action(ALLEGRO_EVENT ev);
 void engine_draw();
 int game();

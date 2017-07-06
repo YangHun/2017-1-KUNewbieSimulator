@@ -27,21 +27,12 @@
     <ClCompile Include="core.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="fsm.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="core.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="scenes.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="fsms.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

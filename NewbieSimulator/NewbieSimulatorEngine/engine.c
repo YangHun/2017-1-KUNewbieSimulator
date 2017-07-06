@@ -99,6 +99,8 @@ static int engine() {
 
 //-------------------------
 
+	end();
+
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_flip_display();
 	
@@ -125,63 +127,7 @@ void scene_manage() {
 	}
 }
 
-void state_manage(ALLEGRO_EVENT ev) {
-	
 
-	if (next.adress >= 0) {
-		prev = next;
-		next = NULLFSM;
-	}
-
-	switch (prev.state_num) {
-
-	//--------------------------------------
-	// Scene 0
-	//--------------------------------------
-	
-	case 0: //when app starts : initialization
-		if (prev.isFirst) {
-			prev.firstframe();
-			prev.isFirst = 0;
-		}
-		else {
-			prev.action();
-			prev.lateupdate();
-
-		}
-		break;
-
-	//--------------------------------------
-	// Scene 1
-	//--------------------------------------
-	
-	case 100:
-		if (prev.isFirst) {
-			prev.firstframe();
-			prev.isFirst = 0;
-		}
-		else {
-			prev.action();
-			prev.lateupdate();
-		}
-		break;
-
-		
-		/*
-
-		TODO : Generate Game Flow FSM
-		rule :
-		scene_0 --> 000, 001, 002, ...
-		scene_1 --> 100, 101, 102, ...
-		scene_2 --> 200, 201, 202, ...
-
-		*/
-
-
-	case 9999: //when app ends
-		break;
-	}
-}
 
 void engine_action(ALLEGRO_EVENT ev) {
 
@@ -198,7 +144,6 @@ void engine_action(ALLEGRO_EVENT ev) {
 	
 	}
 }
-
 
 
 void engine_draw_background() {

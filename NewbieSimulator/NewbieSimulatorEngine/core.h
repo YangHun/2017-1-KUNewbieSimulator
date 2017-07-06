@@ -128,9 +128,6 @@ extern int state_num;
 
 object_t create_object(char* imgpath, float x, float y);
 
-int register_scenes(int n);
-int init_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*transit)()));
-
 int transit_state(fsm_t p, fsm_t n);
 
 void initialization();
