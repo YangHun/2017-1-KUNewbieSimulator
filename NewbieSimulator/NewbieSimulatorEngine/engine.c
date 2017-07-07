@@ -14,6 +14,12 @@ ALLEGRO_EVENT ev;
 
 int redraw = 0; //1일때마다 다시 그린다
 
+void re_draw() {
+	if(!redraw )
+		redraw = 1;
+
+}
+
 static int engine() {
 
 	ALLEGRO_DISPLAY *display = NULL;
@@ -151,10 +157,12 @@ void engine_draw_background() {
 }
 
 void engine_draw_objs() {
+	
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
 		object_t o = Stack.objs[i];
 		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
+
 	}
 }
 

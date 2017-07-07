@@ -59,7 +59,7 @@ int isStackEmpty(objstack_t *stack) {
 
 int push_stack(objstack_t *stack, object_t obj) {
 	if (!(stack->is_full(stack))) {
-		stack->objs[stack->counter - 1] = obj;
+		stack->objs[stack->counter] = obj;
 		stack->counter++;
 		return 0;
 	}

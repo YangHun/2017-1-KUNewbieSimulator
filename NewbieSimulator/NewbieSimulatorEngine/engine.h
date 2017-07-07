@@ -13,5 +13,7 @@ void engine_action(ALLEGRO_EVENT ev);
 void engine_draw();
 int game();
 
+void re_draw();
+
 extern object_t Background;
 extern ALLEGRO_EVENT ev;
