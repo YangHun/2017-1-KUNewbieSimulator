@@ -22,9 +22,8 @@
 * Visual Studio Community 2017 - C++ 데스크톱 개발 환경 포함
     * 이 경우 Windows 8.1 SDK, VC++ v140 도구 집합, NuGet 패키지 관리자를 추가 선택 설치해야 빌드 환경 구성이 완료된다.
 * MSBuild 명령어를 이용해 콘솔에서 빌드하기. 다음 소프트웨어들을 설치해야 한다.
-    * [Microsoft Build Tools 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48159)
-    * [Visual C++ 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
-    * [Windows 10 SDK](https://developer.microsoft.com/ko-kr/windows/downloads/windows-10-sdk)
+    * [Microsoft Build Tools 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48159), [Visual C++ 2015 Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools), [Windows 10 SDK](https://developer.microsoft.com/ko-kr/windows/downloads/windows-10-sdk)
+    * 또는 [Visual Studio 2017용 Build Tools](https://go.microsoft.com/fwlink/?linkid=840931) - Windows 10 SDK (10.0.14393.0) 포함
 
 ### 패키지 의존성
 
