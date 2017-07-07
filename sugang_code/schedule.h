@@ -2,8 +2,8 @@
 #include"lectureInfo.h"
 typedef enum _isEmpty {
 	ISEMPTY_DEFAULT, //초기값.
-	EMPTY, // 이 시간대에 강의가 있음
-	NONEMPTY // 없음
+	EMPTY, // 이 시간대에 강의가 없음
+	NONEMPTY // 있음
 } isEmpty;
 
 typedef struct _strList {
@@ -20,6 +20,7 @@ typedef struct _timetableInfo {
 } timetableInfo;
 
 typedef struct _schedule {
+	int gradePoint;
 	strListPtr idNumberList;
 	timetableInfo timeTable[5][10]; //5요일 10교시
 } schedule;
