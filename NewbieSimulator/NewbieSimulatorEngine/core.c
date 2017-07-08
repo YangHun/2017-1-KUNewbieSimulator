@@ -1,6 +1,4 @@
 #include "core.h"
-#include "scenes.h"
-#include "fsms.h"
 
 static int isStackFull(objstack_t *stack);
 static int isStackEmpty(objstack_t *stack);

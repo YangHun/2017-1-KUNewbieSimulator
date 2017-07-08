@@ -1,7 +1,5 @@
 #include "core.h"
 #include "engine.h"
-#include "scenes.h"
-#include "fsms.h"
 
 
 #define FPS 60
