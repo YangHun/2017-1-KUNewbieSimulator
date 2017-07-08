@@ -111,7 +111,7 @@ int isSceneStackEmpty(scenearray_t *arr) {
 
 int scene_push_stack(scenearray_t *arr, scene_t obj) {
 	if (!(arr->is_full(arr))) {
-		arr->scenes[arr->counter - 1] = obj;
+		arr->scenes[arr->counter] = obj;
 		arr->counter++;
 		return 0;
 	}

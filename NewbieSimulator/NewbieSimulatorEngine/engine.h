@@ -14,6 +14,7 @@ void engine_draw();
 int game();
 
 void re_draw();
+void load_scene(scene_t next);
 
 extern object_t Background;
 extern ALLEGRO_EVENT ev;

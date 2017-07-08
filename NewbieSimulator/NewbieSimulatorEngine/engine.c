@@ -133,7 +133,10 @@ void scene_manage() {
 	}
 }
 
-
+void load_scene(scene_t next) {
+	current = next;
+	current.isFirst = 1;
+}
 
 void engine_action(ALLEGRO_EVENT ev) {
 
@@ -162,7 +165,7 @@ void engine_draw_objs() {
 	for (i = 0; i < Stack.counter; i++) {
 		object_t o = Stack.objs[i];
 		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
-
+		printf("Object %d is drawn\n", i);
 	}
 }
 

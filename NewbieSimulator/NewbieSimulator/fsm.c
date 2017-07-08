@@ -1,5 +1,6 @@
 #include "core.h"
 #include "engine.h"
+#include "fsms.h"
 
 //----------------------------------------
 // Scene 0
@@ -21,10 +22,16 @@ int late_update_0() {
 
 	//action이 끝났을 때.
 	
+	int clicked = 0;
+
 	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 		//transition
 		// if mouse clicked, change scene 0 --> 1
-		transition_0_to_1();
+		clicked++;
+
+		if (clicked == 1) {
+			transition_0_to_1();
+		}
 	}
 
 	return 0;
@@ -35,7 +42,7 @@ int transition_0_to_1() {
 	// state_000에서 state_001로의 전이.
 
 	printf("mouse click \n");
-	current = Scenes.scenes[1];
+	load_scene(Scenes.scenes[1]);
 
 	return 0;
 }
