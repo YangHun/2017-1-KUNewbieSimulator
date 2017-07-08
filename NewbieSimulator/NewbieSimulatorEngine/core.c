@@ -30,6 +30,7 @@ scene_t current;
 
 int state_num = 0;
 
+
 //---------------------------------------------------
 // Stack functions
 //---------------------------------------------------
@@ -206,7 +207,7 @@ void initialization() {
 	prev = FSMs.states[0];
 	next = NULLFSM;
 
-	current = Scenes.scenes[0];
+	current = Scenes.scenes[2];
 }
 
 
