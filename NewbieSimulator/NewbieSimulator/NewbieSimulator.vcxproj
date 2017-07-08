@@ -100,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\NewbieSimulatorEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -163,8 +164,20 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< Updated upstream
     <ClInclude Include="fsms.h" />
     <ClInclude Include="scenes.h" />
+=======
+<<<<<<< Updated upstream
+    <ClInclude Include="..\NewbieSimulatorEngine\fsms.h" />
+    <ClInclude Include="..\NewbieSimulatorEngine\scenes.h" />
+=======
+    <ClInclude Include="fsms.h" />
+    <ClInclude Include="lectureInfo.h" />
+    <ClInclude Include="scenes.h" />
+    <ClInclude Include="schedule.h" />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,8 +13,18 @@ void engine_action(ALLEGRO_EVENT ev);
 void engine_draw();
 int game();
 
+<<<<<<< Updated upstream
 void re_draw();
 void load_scene(scene_t next);
 
+=======
+<<<<<<< Updated upstream
+=======
+void re_draw();
+void load_scene(scene_t next);
+ALLEGRO_EVENT catch_event();
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 extern object_t Background;
 extern ALLEGRO_EVENT ev;
