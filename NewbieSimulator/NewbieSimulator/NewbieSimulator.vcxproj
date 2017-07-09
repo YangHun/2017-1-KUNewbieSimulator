@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A2005A51-534A-4A69-8C21-572D108F48CE}</ProjectGuid>
     <RootNamespace>NewbieSimulator</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -129,6 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\NewbieSimulatorEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -158,6 +159,7 @@
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
     <ClCompile Include="scene_2.c" />
+    <ClCompile Include="timetableAnalyzer.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -165,6 +167,8 @@
   <ItemGroup>
     <ClInclude Include="..\NewbieSimulatorEngine\fsms.h" />
     <ClInclude Include="..\NewbieSimulatorEngine\scenes.h" />
+    <ClInclude Include="lectureInfo.h" />
+    <ClInclude Include="schedule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
