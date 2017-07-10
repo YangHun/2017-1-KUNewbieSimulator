@@ -152,6 +152,9 @@ void engine_action(ALLEGRO_EVENT ev) {
 	}
 }
 
+ALLEGRO_EVENT catch_event() {
+	return ev;
+}
 
 void engine_draw_background() {
 	al_draw_bitmap(Background.image, 0 , 0, 0);
