@@ -83,6 +83,7 @@ struct scenearray_t {
 // fsm_t: game flow를 구현하는 데 쓰는 녀석
 struct fsm_t;
 typedef struct fsm_t fsm_t;
+typedef int(*fsm_transition_t)(fsm_t, fsm_t);
 struct fsm_t {
 
 	int isFirst;
@@ -93,7 +94,7 @@ struct fsm_t {
 	int(*action)(); //매 프레임마다 실행됨
 	int(*lateupdate)(); //액션이 끝난 후 실행됨
 
-	int(*transition)(fsm_t prev, fsm_t next);
+	fsm_transition_t *transition;
 
 };
 

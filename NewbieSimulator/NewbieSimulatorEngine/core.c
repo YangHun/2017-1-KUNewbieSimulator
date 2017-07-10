@@ -155,9 +155,9 @@ object_t create_object(char* imgpath, float x, float y) {
 // FSM functions & Managing FSM functions
 //---------------------------------------------------
 
-int transit_state(fsm_t p, fsm_t n) {
+int transit_state(int i, fsm_t p, fsm_t n) {
 
-	p.transition(p, n);
+	p.transition[i](p, n);
 	prev = p;
 	next = n;
 
