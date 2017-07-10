@@ -198,7 +198,7 @@ void initialization() {
 	//-------------------------------------------
 	// Init variables
 	//-------------------------------------------
-	NULLFSM.adress = -1;
+	NULLFSM.address = -1;
 	NULLFSM.state_num = -1;
 
 	prev = FSMs.states[0];

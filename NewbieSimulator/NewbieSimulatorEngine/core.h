@@ -87,7 +87,7 @@ struct fsm_t {
 
 	int isFirst;
 	int state_num;
-	int adress;
+	int address;
 
 	int(*firstframe)(); //첫 프레임에 한 번 실행
 	int(*action)(); //매 프레임마다 실행됨
