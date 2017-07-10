@@ -1,6 +1,4 @@
 #include "core.h"
-#include "scenes.h"
-#include "fsms.h"
 
 static int isStackFull(objstack_t *stack);
 static int isStackEmpty(objstack_t *stack);
@@ -59,7 +57,7 @@ int isStackEmpty(objstack_t *stack) {
 
 int push_stack(objstack_t *stack, object_t obj) {
 	if (!(stack->is_full(stack))) {
-		stack->objs[stack->counter - 1] = obj;
+		stack->objs[stack->counter] = obj;
 		stack->counter++;
 		return 0;
 	}
@@ -111,7 +109,7 @@ int isSceneStackEmpty(scenearray_t *arr) {
 
 int scene_push_stack(scenearray_t *arr, scene_t obj) {
 	if (!(arr->is_full(arr))) {
-		arr->scenes[arr->counter - 1] = obj;
+		arr->scenes[arr->counter] = obj;
 		arr->counter++;
 		return 0;
 	}
@@ -200,7 +198,7 @@ void initialization() {
 	//-------------------------------------------
 	// Init variables
 	//-------------------------------------------
-	NULLFSM.adress = -1;
+	NULLFSM.address = -1;
 	NULLFSM.state_num = -1;
 
 	prev = FSMs.states[0];

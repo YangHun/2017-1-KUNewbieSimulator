@@ -1,5 +1,7 @@
 #include "core.h"
 #include "engine.h"
+#include "fsms.h"
+ 
 
 //----------------------------------------
 // Scene 0
@@ -20,13 +22,22 @@ int action_0() {
 int late_update_0() {
 
 	//action이 끝났을 때.
-	
-	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-		//transition
-		// if mouse clicked, change scene 0 --> 1
-		transition_0_to_1();
-	}
 
+	static int down = 0;	
+
+	if ( catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+		if (!down) {
+			down = 1;
+		}
+	}
+	if (catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+		
+		if (down) {
+			transition_0_to_1();
+			down = 0;
+		}
+	}
+	
 	return 0;
 }
 
@@ -34,8 +45,11 @@ int transition_0_to_1() {
 
 	// state_000에서 state_001로의 전이.
 
-	printf("mouse click \n");
-	current = Scenes.scenes[1];
+	//다음 frame에 1번째 state를 로드
+	next = FSMs.states[1];
+
+	//다음 scene을 로드
+	load_scene(Scenes.scenes[1]);
 
 	return 0;
 }
