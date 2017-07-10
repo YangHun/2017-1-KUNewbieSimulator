@@ -10,6 +10,9 @@
 object_t Background;
 ALLEGRO_EVENT ev;
 
+static positioni_t last_mouse_down_coord;
+static positioni_t last_mouse_up_coord;
+
 int redraw = 0; //1일때마다 다시 그린다
 
 void re_draw() {
@@ -115,6 +118,47 @@ static int engine() {
 	return 0;
 }
 
+ALLEGRO_EVENT catch_event() {
+	return ev;
+}
+
+void event_manage() {
+	switch (catch_event().type) {
+	
+	case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN: {
+		last_mouse_down_coord.x = catch_event().mouse.x;
+		last_mouse_down_coord.y = catch_event().mouse.y;
+		last_mouse_up_coord.x = -1;
+		last_mouse_up_coord.y = -1; 
+		break;
+	}
+	
+	case ALLEGRO_EVENT_MOUSE_BUTTON_UP: {
+		positioni_t cur_mouse_up_coord;
+
+		cur_mouse_up_coord.x = catch_event().mouse.x;
+		cur_mouse_up_coord.y = catch_event().mouse.y;
+
+		if (positioni_equals(last_mouse_up_coord, cur_mouse_up_coord))
+			break;
+		
+		for (int i = 0; i < Stack.counter; i++) {
+			object_t *o = &(Stack.objs[i]);
+			if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
+				if (rect_contains_point(o->rect, last_mouse_down_coord) && rect_contains_point(o->rect, cur_mouse_up_coord)) {
+					o->modifier.value.button_value.on_click();
+				}
+			}
+		}
+		
+		last_mouse_up_coord.x = catch_event().mouse.x;
+		last_mouse_up_coord.y = catch_event().mouse.y;
+
+		break;
+	}
+
+	}
+}
 
 void scene_manage() {
 
@@ -140,6 +184,10 @@ void engine_action(ALLEGRO_EVENT ev) {
 
 	if (current.num >= 0) {
 		
+		// 0. check event and execute handler
+
+		event_manage();
+
 		//1. check scene and execute current scene
 		scene_manage();
 	
@@ -152,10 +200,6 @@ void engine_action(ALLEGRO_EVENT ev) {
 	}
 }
 
-ALLEGRO_EVENT catch_event() {
-	return ev;
-}
-
 void engine_draw_background() {
 	al_draw_bitmap(Background.image, 0 , 0, 0);
 }
@@ -166,7 +210,6 @@ void engine_draw_objs() {
 	for (i = 0; i < Stack.counter; i++) {
 		object_t o = Stack.objs[i];
 		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
-		printf("Object %d is drawn\n", i);
 	}
 }
 

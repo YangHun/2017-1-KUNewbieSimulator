@@ -143,6 +143,12 @@ object_t create_object(char* imgpath, float x, float y) {
 	if (obj.image == NULL) {
 		printf("failed load bitmap image! \n");
 	}
+
+	obj.rect.width = al_get_bitmap_width(obj.image);
+	obj.rect.height = al_get_bitmap_height(obj.image);
+	obj.rect.left = x;
+	obj.rect.top = y;
+
 	obj.pos.x = x;
 	obj.pos.y = y;
 

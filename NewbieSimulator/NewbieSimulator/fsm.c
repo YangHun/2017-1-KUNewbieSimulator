@@ -22,21 +22,6 @@ int action_0() {
 int late_update_0() {
 
 	//action¿Ã ≥°≥µ¿ª ∂ß.
-
-	static int down = 0;	
-
-	if ( catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-		if (!down) {
-			down = 1;
-		}
-	}
-	if (catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-		
-		if (down) {
-			transition_0_to_1();
-			down = 0;
-		}
-	}
 	
 	return 0;
 }

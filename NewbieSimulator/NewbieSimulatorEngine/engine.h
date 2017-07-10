@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <allegro5\allegro.h>
 #include "core.h"
+#include "ui.h"
 
 static int engine();
 

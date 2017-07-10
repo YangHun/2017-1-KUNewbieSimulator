@@ -4,12 +4,24 @@
 #include <Windows.h>
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
+#include "basictyps.h"
 
-struct position_t;
-typedef struct position_t position_t;
-struct position_t {
-	float x;
-	float y;
+enum object_modifier_type_t;
+typedef enum object_modifier_type_t object_modifier_type_t;
+enum object_modifier_type_t {
+	OBJECT_MODIFIER_DRAWABLE_ONLY,
+	OBJECT_MODIFIER_BUTTON,
+};
+
+struct object_modifier_t;
+typedef struct object_modifier_t object_modifier_t;
+struct object_modifier_t {
+	object_modifier_type_t type;
+	union {
+		struct {
+			void(*on_click)();
+		} button_value;
+	} value;
 };
 
 struct object_t;
@@ -17,7 +29,8 @@ typedef struct object_t object_t;
 struct object_t {
 	ALLEGRO_BITMAP *image;
 	position_t pos;
-
+	object_modifier_t modifier;
+	rect_t rect;
 };
 
 struct animation_t;
