@@ -79,7 +79,7 @@ int action_100() {
 
 int late_update_100() {
 
-	current = Scenes.scenes[1]; //다음 scene으로 이동
+	current_scene = Scenes.scenes[1]; //다음 scene으로 이동
 
 	return 0;
 }

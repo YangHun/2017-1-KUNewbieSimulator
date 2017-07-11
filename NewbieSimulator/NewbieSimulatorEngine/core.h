@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
+#include <allegro5\allegro_primitives.h>
 #include "basictyps.h"
 
 enum object_modifier_type_t;
@@ -29,6 +30,10 @@ typedef struct object_t object_t;
 struct object_t {
 	ALLEGRO_BITMAP *image;
 	position_t pos;
+
+	bool rotated;
+	float angle;
+
 	object_modifier_t modifier;
 	rect_t rect;
 };
@@ -61,6 +66,7 @@ struct objstack_t {
 	int (*is_empty)(objstack_t *stack); //스택이 비어있으면 1을 반환, 아니면 0
 	int (*push)(objstack_t *stack, object_t obj); //스택에 새 오브젝트를 추가한다
 	int (*pull)(objstack_t *stack); //스택에 맨 마지막으로 등록된 오브젝트를 삭제한다
+	int (*clear)(objstack_t *stack); //스택을 비운다
 
 };
 
@@ -133,14 +139,21 @@ extern fsmarray_t FSMs;
 
 extern fsm_t prev;
 extern fsm_t next;
-extern fsm_t NULLFSM;
+extern fsm_t null_fsm;
 
-extern scene_t current;
+extern scene_t current_scene;
+extern scene_t next_scene;
+extern scene_t null_scene;
+
+#define NULLFSM null_fsm;
+#define NULLSCENE null_scene;
 
 extern int state_num;
 
 object_t create_object(char* imgpath, float x, float y);
+void rotate_object(object_t* obj, float angle);
 
+void load_scene(scene_t next);
 int transit_state(fsm_t p, fsm_t n);
 
 void initialization();

@@ -19,12 +19,15 @@ int scene_0_init() {
 	return 0;
 }
 
+#define HOSBUTTON Stack.objs[0]
 
 int scene_0_update() {
 
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 	printf("Scene 0 act! \n");
+	rotate_object(&HOSBUTTON, 0.005f);
+	re_draw();
 
 	return 0;
 }
@@ -32,14 +35,14 @@ int scene_0_update() {
 int scene_0_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
-
+	Stack.clear(&Stack);
 
 	return 0;
 }
 
 void on_click_button_0() {
 
-	current = Scenes.scenes[1];
+	load_scene(Scenes.scenes[1]);
 
 }
 

@@ -162,27 +162,34 @@ void event_manage() {
 
 void scene_manage() {
 
-	// Plz add a new case when new scene is added
-	if (current.isFirst) {
+	if (next_scene.num >= 0) {
+
+		if (!current_scene.fin()) {
+			current_scene = next_scene;
+			next_scene = NULLSCENE;
+		}
+		else {
+			printf("scene fin error, return");
+			return;
+		}
+	}
+
+	if (current_scene.isFirst) {
 		if (!redraw) {
 			redraw = 1;
 		}
-		current.init();
-		current.isFirst = 0;
+		current_scene.init();
+		current_scene.isFirst = 0;
 	}
 	else {
-		current.act();
+		current_scene.act();
 	}
 }
 
-void load_scene(scene_t next) {
-	current = next;
-	current.isFirst = 1;
-}
 
 void engine_action(ALLEGRO_EVENT ev) {
 
-	if (current.num >= 0) {
+	if (current_scene.num >= 0) {
 		
 		// 0. check event and execute handler
 
@@ -208,8 +215,21 @@ void engine_draw_objs() {
 	
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
-		object_t o = Stack.objs[i];
-		al_draw_bitmap(o.image, o.pos.x, o.pos.y, 0);
+		object_t* o = &(Stack.objs[i]);
+
+		if (o->rotated == true) {
+			al_draw_rotated_bitmap(o->image, (o->rect.width / 2.0), (o->rect.height / 2.0),
+				o->pos.x + o->rect.width/2, o->pos.y + o->rect.height/2, o->angle ,0);
+			o->rotated = false ;
+			if (o->angle >= 360.0) {
+				o->angle -= 360.0f;
+			}
+		}
+		else {
+			al_set_target_bitmap(o->image);
+			al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
+			al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
+		}
 	}
 }
 
