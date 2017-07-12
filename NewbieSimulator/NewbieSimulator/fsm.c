@@ -22,21 +22,6 @@ int action_0() {
 int late_update_0() {
 
 	//action이 끝났을 때.
-
-	static int down = 0;	
-
-	if ( catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-		if (!down) {
-			down = 1;
-		}
-	}
-	if (catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-		
-		if (down) {
-			transition_0_to_1();
-			down = 0;
-		}
-	}
 	
 	return 0;
 }
@@ -94,7 +79,7 @@ int action_100() {
 
 int late_update_100() {
 
-	current = Scenes.scenes[1]; //다음 scene으로 이동
+	current_scene = Scenes.scenes[1]; //다음 scene으로 이동
 
 	return 0;
 }

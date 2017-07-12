@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
-#include <allegro5\allegro.h>
 #include "core.h"
+#include "ui.h"
 
 static int engine();
 
@@ -14,7 +14,6 @@ void engine_draw();
 int game();
 
 void re_draw();
-void load_scene(scene_t next);
 ALLEGRO_EVENT catch_event();
 
 extern object_t Background;
