@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "schedule.h"
 
+#define MAX_CREDIT 19
 
 void registerLecture();
 void init_mySchedule(schedule* mySchedulePtr);
@@ -251,6 +252,35 @@ void addLectureToSchedule(schedule* mySchedulePtr, int index) {
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
 }
 int analyzeSchedule(schedule mySchedule, int index) {
-	return NO_OVERLAP;
+	int i, j;
+	int day, period;
+
+	lectureInfo target = lectureTable[index];
+	timeListPtr currentPtr = target.lectureTime;
+	isEmpty targetTable[5][10] = { ISEMPTY_DEFAULT };
+
+	if (mySchedule.gradePoint + target.credit > MAX_CREDIT)
+		return EXCEED_POINT;
+
+	if (currentPtr == NULL)
+		currentPtr = currentPtr->next;
+	while (currentPtr != NULL) {
+		day = currentPtr->timeblock.dayofWeek;
+		period = currentPtr->timeblock.period;
+		targetTable[day][period] = NONEMPTY;
+		currentPtr = currentPtr->next;
+	}
+
+	//시간표 겹침 및 확인
+	for (i = 0; i < 5; i++)
+		for (j = 0; j < 10; j++)
+			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
+				if (!strncmp(target.identifyNumber, mySchedule., 7)) //학수번호 중복확인
+					return ALREADY_EXIST;
+				if (targetTable[i][j] == NONEMPTY) //시간표 중복확인
+					return TIME_OVERLAP;
+			}
+
+	return NO_OVERLAP; //상기 해당사항 없을 시
 }
 //do yourself
