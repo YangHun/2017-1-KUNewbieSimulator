@@ -250,6 +250,35 @@ void addLectureToSchedule(schedule* mySchedulePtr, int index) {
 	}
 }
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
+	strListPtr current = mySchedulePtr->idNumberList;
+	strListPtr previous = NULL;
+	
+	char* target = lectureTable[index].identifyNumber;
+
+	while (p != NULL) {
+		if (!strncmp(target, current->str, 7)) {
+			if (previous == NULL) 
+				mySchedulePtr->idNumberList = current->next;
+			else 
+				previous->next = current->next;
+			free(current->str);
+			free(current);
+			break;
+		}
+		else {
+			previous = current;
+			current = current->next;
+		}
+
+	}
+	
+	for (timeListPtr k = lectureTable[index].lectureTime->next; k != NULL; k = k->next) {
+		int i = k->timeblock.dayofWeek;
+		int j = k->timeblock.period;
+		mySchedulePtr->timeTable[i][j].isEmptyBit = EMPTY;
+		mySchedulePtr->timeTable[i][j].name = NULL; // null? free?
+		mySchedulePtr->timeTable[i][j].room = ROOM_DEFAULT;
+	}
 }
 int analyzeSchedule(schedule mySchedule, int index) {
 	int i, j;
@@ -257,8 +286,19 @@ int analyzeSchedule(schedule mySchedule, int index) {
 
 	lectureInfo target = lectureTable[index];
 	timeListPtr currentPtr = target.lectureTime;
+	strListPtr currentPtr_id = mySchedule.idNumberList;
 	isEmpty targetTable[5][10] = { ISEMPTY_DEFAULT };
 
+
+	//중복강의 확인
+	while (currentPtr_id != NULL) {
+		if (!strncmp(currentPtr_id->str, target.identifyNumber, 7))
+			return ALREADY_EXIST;
+		else
+			currentPtr_id = currentPtr_id->next;
+	}
+
+	//학점초과 확인
 	if (mySchedule.gradePoint + target.credit > MAX_CREDIT)
 		return EXCEED_POINT;
 
@@ -272,15 +312,14 @@ int analyzeSchedule(schedule mySchedule, int index) {
 	}
 
 	//시간표 겹침 및 확인
-	for (i = 0; i < 5; i++)
-		for (j = 0; j < 10; j++)
+	for (i = 0; i < 5; i++) {
+		for (j = 0; j < 10; j++) {
 			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
-				if (!strncmp(target.identifyNumber, mySchedule., 7)) //학수번호 중복확인
-					return ALREADY_EXIST;
 				if (targetTable[i][j] == NONEMPTY) //시간표 중복확인
 					return TIME_OVERLAP;
 			}
+		}
+	}
 
 	return NO_OVERLAP; //상기 해당사항 없을 시
 }
-//do yourself
