@@ -217,18 +217,21 @@ void engine_draw_objs() {
 	for (i = 0; i < Stack.counter; i++) {
 		object_t* o = &(Stack.objs[i]);
 
-		if (o->rotated == true) {
-			al_draw_rotated_bitmap(o->image, (o->rect.width / 2.0), (o->rect.height / 2.0),
-				o->pos.x + o->rect.width/2, o->pos.y + o->rect.height/2, o->angle ,0);
-			o->rotated = false ;
-			if (o->angle >= 360.0) {
-				o->angle -= 360.0f;
+		if (o->enable == true) {
+
+			if (o->rotated == true) {
+				al_draw_rotated_bitmap(o->image, (o->rect.width / 2.0), (o->rect.height / 2.0),
+					o->pos.x + o->rect.width / 2, o->pos.y + o->rect.height / 2, o->angle, 0);
+				o->rotated = false;
+				if (o->angle >= 360.0) {
+					o->angle -= 360.0f;
+				}
 			}
-		}
-		else {
-			al_set_target_bitmap(o->image);
-			al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
-			al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
+			else {
+				al_set_target_bitmap(o->image);
+				al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
+				al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
+			}
 		}
 	}
 }
