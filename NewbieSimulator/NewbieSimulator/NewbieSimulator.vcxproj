@@ -100,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\NewbieSimulatorEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -154,7 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\NewbieSimulatorEngine\fsm.c" />
+    <ClCompile Include="fsm.c" />
     <ClCompile Include="gamemanager.c" />
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
@@ -165,10 +166,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\NewbieSimulatorEngine\fsms.h" />
-    <ClInclude Include="..\NewbieSimulatorEngine\scenes.h" />
+    <ClInclude Include="fsms.h" />
+    <ClInclude Include="scenes.h" />
     <ClInclude Include="lectureInfo.h" />
     <ClInclude Include="schedule.h" />
+    <ClInclude Include="fsms.h" />
+    <ClInclude Include="scenes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
