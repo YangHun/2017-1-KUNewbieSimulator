@@ -165,6 +165,7 @@ object_t create_object(char* imgpath, float x, float y) {
 		printf("failed load bitmap image! \n");
 	}
 
+	obj.enable = true;
 	obj.rotated = false;
 	obj.angle = 0.0f;
 
@@ -190,6 +191,10 @@ void rotate_object(object_t* obj, float angle) {
 //---------------------------------------------------
 // FSM functions & Managing FSM functions
 //---------------------------------------------------
+
+void enable_object(object_t*obj, bool b) {
+	obj->enable = b;
+}
 
 int transit_state(fsm_t p, fsm_t n) {
 

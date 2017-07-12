@@ -31,11 +31,14 @@ struct object_t {
 	ALLEGRO_BITMAP *image;
 	position_t pos;
 
+	bool enable; // enable이면 draw, disable이면 not draw
+
 	bool rotated;
 	float angle;
 
 	object_modifier_t modifier;
 	rect_t rect;
+	
 };
 
 struct animation_t;
@@ -152,6 +155,7 @@ extern int state_num;
 
 object_t create_object(char* imgpath, float x, float y);
 void rotate_object(object_t* obj, float angle);
+void enable_object(object_t*obj, bool b);
 
 void load_scene(scene_t next);
 int transit_state(fsm_t p, fsm_t n);
