@@ -228,8 +228,8 @@ void engine_draw_objs() {
 				}
 			}
 			else {
-				al_set_target_bitmap(o->image);
-				al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
+				//al_set_target_bitmap(o->image);
+				//al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
 				al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
 			}
 		}
