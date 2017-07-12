@@ -3,13 +3,10 @@
 #include "fsms.h"
 
 static int register_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*transit)()));
-static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), fsm_transition_t* trs);
+static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)()));
 static int register_fsm_obj_no_transit(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()));
 
 extern ALLEGRO_EVENT ev;
-
-
-static fsm_transition_t *trns;
 
 //-----------------------------------------------------------------
 
@@ -65,12 +62,7 @@ void start () {
 	//link function pointer
 	//Plz add functions and call register_fsm_obj() when new state has been added.
 	//please add "all the" functions whether the function is empty or not. 
-
-
-	trns = malloc(sizeof(fsm_transition_t) * 1);
-	trns[0] = transition_0_to_1;
-	register_fsm_obj(&FSMs.states[0], 0, first_frame_0, action_0, late_update_0, trns);
-	
+	register_fsm_obj(&FSMs.states[0], 0, first_frame_0, action_0, late_update_0, transition_0_to_1);
 	register_fsm_obj_no_transit(&FSMs.states[1], 1, first_frame_1, action_1, late_update_1);
 	register_fsm_obj_no_transit(&FSMs.states[2], 100, first_frame_100, action_100, late_update_100);
 
@@ -83,7 +75,7 @@ void end () {
 	//free memory and destroy elements
 	//called once
 
-	free(trns);
+
 }
 
 //------------------------------------------------------------------
@@ -156,13 +148,13 @@ static int register_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*t
 	return 0;
 }
 
-static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), fsm_transition_t* trs) {
+static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)())) {
 
 	f->state_num = statenum;
 	f->firstframe = firstframe;
 	f->action = action;
 	f->lateupdate = lateupdate;
-	f->transition = trs;
+	f->transition = transition;
 
 	return 0;
 }

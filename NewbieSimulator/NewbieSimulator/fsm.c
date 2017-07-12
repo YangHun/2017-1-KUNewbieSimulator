@@ -23,6 +23,20 @@ int late_update_0() {
 
 	//action이 끝났을 때.
 
+	static int down = 0;	
+
+	if ( catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+		if (!down) {
+			down = 1;
+		}
+	}
+	if (catch_event().type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+		
+		if (down) {
+			transition_0_to_1();
+			down = 0;
+		}
+	}
 	
 	return 0;
 }
@@ -31,7 +45,11 @@ int transition_0_to_1() {
 
 	// state_000에서 state_001로의 전이.
 
-	
+	//다음 frame에 1번째 state를 로드
+	next = FSMs.states[1];
+
+	//다음 scene을 로드
+	load_scene(Scenes.scenes[1]);
 
 	return 0;
 }

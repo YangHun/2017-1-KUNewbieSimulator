@@ -17,6 +17,7 @@ int scene_0_update() {
 
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
+	printf("Scene 0 act! \n");
 
 	return 0;
 }
