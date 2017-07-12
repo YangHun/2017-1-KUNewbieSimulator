@@ -3,8 +3,8 @@
 #include "fsms.h"
 
 static int register_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*transit)()));
-static int register_fsm_obj(fsm_t *f, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)()));
-static int register_fsm_obj_no_transit(fsm_t *f, int((*firstframe)()), int((*action)()), int((*lateupdate)()));
+static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)()));
+static int register_fsm_obj_no_transit(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()));
 
 extern ALLEGRO_EVENT ev;
 
@@ -50,27 +50,21 @@ void start () {
 	n = EXIST_STATE_NUM;
 
 	for (i = 0; i < n; i++) {
-		scene_t s;
-		s.num = i;
+		fsm_t s;
+		s.address = i;
+		s.state_num = 0;
 		s.isFirst = 1;
 
-		if (!(Scenes.is_full(&Scenes))) {
-			Scenes.push(&Scenes, s);
-		}
-		else {
-			break;
-			printf("error : scene stack is full!!");
-			return;
-		}
+		FSMs.states[i] = s;
 	}
 
 	// 4) Register function at each function pointer
 	//link function pointer
 	//Plz add functions and call register_fsm_obj() when new state has been added.
 	//please add "all the" functions whether the function is empty or not. 
-	register_fsm_obj(&FSMs.states[0], first_frame_0, action_0, late_update_0, transition_0_to_1);
-	register_fsm_obj_no_transit(&FSMs.states[1], first_frame_1, action_1, late_update_1);
-	register_fsm_obj_no_transit(&FSMs.states[2], first_frame_100, action_100, late_update_100);
+	register_fsm_obj(&FSMs.states[0], 0, first_frame_0, action_0, late_update_0, transition_0_to_1);
+	register_fsm_obj_no_transit(&FSMs.states[1], 1, first_frame_1, action_1, late_update_1);
+	register_fsm_obj_no_transit(&FSMs.states[2], 100, first_frame_100, action_100, late_update_100);
 
 
 }
@@ -88,8 +82,7 @@ void end () {
 
 void state_manage(ALLEGRO_EVENT ev) {
 
-
-	if (next.adress >= 0) {
+	if (next.address >= 0) {
 		prev = next;
 		next = NULLFSM;
 	}
@@ -155,8 +148,9 @@ static int register_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*t
 	return 0;
 }
 
-static int register_fsm_obj(fsm_t *f, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)())) {
+static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)())) {
 
+	f->state_num = statenum;
 	f->firstframe = firstframe;
 	f->action = action;
 	f->lateupdate = lateupdate;
@@ -165,8 +159,9 @@ static int register_fsm_obj(fsm_t *f, int((*firstframe)()), int((*action)()), in
 	return 0;
 }
 
-static int register_fsm_obj_no_transit(fsm_t *f, int((*firstframe)()), int((*action)()), int((*lateupdate)())) {
+static int register_fsm_obj_no_transit(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)())) {
 
+	f->state_num = statenum;
 	f->firstframe = firstframe;
 	f->action = action;
 	f->lateupdate = lateupdate;

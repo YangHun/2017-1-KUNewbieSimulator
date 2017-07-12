@@ -144,13 +144,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basictypes.c" />
     <ClCompile Include="core.c" />
     <ClCompile Include="engine.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="ui.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="basictyps.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

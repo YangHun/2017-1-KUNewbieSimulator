@@ -27,7 +27,7 @@
     <ClCompile Include="gamemanager.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\NewbieSimulatorEngine\fsm.c">
+    <ClCompile Include="fsm.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="timetableAnalyzer.c">
@@ -38,10 +38,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\NewbieSimulatorEngine\scenes.h">
+    <ClInclude Include="scenes.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\NewbieSimulatorEngine\fsms.h">
+    <ClInclude Include="fsms.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="schedule.h">
