@@ -98,6 +98,8 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	mySchedulePtr->idNumberList->str = NULL;
 	mySchedulePtr->idNumberList->next = NULL;
 
+	mySchedulePtr->gradePoint = 0;
+
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
 			mySchedulePtr->timeTable[i][j].isEmptyBit = EMPTY;
@@ -250,18 +252,18 @@ void addLectureToSchedule(schedule* mySchedulePtr, int index) {
 	}
 }
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
-	strListPtr current = mySchedulePtr->idNumberList;
+	strListPtr current = mySchedulePtr->idNumberList->next;
 	strListPtr previous = NULL;
-	
+
 	char* target = lectureTable[index].identifyNumber;
 
-	while (p != NULL) {
+	while (current != NULL) {
 		if (!strncmp(target, current->str, 7)) {
-			if (previous == NULL) 
-				mySchedulePtr->idNumberList = current->next;
-			else 
+			if (previous == NULL)
+				mySchedulePtr->idNumberList->next = current->next;
+			else
 				previous->next = current->next;
-			free(current->str);
+			//free(current->str);
 			free(current);
 			break;
 		}
@@ -271,7 +273,7 @@ void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
 		}
 
 	}
-	
+
 	for (timeListPtr k = lectureTable[index].lectureTime->next; k != NULL; k = k->next) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
@@ -291,6 +293,8 @@ int analyzeSchedule(schedule mySchedule, int index) {
 
 
 	//중복강의 확인
+	//if (currentPtr_id = NULL)
+	currentPtr_id = currentPtr_id->next;
 	while (currentPtr_id != NULL) {
 		if (!strncmp(currentPtr_id->str, target.identifyNumber, 7))
 			return ALREADY_EXIST;
@@ -302,8 +306,8 @@ int analyzeSchedule(schedule mySchedule, int index) {
 	if (mySchedule.gradePoint + target.credit > MAX_CREDIT)
 		return EXCEED_POINT;
 
-	if (currentPtr == NULL)
-		currentPtr = currentPtr->next;
+	// if (currentPtr == NULL)
+	currentPtr = currentPtr->next;
 	while (currentPtr != NULL) {
 		day = currentPtr->timeblock.dayofWeek;
 		period = currentPtr->timeblock.period;
