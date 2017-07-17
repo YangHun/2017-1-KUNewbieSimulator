@@ -29,11 +29,13 @@ typedef enum _ratingNumber {
 
 typedef enum _whatDay {
 	DAY_DEFAULT,
-	MON = 0,
+	MON,
 	TUE,
 	WED,
 	THU,
-	FRI
+	FRI,
+	SAT,
+	SUN
 } whatDay;
 
 typedef struct _timeBlock {

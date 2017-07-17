@@ -130,6 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\NewbieSimulatorEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -159,11 +160,16 @@
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
     <ClCompile Include="scene_2.c" />
+    <ClCompile Include="timetableAnalyzer.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fsms.h" />
+    <ClInclude Include="scenes.h" />
+    <ClInclude Include="lectureInfo.h" />
+    <ClInclude Include="schedule.h" />
     <ClInclude Include="fsms.h" />
     <ClInclude Include="scenes.h" />
   </ItemGroup>

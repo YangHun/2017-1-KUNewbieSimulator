@@ -30,6 +30,9 @@
     <ClCompile Include="fsm.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="timetableAnalyzer.c">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -39,6 +42,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="fsms.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="schedule.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="lectureInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
