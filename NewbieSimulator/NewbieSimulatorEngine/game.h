@@ -1,4 +1,4 @@
 #pragma once
 
-void start();
-void end();
+extern void start();
+extern void end();

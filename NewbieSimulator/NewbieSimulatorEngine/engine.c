@@ -1,5 +1,6 @@
 #include "core.h"
 #include "engine.h"
+#include "game.h"
 
 
 #define FPS 60

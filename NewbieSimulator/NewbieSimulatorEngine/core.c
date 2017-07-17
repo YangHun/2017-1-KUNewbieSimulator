@@ -1,4 +1,5 @@
 #include "core.h"
+#include "game.h"
 
 static int isStackFull(objstack_t *stack);
 static int isStackEmpty(objstack_t *stack);
@@ -10,8 +11,6 @@ static int isSceneStackEmpty(scenearray_t *stack);
 static int scene_push_stack(scenearray_t *stack, scene_t obj);
 static int scene_pull_stack(scenearray_t *stack);
 
-extern void start();
-extern void end();
 
 //--------------------------------------------------------
 // Core Variables
