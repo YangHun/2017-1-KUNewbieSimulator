@@ -37,6 +37,8 @@ int scene_0_fin() {
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
 
+	printf("counter : %d \n", Stack.counter);
+
 	return 0;
 }
 

@@ -144,9 +144,14 @@ void event_manage() {
 		
 		for (int i = 0; i < Stack.counter; i++) {
 			object_t *o = &(Stack.objs[i]);
-			if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
-				if (rect_contains_point(o->rect, last_mouse_down_coord) && rect_contains_point(o->rect, cur_mouse_up_coord)) {
-					o->modifier.value.button_value.on_click();
+			
+			if (o->enable == true) {
+				if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
+					if (rect_contains_point(o->rect, last_mouse_down_coord) && rect_contains_point(o->rect, cur_mouse_up_coord)) {
+						if (positionf_transparancy(o, last_mouse_down_coord) == true) {
+							o->modifier.value.button_value.on_click();
+						}
+					}
 				}
 			}
 		}
@@ -230,7 +235,7 @@ void engine_draw_objs() {
 			else {
 				//al_set_target_bitmap(o->image);
 				//al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
-				al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
+				al_draw_tinted_bitmap(o->image,al_map_rgba(1,1,1,o->opacity), o->pos.x, o->pos.y, 0);
 			}
 		}
 	}

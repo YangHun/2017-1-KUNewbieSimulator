@@ -24,10 +24,10 @@
     <ClCompile Include="scene_2.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="gamemanager.c">
+    <ClCompile Include="fsm.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="fsm.c">
+    <ClCompile Include="game.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -38,6 +38,7 @@ int scene_1_init(){
 	ui_set_button(&hos);
 	ui_set_on_click_listener(&hos, scene_1_on_click_button_0);
 	Stack.push(&Stack, hos); //Stack.objs[0]
+	Stack.objs[0].enable = false;
 	
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();

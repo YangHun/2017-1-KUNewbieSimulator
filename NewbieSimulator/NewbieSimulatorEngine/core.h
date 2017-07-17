@@ -5,7 +5,35 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
 #include <allegro5\allegro_primitives.h>
-#include "basictyps.h"
+#include <stdbool.h>
+
+
+
+struct positioni_t;
+typedef struct positioni_t positioni_t;
+struct positioni_t {
+	int x;
+	int y;
+};
+
+bool positioni_equals(positioni_t a, positioni_t b);
+
+struct positionf_t;
+typedef struct positionf_t position_t;
+struct positionf_t {
+	float x;
+	float y;
+};
+
+struct rect_t;
+typedef struct rect_t rect_t;
+struct rect_t {
+	int left;
+	int top;
+	int width;
+	int height;
+};
+
 
 enum object_modifier_type_t;
 typedef enum object_modifier_type_t object_modifier_type_t;
@@ -32,6 +60,8 @@ struct object_t {
 	position_t pos;
 
 	bool enable; // enable이면 draw, disable이면 not draw
+
+	float opacity; //transparancy
 
 	bool rotated;
 	float angle;
@@ -156,6 +186,10 @@ extern int state_num;
 object_t create_object(char* imgpath, float x, float y);
 void rotate_object(object_t* obj, float angle);
 void enable_object(object_t*obj, bool b);
+
+
+bool rect_contains_point(rect_t rect, positioni_t point);
+bool positionf_transparancy(object_t *obj, positioni_t point);
 
 void load_scene(scene_t next);
 int transit_state(fsm_t p, fsm_t n);

@@ -168,6 +168,7 @@ object_t create_object(char* imgpath, float x, float y) {
 	obj.enable = true;
 	obj.rotated = false;
 	obj.angle = 0.0f;
+	obj.opacity = 1.0f;
 
 	obj.rect.width = al_get_bitmap_width(obj.image);
 	obj.rect.height = al_get_bitmap_height(obj.image);
@@ -187,6 +188,31 @@ void rotate_object(object_t* obj, float angle) {
 
 	printf("%f %d", obj->angle, obj->rotated);
 }
+
+
+//--------------------------------------------------
+// basic types function
+//--------------------------------------------------
+
+bool positioni_equals(positioni_t a, positioni_t b) {
+	return a.x == b.x && a.y == b.y;
+}
+
+bool rect_contains_point(rect_t rect, positioni_t point) {
+	return (
+		(rect.left <= point.x) &&
+		(rect.top <= point.y) &&
+		(point.x < rect.left + rect.width) &&
+		(point.y < rect.top + rect.height)
+		);
+}
+
+bool positionf_transparancy(object_t *obj, positioni_t point) {
+	return (
+		al_get_pixel(obj->image, point.x - obj->pos.x, point.y - obj->pos.y).a > 0.0f
+		);
+}
+
 
 //---------------------------------------------------
 // FSM functions & Managing FSM functions
