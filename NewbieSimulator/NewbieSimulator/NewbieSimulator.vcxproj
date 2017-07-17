@@ -160,7 +160,6 @@
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
     <ClCompile Include="scene_2.c" />
-    <ClCompile Include="timetableAnalyzer.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -170,8 +169,6 @@
     <ClInclude Include="scenes.h" />
     <ClInclude Include="lectureInfo.h" />
     <ClInclude Include="schedule.h" />
-    <ClInclude Include="fsms.h" />
-    <ClInclude Include="scenes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

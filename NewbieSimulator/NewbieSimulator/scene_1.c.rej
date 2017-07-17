@@ -1,9 +1,0 @@
-diff a/NewbieSimulator/NewbieSimulator/scene_1.c b/NewbieSimulator/NewbieSimulator/scene_1.c	(rejected hunks)
-@@ -144,7 +144,6 @@
- 	event_func[3].isStarted = true;
- }
- 
--void scene_1_on_click_button_0() {
- //���Ի� OT
- void newbie_OT() { 
- 	printf("newbie_OT\n");
