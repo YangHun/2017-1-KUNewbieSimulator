@@ -1,4 +1,8 @@
 #include "engine.h"
+#include<allegro5\allegro_font.h>
+#include<allegro5\allegro_native_dialog.h>
+#include<allegro5\allegro_ttf.h>
+
 
 static void scene_1_on_click_button_0();
 float brightness, transparency;
@@ -8,6 +12,7 @@ float brightness, transparency;
 ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* timer_event_queue;
 ALLEGRO_EVENT timer_event;
+ALLEGRO_FONT *font;
 
 void first_meeting();
 void newbie_before_study();
@@ -17,6 +22,7 @@ void newbie_OT();
 void scene_1_finish();
 
 int timer_set = 0;
+int explain_stat = 0;
 
 struct event_function {
 	void(*func)();
@@ -26,32 +32,33 @@ struct event_function {
 typedef struct event_function event_function;
 event_function event_func[EVENTCOUNT];
 
+object_t timebar, popup;
+
 int scene_1_init(){
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	printf("Scene 1 start!");
 
-	object_t bg = create_object("Resources\\dummy\\tutorial.jpg", 0, 0);
+	object_t bg = create_object("Resources\\dummy\\nothing.png", 0, 0);
 	Background = bg;
-	
-	object_t hos = create_object("Resources\\dummy\\hos.png", 200, 200);
-	ui_set_button(&hos);
-	ui_set_on_click_listener(&hos, scene_1_on_click_button_0);
-	Stack.push(&Stack, hos); //Stack.objs[0]
-	Stack.objs[0].enable = false;
-	
+
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();
 	al_register_event_source(timer_event_queue, al_get_timer_event_source(timer));
 
-	object_t stat_popup = create_object("Resources\\dummy\\popup.png", 205, 120);
-	Stack.push(&Stack, stat_popup); //Stack.objs[1]
+	object_t stat_window = create_object("Resources\\dummy\\stat_window.png", 0, 0);
+	Stack.push(&Stack, stat_window);
+	Stack.objs[0].enable = true;
+	timebar = create_object("Resources\\dummy\\timebar.png", 700, 0);
+	Stack.push(&Stack, timebar);
 	Stack.objs[1].enable = true;
-	object_t event_popup = create_object("Resources\\dummy\\popup.png", 205, 120);
-	Stack.push(&Stack, event_popup); //Stack.objs[2]
-	Stack.objs[2].enable = false;
-	object_t timebar = create_object("Resources\\dummy\\timebar.png", 700, 300); //Stack.objs[3]
-	Stack.objs[3].enable = true;
+
+	al_init_font_addon();
+	al_init_ttf_addon();
+
+	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
+
+	//al_draw_filled_rectangle(0, 0, 800, 120, al_map_rgb(255, 0, 0));
 
 	//이벤트 함수 모음
 	event_func[0].func = first_meeting;
@@ -71,9 +78,19 @@ int scene_1_update() {
 
 	//Scene 1의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
+
+	if (!explain_stat) {
+		explain_stat=1;
+		popup = create_object("Resources\\dummy\\popup.png", 205, 120);
+		Stack.push(&Stack, popup);
+		Stack.objs[1].enable = true;
+		al_draw_text(font, al_map_rgb(0, 0, 0), 205, 120, ALLEGRO_ALIGN_CENTER, "Hello world!");
+	}
+	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) event_func[0].isStarted=TRUE;
+
 	if (Stack.objs[1].enable) {
 		if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-			Stack.objs[1].enable = false;
+			Stack.objs[2].enable = false;
 			al_start_timer(timer);
 			printf("start timer\n");
 			al_wait_for_event(timer_event_queue, &timer_event);
@@ -153,6 +170,7 @@ void newbie_OT() {
 //마지막 이벤트 후 씬 종료
 void scene_1_finish() {
 	event_func[5].isStarted = true;
+	al_destroy_font(font);
 	load_scene(Scenes.scenes[2]);
 
 }
