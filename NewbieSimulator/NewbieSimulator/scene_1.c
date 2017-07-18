@@ -1,7 +1,4 @@
 #include "engine.h"
-#include<allegro5\allegro_font.h>
-#include<allegro5\allegro_native_dialog.h>
-#include<allegro5\allegro_ttf.h>
 
 
 static void scene_1_on_click_button_0();
@@ -41,6 +38,7 @@ int scene_1_init(){
 
 	object_t bg = create_object("Resources\\dummy\\nothing.png", 0, 0);
 	Background = bg;
+	Background.enable = false;
 
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();
@@ -53,11 +51,13 @@ int scene_1_init(){
 	Stack.push(&Stack, timebar);
 	Stack.objs[1].enable = true;
 
-	al_init_font_addon();
-	al_init_ttf_addon();
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
-
+	object_t font_obj = create_object(NULL, 205, 120);
+	ui_set_text(&font_obj, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf","hello world!", 36);
+	Stack.push(&Stack,font_obj);
+#define TEST_FONT Stack.objs[2]
+	
 	//al_draw_filled_rectangle(0, 0, 800, 120, al_map_rgb(255, 0, 0));
 
 	//이벤트 함수 모음
@@ -84,7 +84,7 @@ int scene_1_update() {
 		popup = create_object("Resources\\dummy\\popup.png", 205, 120);
 		Stack.push(&Stack, popup);
 		Stack.objs[1].enable = true;
-		al_draw_text(font, al_map_rgb(0, 0, 0), 205, 120, ALLEGRO_ALIGN_CENTER, "Hello world!");
+
 	}
 	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) event_func[0].isStarted=TRUE;
 

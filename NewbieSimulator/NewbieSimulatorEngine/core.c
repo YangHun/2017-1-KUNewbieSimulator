@@ -159,9 +159,14 @@ object_t create_object(char* imgpath, float x, float y) {
 
 	object_t obj;
 
-	obj.image = al_load_bitmap(imgpath);
-	if (obj.image == NULL) {
-		printf("failed load bitmap image! \n");
+	if (imgpath != NULL) {
+		obj.image = al_load_bitmap(imgpath);
+		if (obj.image == NULL) {
+			printf("failed load bitmap image! \n");
+		}
+	}
+	else {
+		obj.image = NULL;
 	}
 
 	obj.enable = true;
@@ -169,10 +174,19 @@ object_t create_object(char* imgpath, float x, float y) {
 	obj.angle = 0.0f;
 	obj.opacity = 1.0f;
 
-	obj.rect.width = al_get_bitmap_width(obj.image);
-	obj.rect.height = al_get_bitmap_height(obj.image);
-	obj.rect.left = x;
-	obj.rect.top = y;
+	if (obj.image != NULL) {
+
+		obj.rect.width = al_get_bitmap_width(obj.image);
+		obj.rect.height = al_get_bitmap_height(obj.image);
+		obj.rect.left = x;
+		obj.rect.top = y;
+	}
+	else {
+		obj.rect.width = 0;
+		obj.rect.height = 0;
+		obj.rect.left = 0;
+		obj.rect.top = 0;
+	}
 
 	obj.pos.x = x;
 	obj.pos.y = y;

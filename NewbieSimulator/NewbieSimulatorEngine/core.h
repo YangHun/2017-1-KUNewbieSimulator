@@ -5,8 +5,12 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
 #include <allegro5\allegro_primitives.h>
-#include <stdbool.h>
 
+#include<allegro5\allegro_font.h>
+#include<allegro5\allegro_native_dialog.h>
+#include<allegro5\allegro_ttf.h>
+
+#include <stdbool.h>
 
 
 struct positioni_t;
@@ -40,6 +44,7 @@ typedef enum object_modifier_type_t object_modifier_type_t;
 enum object_modifier_type_t {
 	OBJECT_MODIFIER_DRAWABLE_ONLY,
 	OBJECT_MODIFIER_BUTTON,
+	OBJECT_MODIFIER_FONT
 };
 
 struct object_modifier_t;
@@ -50,6 +55,11 @@ struct object_modifier_t {
 		struct {
 			void(*on_click)();
 		} button_value;
+		struct {
+			ALLEGRO_FONT *font;
+			ALLEGRO_COLOR color;
+			char* text;
+		}font_value;
 	} value;
 };
 
@@ -60,7 +70,7 @@ struct object_t {
 	position_t pos;
 
 	bool enable; // enable이면 draw, disable이면 not draw
-
+	
 	float opacity; //transparancy
 
 	bool rotated;
