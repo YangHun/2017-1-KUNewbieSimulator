@@ -73,6 +73,7 @@ int push_stack(objstack_t *stack, object_t obj) {
 int pull_stack(objstack_t *stack) {
 
 	if (!(stack->is_empty(stack))) {
+		al_destroy_bitmap(stack->objs[stack->counter].image);
 		stack->counter--;
 		return 0;
 	}
@@ -161,6 +162,7 @@ object_t create_object(char* imgpath, float x, float y) {
 
 	if (imgpath != NULL) {
 		obj.image = al_load_bitmap(imgpath);
+
 		if (obj.image == NULL) {
 			printf("failed load bitmap image! \n");
 		}
