@@ -2,7 +2,7 @@
 //commit test
 #include "engine.h"
 #include "schedule.h"
-
+#pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 
 void registerLecture();
@@ -17,7 +17,7 @@ int analyzeSchedule(schedule mySchedule, int index); //do yourself
 
 
 //Global Variable
-lectureInfo lectureTable[5];
+lectureInfo lectureTable[17];
 int input = 0;
 int analyzeMessage = MESSAGE_DEFAULT;
 
@@ -103,19 +103,18 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
 			mySchedulePtr->timeTable[i][j].isEmptyBit = EMPTY;
-			mySchedulePtr->timeTable[i][j].name = NULL;
-			mySchedulePtr->timeTable[i][j].room = ROOM_DEFAULT;
+			mySchedulePtr->timeTable[i][j].index = -1;
 		}
 	}
 }
-void registerLecture() {
+/*void registerLecture() {
 	lectureInfo a1;
-	a1.classify = NUCLEAR;
+	a1.classify = CORE;
 	a1.classNumber = 0;
 	a1.credit = 3;
 	a1.identifyNumber = "GELA050";
 	a1.klueRating = NORMAL;
-	a1.name = "한국현대시산책";
+	strcpy_s(a1.name, sizeof(a1.name), u8"한국현대시산책");
 	a1.room = EDUCATE;
 	a1.lectureTime = (timeListPtr)malloc(sizeof(timeList));
 	timeListPtr a1_tempNode1 = (timeListPtr)malloc(sizeof(timeList));
@@ -127,14 +126,16 @@ void registerLecture() {
 	a1.lectureTime->next = a1_tempNode1;
 	a1_tempNode1->next = a1_tempNode2;
 	a1_tempNode2->next = NULL;
+	a1.distance = 20;
+	strcpy_s(a1.timeString, sizeof(a1.timeString), u8"화(2) 목(2)");
 
 	lectureInfo a2;
-	a2.classify = NUCLEAR;
+	a2.classify = CORE;
 	a2.classNumber = 0;
 	a2.credit = 3;
 	a2.identifyNumber = "GELA053";
 	a2.klueRating = NORMAL;
-	a2.name = "한국시속에살아있는독일문학";
+	strcpy_s(a2.name, sizeof(a2.name), u8"한국시속에살아있는독일문학");
 	a2.room = REFINEMENT;
 	a2.lectureTime = (timeListPtr)malloc(sizeof(timeList));
 	timeListPtr a2_tempNode1 = (timeListPtr)malloc(sizeof(timeList));
@@ -146,14 +147,16 @@ void registerLecture() {
 	a2.lectureTime->next = a2_tempNode1;
 	a2_tempNode1->next = a2_tempNode2;
 	a2_tempNode2->next = NULL;
+	a2.distance = 10;
+	strcpy_s(a2.timeString, sizeof(a2.timeString), u8"월(2) 수(2)");
 
 	lectureInfo a3;
-	a3.classify = NUCLEAR;
+	a3.classify = CORE;
 	a3.classNumber = 0;
 	a3.credit = 3;
 	a3.identifyNumber = "GELA107";
 	a3.klueRating = NORMAL;
-	a3.name = "한국고전문학과배경사상";
+	strcpy_s(a3.name, sizeof(a3.name), u8"한국고전문학과배경사상");
 	a3.room = REFINEMENT;
 	a3.lectureTime = (timeListPtr)malloc(sizeof(timeList));
 	timeListPtr a3_tempNode1 = (timeListPtr)malloc(sizeof(timeList));
@@ -165,14 +168,16 @@ void registerLecture() {
 	a3.lectureTime->next = a3_tempNode1;
 	a3_tempNode1->next = a3_tempNode2;
 	a3_tempNode2->next = NULL;
+	a3.distance = 10;
+	strcpy_s(a3.timeString, sizeof(a3.timeString), u8"월(6) 수(6)");
 
 	lectureInfo a4;
-	a4.classify = NUCLEAR;
+	a4.classify = CORE;
 	a4.classNumber = 0;
 	a4.credit = 3;
 	a4.identifyNumber = "GELA132";
 	a4.klueRating = GOOD;
-	a4.name = "현대음악의이해";
+	strcpy_s(a4.name, sizeof(a4.name), u8"현대음악의이해");
 	a4.room = REFINEMENT;
 	a4.lectureTime = (timeListPtr)malloc(sizeof(timeList));
 	timeListPtr a4_tempNode1 = (timeListPtr)malloc(sizeof(timeList));
@@ -184,14 +189,16 @@ void registerLecture() {
 	a4.lectureTime->next = a4_tempNode1;
 	a4_tempNode1->next = a4_tempNode2;
 	a4_tempNode2->next = NULL;
+	a4.distance = 10;
+	strcpy_s(a4.timeString, sizeof(a4.timeString), u8"월(5) 수(5)");
 
 	lectureInfo a5;
-	a5.classify = NUCLEAR;
+	a5.classify = CORE;
 	a5.classNumber = 0;
 	a5.credit = 3;
 	a5.identifyNumber = "GELA133";
 	a5.klueRating = NORMAL;
-	a5.name = "한시,영화와엮어읽기";
+	strcpy_s(a5.name, sizeof(a5.name), u8"한시,영화와엮어읽기");
 	a5.room = REFINEMENT;
 	a5.lectureTime = (timeListPtr)malloc(sizeof(timeList));
 	timeListPtr a5_tempNode1 = (timeListPtr)malloc(sizeof(timeList));
@@ -203,13 +210,15 @@ void registerLecture() {
 	a5.lectureTime->next = a5_tempNode1;
 	a5_tempNode1->next = a5_tempNode2;
 	a5_tempNode2->next = NULL;
+	a5.distance = 10;
+	strcpy_s(a5.timeString, sizeof(a5.timeString), u8"월(2) 수(2)");
 
 	lectureTable[0] = a1;
 	lectureTable[1] = a2;
 	lectureTable[2] = a3;
 	lectureTable[3] = a4;
 	lectureTable[4] = a5;
-}
+}*/
 void printSchedule(schedule mySchedule) {
 	printf("idNumber : ");
 	for (strListPtr p = mySchedule.idNumberList->next; p != NULL; p = p->next) {
@@ -247,8 +256,7 @@ void addLectureToSchedule(schedule* mySchedulePtr, int index) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
 		mySchedulePtr->timeTable[i][j].isEmptyBit = NONEMPTY;
-		mySchedulePtr->timeTable[i][j].name = lectureTable[index].name;
-		mySchedulePtr->timeTable[i][j].room = lectureTable[index].room;
+		mySchedulePtr->timeTable[i][j].index = index;
 	}
 }
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
@@ -259,11 +267,12 @@ void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
 
 	while (current != NULL) {
 		if (!strncmp(target, current->str, 7)) {
-			if (previous == NULL)
+			if (previous == NULL) {
 				mySchedulePtr->idNumberList->next = current->next;
-			else
+			}
+			else {
 				previous->next = current->next;
-			//free(current->str);
+			}
 			free(current);
 			break;
 		}
@@ -278,8 +287,7 @@ void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
 		mySchedulePtr->timeTable[i][j].isEmptyBit = EMPTY;
-		mySchedulePtr->timeTable[i][j].name = NULL; // null? free?
-		mySchedulePtr->timeTable[i][j].room = ROOM_DEFAULT;
+		mySchedulePtr->timeTable[i][j].index = index;
 	}
 }
 int analyzeSchedule(schedule mySchedule, int index) {

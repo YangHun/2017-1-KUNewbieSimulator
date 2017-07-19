@@ -14,8 +14,7 @@ typedef struct _strList {
 typedef strList* strListPtr;
 
 typedef struct _timetableInfo {
-	char* name; // 강의명
-	enum roomNumber room; // 강의실
+	int index;
 	enum isEmpty isEmptyBit; // 비었는지 안비었는지 확인
 } timetableInfo;
 
