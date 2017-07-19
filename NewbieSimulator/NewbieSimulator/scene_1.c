@@ -10,6 +10,7 @@ ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* timer_event_queue;
 ALLEGRO_EVENT timer_event;
 ALLEGRO_FONT *font;
+ALLEGRO_CONFIG *conf;
 
 void first_meeting();
 void newbie_before_study();
@@ -36,6 +37,8 @@ int scene_1_init(){
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	printf("Scene 1 start!");
 
+	conf = al_load_config_file("Resources\\korean\\tutorial.ini");
+
 	object_t bg = create_object("Resources\\dummy\\nothing.png", 0, 0);
 	Background = bg;
 	Background.enable = false;
@@ -57,8 +60,6 @@ int scene_1_init(){
 	ui_set_text(&font_obj, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf","hello world!", 36);
 	Stack.push(&Stack,font_obj);
 #define TEST_FONT Stack.objs[2]
-	
-	//al_draw_filled_rectangle(0, 0, 800, 120, al_map_rgb(255, 0, 0));
 
 	//이벤트 함수 모음
 	event_func[0].func = first_meeting;
