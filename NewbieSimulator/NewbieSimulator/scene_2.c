@@ -2,6 +2,9 @@
 //commit test
 #include "engine.h"
 #include "schedule.h"
+#include"lectureInfo.h"
+#include<libxml\parser.h>
+#include "xmlParser.h"
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 
@@ -13,7 +16,6 @@ void printSchedule(schedule mySchedule);
 void addLectureToSchedule(schedule* mySchedulePtr, int index);
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index);
 int analyzeSchedule(schedule mySchedule, int index); //do yourself
-
 
 
 //Global Variable
@@ -36,9 +38,31 @@ int scene_2_init() {
 	Background = bg;
 
 	registerLecture();
+	//xmlParse(lectureTable);
 	init_mySchedule(mySchedulePtr);
 	
+	xmlDocPtr doc;
+	xmlNodePtr cur;
 
+	doc = xmlParseFile("Resources\\xml\\dummy-data.xml");
+	if (doc == NULL) {
+		printf("Document not parsed successfully. \n");
+		return;
+	}
+
+	cur = xmlDocGetRootElement(doc);
+
+	if (cur == NULL) {
+		printf("empty document\n");
+		xmlFreeDoc(doc);
+		return;
+	}
+
+	if (strcmp(cur->name, "root")) {
+		printf("document of the wrong type, root node != root \n");
+		xmlFreeDoc(doc);
+		return;
+	}
 	return 0;
 }
 
@@ -90,9 +114,6 @@ int scene_2_fin() {
 	return 0;
 }
 
-
-
-
 void init_mySchedule(schedule* mySchedulePtr) {
 	mySchedulePtr->idNumberList = (strListPtr)malloc(sizeof(strList));
 	mySchedulePtr->idNumberList->str = NULL;
@@ -107,12 +128,12 @@ void init_mySchedule(schedule* mySchedulePtr) {
 		}
 	}
 }
-/*void registerLecture() {
+void registerLecture() {
 	lectureInfo a1;
 	a1.classify = CORE;
 	a1.classNumber = 0;
 	a1.credit = 3;
-	a1.identifyNumber = "GELA050";
+	strcpy_s(a1.identifyNumber, sizeof(a1.identifyNumber), "GELA050");
 	a1.klueRating = NORMAL;
 	strcpy_s(a1.name, sizeof(a1.name), u8"한국현대시산책");
 	a1.room = EDUCATE;
@@ -133,7 +154,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	a2.classify = CORE;
 	a2.classNumber = 0;
 	a2.credit = 3;
-	a2.identifyNumber = "GELA053";
+	strcpy_s(a2.identifyNumber, sizeof(a2.identifyNumber), "GELA053");
 	a2.klueRating = NORMAL;
 	strcpy_s(a2.name, sizeof(a2.name), u8"한국시속에살아있는독일문학");
 	a2.room = REFINEMENT;
@@ -154,7 +175,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	a3.classify = CORE;
 	a3.classNumber = 0;
 	a3.credit = 3;
-	a3.identifyNumber = "GELA107";
+	strcpy_s(a3.identifyNumber, sizeof(a3.identifyNumber), "GELA107");
 	a3.klueRating = NORMAL;
 	strcpy_s(a3.name, sizeof(a3.name), u8"한국고전문학과배경사상");
 	a3.room = REFINEMENT;
@@ -175,7 +196,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	a4.classify = CORE;
 	a4.classNumber = 0;
 	a4.credit = 3;
-	a4.identifyNumber = "GELA132";
+	strcpy_s(a4.identifyNumber, sizeof(a4.identifyNumber), "GELA132");
 	a4.klueRating = GOOD;
 	strcpy_s(a4.name, sizeof(a4.name), u8"현대음악의이해");
 	a4.room = REFINEMENT;
@@ -196,7 +217,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	a5.classify = CORE;
 	a5.classNumber = 0;
 	a5.credit = 3;
-	a5.identifyNumber = "GELA133";
+	strcpy_s(a5.identifyNumber, sizeof(a5.identifyNumber), "GELA133");
 	a5.klueRating = NORMAL;
 	strcpy_s(a5.name, sizeof(a5.name), u8"한시,영화와엮어읽기");
 	a5.room = REFINEMENT;
@@ -218,7 +239,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	lectureTable[2] = a3;
 	lectureTable[3] = a4;
 	lectureTable[4] = a5;
-}*/
+}
 void printSchedule(schedule mySchedule) {
 	printf("idNumber : ");
 	for (strListPtr p = mySchedule.idNumberList->next; p != NULL; p = p->next) {
@@ -256,7 +277,7 @@ void addLectureToSchedule(schedule* mySchedulePtr, int index) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
 		mySchedulePtr->timeTable[i][j].isEmptyBit = NONEMPTY;
-		mySchedulePtr->timeTable[i][j].index = index;
+		mySchedulePtr->timeTable[i][j].index = -1;
 	}
 }
 void deleteLectureFromSchedule(schedule* mySchedulePtr, int index) {
