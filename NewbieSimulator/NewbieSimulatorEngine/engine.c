@@ -242,7 +242,7 @@ void engine_draw_objs() {
 			else{
 				//al_set_target_bitmap(o->image);
 				//al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
-				al_draw_tinted_bitmap(o->image,al_map_rgba(255,255,255,o->opacity), o->pos.x, o->pos.y, 0);
+				al_draw_tinted_bitmap(o->image,al_map_rgba_f(1,1,1,o->opacity), o->pos.x, o->pos.y, 0);
 				//al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
 			}
 		}
