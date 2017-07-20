@@ -30,18 +30,19 @@ struct event_function {
 typedef struct event_function event_function;
 event_function event_func[EVENTCOUNT];
 
-object_t timebar, popup;
+object_t timebar, popup, text;
 
 int scene_1_init(){
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	printf("Scene 1 start!");
 
+	al_clear_to_color(al_map_rgb(204, 225, 152));
+
 	conf = al_load_config_file("Resources\\korean\\tutorial.ini");
 
 	object_t bg = create_object("Resources\\dummy\\nothing.png", 0, 0);
 	Background = bg;
-	Background.enable = false;
 
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();
@@ -49,17 +50,10 @@ int scene_1_init(){
 
 	object_t stat_window = create_object("Resources\\dummy\\stat_window.png", 0, 0);
 	Stack.push(&Stack, stat_window);
-	Stack.objs[0].enable = true;
 	timebar = create_object("Resources\\dummy\\timebar.png", 700, 0);
 	Stack.push(&Stack, timebar);
-	Stack.objs[1].enable = true;
-
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
-	object_t font_obj = create_object(NULL, 205, 120);
-	ui_set_text(&font_obj, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf","hello world!", 36);
-	Stack.push(&Stack,font_obj);
-#define TEST_FONT Stack.objs[2]
 
 	//이벤트 함수 모음
 	event_func[0].func = first_meeting;
@@ -82,12 +76,13 @@ int scene_1_update() {
 
 	if (!explain_stat) {
 		explain_stat=1;
-		popup = create_object("Resources\\dummy\\popup.png", 205, 120);
+		popup = create_object("Resources\\dummy\\test.png", 500, 120);
 		Stack.push(&Stack, popup);
-		Stack.objs[1].enable = true;
-
+		text = create_object(NULL, 205, 120);
+		ui_set_text(&text, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "explain_stat_1"), 36);
+		Stack.push(&Stack, text);
 	}
-	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) event_func[0].isStarted=TRUE;
+	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) event_func[0].isStarted = true;
 
 	if (Stack.objs[1].enable) {
 		if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
@@ -171,6 +166,7 @@ void newbie_OT() {
 //마지막 이벤트 후 씬 종료
 void scene_1_finish() {
 	event_func[5].isStarted = true;
+	al_destroy_config(conf);
 	al_destroy_font(font);
 	load_scene(Scenes.scenes[2]);
 
