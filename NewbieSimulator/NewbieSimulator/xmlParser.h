@@ -1,35 +1,9 @@
 #pragma once
 #include"lectureInfo.h"
 #include<libxml\parser.h>
-#include"stringAdvance.h"
+#include"stringSwitch.h"
 #pragma comment(lib, "Ws2_32.lib")
-typedef enum _XMLelementMessage {
-	XML_MESSAGE_DEFAULT,
-	CODE,
-	CLASS,
-	TYPE,
-	NAME,
-	CREDIT,
-	TIME,
-	ROOM,
-	DISTANCE,
-	KLUE
-} XMLelementMessage;
 
-int getClassifyMessage(char* name) {
-	switchs(name) {
-		cases("major")
-			return MAJOR;
-		cases("selective")
-			return SELECTIVE;
-		cases("core")
-			return CORE;
-		defaults
-			return CLASSIFY_DEFAULT;
-
-	} switchs_end;
-	return 0;
-}
 int atoiCustom(char* key, int isDistance) {
 	int k = (isDistance == 0) ? (int)strlen(key) : (int)strlen(key) - 3;
 	int sum = 0;
@@ -38,89 +12,6 @@ int atoiCustom(char* key, int isDistance) {
 		sum += (key[i] - '0');
 	}
 	return sum;
-}
-int getKlueMessage(char* name) {
-	switchs(name) {
-		cases(u8"지뢰")
-			return BAD;
-		cases(u8"꿀강")
-			return GOOD;
-		defaults
-			return NORMAL;
-	} switchs_end;
-	return 0;
-}
-int getRoomMessage(char* name) {
-	switchs(name) {
-		cases(u8"교육관")
-			return EDUCATE;
-		cases(u8"교양관")
-			return REFINEMENT;
-		cases(u8"정통관")
-			return INFORMATICS;
-		cases(u8"과도관")
-			return SCI_LIBRARY;
-		cases(u8"이학관")
-			return SCIENCE_HALL;
-		cases(u8"법학관신관")
-			return NEW_LAW_HALL;
-		cases(u8"L-P관")
-			return LP_HALL;
-		cases(u8"서관")
-			return WEST_HALL;
-		cases(u8"정경관")
-			return POLITIC;
-		defaults
-			return ROOM_DEFAULT;
-	} switchs_end;
-	return 0;
-}
-int getElementMessage(char* name) {
-	switchs(name) {
-		cases("code")
-			return CODE;
-		cases("class")
-			return CLASS;
-		cases("type")
-			return TYPE;
-		cases("name")
-			return NAME;
-		cases("credit")
-			return CREDIT;
-		cases("time")
-			return TIME;
-		cases("room")
-			return ROOM;
-		cases("distance")
-			return DISTANCE;
-		cases("klue")
-			return KLUE;
-		defaults
-			return XML_MESSAGE_DEFAULT;
-	} switchs_end;
-	return 0;
-}
-int whatDayFunc(char hangul[]) {
-	switchs(hangul) {
-		cases(u8"월")
-			return MON;
-		cases(u8"화")
-			return TUE;
-		cases(u8"수")
-			return WED;
-		cases(u8"목")
-			return THU;
-		cases(u8"금")
-			return FRI;
-		cases(u8"토")
-			return SAT;
-		cases(u8"일")
-			return SUN;
-		defaults
-			return DAY_DEFAULT;
-
-	} switchs_end;
-	return 0;
 }
 timeListPtr registerTimeList(char* key) {
 	unsigned char hangul[5];
@@ -191,11 +82,10 @@ timeListPtr registerTimeList(char* key) {
 	}
 	return nullNode;
 }
-/*
+
 void xmlParse(lectureInfo lectureTable[]) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
-	
 	xmlNodePtr savePoint1;
 	xmlNodePtr savePoint2;
 	xmlChar* key;
@@ -222,4 +112,163 @@ void xmlParse(lectureInfo lectureTable[]) {
 		xmlFreeDoc(doc);
 		return;
 	}
-}*/
+	cur = cur->children;
+	i = 0;
+	while (cur != NULL) { //cur : text major text core -> ...
+		savePoint1 = cur;
+		if (!strcmp(cur->name, "major") || !strcmp(cur->name, "selective") || !strcmp(cur->name, "core")) {
+
+			lectureTable[i].classify = getClassifyMessage(cur->name);
+			cur = cur->children;
+			while (cur != NULL) { //cur : text code text class ...
+				savePoint2 = cur;
+				nameString = cur->name;
+				if (getElementMessage(nameString) != XML_MESSAGE_DEFAULT) {
+					cur = cur->children;
+					key = xmlNodeListGetString(doc, cur, 1);
+					keyLength = strlen(key);
+					switch (getElementMessage(nameString)) {
+					case CODE:
+						strcpy_s(lectureTable[i].identifyNumber, sizeof(lectureTable[i].identifyNumber), key);
+						break;
+					case CLASS:
+						lectureTable[i].classNumber = atoiCustom(key, 0);
+						break;
+					case TYPE:
+						break;
+					case NAME:
+						strcpy_s(lectureTable[i].name, sizeof(lectureTable[i].name), key);
+						break;
+					case CREDIT:
+						lectureTable[i].credit = atoiCustom(key, 0);
+						break;
+					case TIME:
+						strcpy_s(lectureTable[i].timeString, sizeof(lectureTable[i].timeString), key);
+						lectureTable[i].lectureTime = registerTimeList(key);
+						break;
+					case ROOM:
+						lectureTable[i].room = getRoomMessage(key);
+						break;
+					case DISTANCE:
+						lectureTable[i].distance = atoiCustom(key, 1);
+						break;
+					case KLUE:
+						lectureTable[i].klueRating = getKlueMessage(key);
+						break;
+					case XML_MESSAGE_DEFAULT:
+						break;
+					default:
+						break;
+					}
+					xmlFree(key);
+				}
+				cur = savePoint2;
+				cur = cur->next;
+			}
+			i++;
+		}
+		cur = savePoint1;
+		cur = cur->next;
+	}
+	for (int i = 0; i < 17; i++) {
+		printf("%s \n", lectureTable[i].identifyNumber);
+		printf("%d \n", lectureTable[i].classNumber);
+		switch (lectureTable[i].classify)
+		{
+		case CORE:
+			printf("%s \n", u8"핵심교양");
+			break;
+		case MAJOR:
+			printf("%s \n", u8"전필교양");
+			break;
+		case SELECTIVE:
+			printf("%s \n", u8"선택교양");
+			break;
+		default:
+			break;
+		}
+		printf("%s \n", lectureTable[i].name);
+		printf("%d \n", lectureTable[i].credit);
+		printf("%s \n", lectureTable[i].timeString);
+		for (timeListPtr j = lectureTable[i].lectureTime->next; j != NULL; j = j->next) {
+			switch (j->timeblock.dayofWeek)
+			{
+			case MON:
+				printf("%s", u8"월");
+				break;
+			case TUE:
+				printf("%s", u8"화");
+				break;
+			case WED:
+				printf("%s", u8"수");
+				break;
+			case THU:
+				printf("%s", u8"목");
+				break;
+			case FRI:
+				printf("%s", u8"금");
+				break;
+			case SAT:
+				printf("%s", u8"토");
+				break;
+			case SUN:
+				printf("%s", u8"일");
+				break;
+			default:
+				break;
+			}
+			printf("%d ", j->timeblock.period);
+		}
+		printf("\n");
+		switch (lectureTable[i].room)
+		{
+		case EDUCATE:
+			printf("%s \n", u8"교육관");
+			break;
+		case REFINEMENT:
+			printf("%s \n", u8"교양관");
+			break;
+		case INFORMATICS:
+			printf("%s \n", u8"정통관");
+			break;
+		case SCI_LIBRARY:
+			printf("%s \n", u8"과도관");
+			break;
+		case SCIENCE_HALL:
+			printf("%s \n", u8"이학관");
+			break;
+		case NEW_LAW_HALL:
+			printf("%s \n", u8"법학관신관");
+			break;
+		case LP_HALL:
+			printf("%s \n", u8"L-P관");
+			break;
+		case WEST_HALL:
+			printf("%s \n", u8"서관");
+			break;
+		case POLITIC:
+			printf("%s \n", u8"정경관");
+			break;
+		default:
+			break;
+		}
+		printf("%d%s \n", lectureTable[i].distance, u8"분");
+		switch (lectureTable[i].klueRating)
+		{
+		case GOOD:
+			printf("%s \n", u8"꿀강");
+			break;
+		case NORMAL:
+			printf("%s \n", u8"보통");
+			break;
+		case BAD:
+			printf("%s \n", u8"지뢰");
+			break;
+		default:
+			break;
+		}
+		printf("\n");
+	}
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+}

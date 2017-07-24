@@ -47,10 +47,13 @@
     <ClInclude Include="lectureInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="stringAdvance.h">
+    <ClInclude Include="xmlParser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="xmlParser.h">
+    <ClInclude Include="stringSwitch.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="manageTimetable.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
