@@ -160,6 +160,8 @@ object_t create_object(char* imgpath, float x, float y) {
 
 	object_t obj;
 
+	
+
 	if (imgpath != NULL) {
 		obj.image = al_load_bitmap(imgpath);
 
@@ -169,6 +171,7 @@ object_t create_object(char* imgpath, float x, float y) {
 	}
 	else {
 		obj.image = NULL;
+
 	}
 
 	obj.enable = true;
@@ -192,6 +195,27 @@ object_t create_object(char* imgpath, float x, float y) {
 
 	obj.pos.x = x;
 	obj.pos.y = y;
+
+	return obj;
+}
+
+object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float top, float left){
+
+	object_t obj;
+
+	obj.color = c;
+	obj.image = NULL;
+
+	obj.enable = true;
+	obj.rotated = false;
+	obj.angle = 0.0f;
+	obj.opacity = 1.0f;
+
+	obj.rect.width = width;
+	obj.rect.height = height;
+	obj.rect.left = top;
+	obj.rect.top = left;
+
 
 	return obj;
 }
