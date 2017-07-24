@@ -54,7 +54,7 @@ int scene_1_init(){
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
 	object_t font_obj = create_object(NULL, 205, 120);
-	ui_set_text(&font_obj, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf","hello world!", 36);
+	ui_set_text(&font_obj, al_map_rgb(1, 1, 1), ALLEGRO_ALIGN_LEFT, "Resources\\font\\NanumGothic.ttf","hello world!", 36);
 	Stack.push(&Stack,font_obj);
 #define TEST_FONT Stack.objs[2]
 	

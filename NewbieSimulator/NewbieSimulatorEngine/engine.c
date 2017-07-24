@@ -237,7 +237,7 @@ void engine_draw_objs() {
 				}
 			}
 			else if (o->modifier.type == OBJECT_MODIFIER_FONT) {
-				al_draw_text(o->modifier.value.font_value.font, o->modifier.value.font_value.color, o->pos.x, o->pos.y, ALLEGRO_ALIGN_CENTER, o->modifier.value.font_value.text);
+				al_draw_text(o->modifier.value.font_value.font, o->modifier.value.font_value.color, o->pos.x, o->pos.y, o->modifier.value.font_value.align, o->modifier.value.font_value.text);
 			}
 			else{
 				//al_set_target_bitmap(o->image);
