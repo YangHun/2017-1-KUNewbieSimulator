@@ -22,6 +22,9 @@ void scene_1_finish();
 int timer_set = 0;
 int explain_stat = 0;
 
+float health_point = 0;
+float social_point = 0;
+
 struct event_function {
 	void(*func)();
 	bool isStarted;
@@ -30,7 +33,7 @@ struct event_function {
 typedef struct event_function event_function;
 event_function event_func[EVENTCOUNT];
 
-object_t timebar, popup, text;
+object_t timebar, popup;
 
 int scene_1_init(){
 
@@ -53,6 +56,21 @@ int scene_1_init(){
 	timebar = create_object("Resources\\dummy\\timebar.png", 700, 0);
 	Stack.push(&Stack, timebar);
 
+	object_t health = create_object(NULL, 60, 300);
+	ui_set_text(&health, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "health"), 24);
+	Stack.push(&Stack, health);
+	object_t sociality = create_object(NULL, 60, 350);
+	ui_set_text(&sociality, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "sociality"), 24);
+	Stack.push(&Stack, sociality);
+	object_t attend = create_object(NULL, 60, 400);
+	ui_set_text(&attend, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "attend"), 24);
+	Stack.push(&Stack, attend);
+
+
+	object_t hp = create_object(NULL, 300, 150);
+	ui_set_text(&hp, al_map_rgb(1, 0, 0), "Resources\\font\\NanumGothic.ttf", (char)health_point, 24);
+	Stack.push(&Stack, hp);
+
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
 
 	//이벤트 함수 모음
@@ -74,17 +92,28 @@ int scene_1_update() {
 	//Scene 1의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 
-	if (!explain_stat) {
+	if (!explain_stat) { //stat설명 팝업 띄우기
 		explain_stat=1;
-		popup = create_object("Resources\\dummy\\test.png", 500, 120);
+		popup = create_object("Resources\\dummy\\popup.png", 250, 120);
 		Stack.push(&Stack, popup);
-		text = create_object(NULL, 205, 120);
-		ui_set_text(&text, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "explain_stat_1"), 36);
-		Stack.push(&Stack, text);
+		object_t text1 = create_object(NULL, 280, 130);
+		ui_set_text(&text1, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "explain_stat_1"), 36);
+		Stack.push(&Stack, text1);
+		object_t text2 = create_object(NULL, 280, 170);
+		ui_set_text(&text2, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "explain_stat_2"), 36);
+		Stack.push(&Stack, text2);
+		object_t text3 = create_object(NULL, 280, 210);
+		ui_set_text(&text3, al_map_rgb(1, 1, 1), "Resources\\font\\NanumGothic.ttf", al_get_config_value(conf, "korean", "explain_stat_3"), 36);
+		Stack.push(&Stack, text3);
 	}
-	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) event_func[0].isStarted = true;
+	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) {//아무데나 누르면 팝업 없애기
+		Stack.pull(&Stack);
+		Stack.pull(&Stack);
+		Stack.pull(&Stack);
+		Stack.pull(&Stack);
+	}
 
-	if (Stack.objs[1].enable) {
+	/*if (Stack.objs[1].enable) {
 		if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 			Stack.objs[2].enable = false;
 			al_start_timer(timer);
@@ -92,7 +121,7 @@ int scene_1_update() {
 			al_wait_for_event(timer_event_queue, &timer_event);
 			printf("wait event\n");
 		}
-	}
+	}*/
 
 	if (al_get_timer_count(timer) - timer_set > (5*1000)) {
 		printf("timer : %lld\n", al_get_timer_count(timer));
