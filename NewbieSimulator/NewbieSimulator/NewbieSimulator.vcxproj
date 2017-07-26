@@ -189,7 +189,7 @@
     <Import Project="..\packages\Allegro.5.2.2.1\build\native\Allegro.targets" Condition="Exists('..\packages\Allegro.5.2.2.1\build\native\Allegro.targets')" />
     <Import Project="..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets" Condition="Exists('..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets')" />
     <Import Project="..\packages\libiconv.1.14.0.11\build\native\libiconv.targets" Condition="Exists('..\packages\libiconv.1.14.0.11\build\native\libiconv.targets')" />
-    <Import Project="..\packages\libxml2-vc140-static-32_64.2.9.4\build\native\libxml2-vc140-static-32_64.targets" Condition="Exists('..\packages\libxml2-vc140-static-32_64.2.9.4\build\native\libxml2-vc140-static-32_64.targets')" />
+    <Import Project="..\packages\libxml2-vc140-static-64.2.9.4\build\native\libxml2-vc140-static-64.targets" Condition="Exists('..\packages\libxml2-vc140-static-64.2.9.4\build\native\libxml2-vc140-static-64.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -199,6 +199,6 @@
     <Error Condition="!Exists('..\packages\Allegro.5.2.2.1\build\native\Allegro.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Allegro.5.2.2.1\build\native\Allegro.targets'))" />
     <Error Condition="!Exists('..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets'))" />
     <Error Condition="!Exists('..\packages\libiconv.1.14.0.11\build\native\libiconv.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libiconv.1.14.0.11\build\native\libiconv.targets'))" />
-    <Error Condition="!Exists('..\packages\libxml2-vc140-static-32_64.2.9.4\build\native\libxml2-vc140-static-32_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libxml2-vc140-static-32_64.2.9.4\build\native\libxml2-vc140-static-32_64.targets'))" />
+    <Error Condition="!Exists('..\packages\libxml2-vc140-static-64.2.9.4\build\native\libxml2-vc140-static-64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libxml2-vc140-static-64.2.9.4\build\native\libxml2-vc140-static-64.targets'))" />
   </Target>
 </Project>
