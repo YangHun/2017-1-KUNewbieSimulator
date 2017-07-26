@@ -4,7 +4,7 @@
 
 
 #define FPS 60
-#define SCREEN_W 1024
+#define SCREEN_W 1280
 #define SCREEN_H 720
 #define BOUNCER_SIZE 64
 
@@ -78,6 +78,8 @@ static int engine() {
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
+	al_init_font_addon();
+	al_init_ttf_addon();
 	al_init_timeout(&timeout, 0.1);
 
 	//core initialization
@@ -173,6 +175,7 @@ void scene_manage() {
 		if (!current_scene.fin()) {
 			current_scene = next_scene;
 			next_scene = NULLSCENE;
+			al_clear_to_color(al_map_rgb(0,0,0));
 		}
 		else {
 			printf("scene fin error, return");
@@ -233,10 +236,14 @@ void engine_draw_objs() {
 					o->angle -= 360.0f;
 				}
 			}
-			else {
+			else if (o->modifier.type == OBJECT_MODIFIER_FONT) {
+				al_draw_text(o->modifier.value.font_value.font, o->modifier.value.font_value.color, o->pos.x, o->pos.y, o->modifier.value.font_value.align, o->modifier.value.font_value.text);
+			}
+			else{
 				//al_set_target_bitmap(o->image);
 				//al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);
 				al_draw_tinted_bitmap(o->image,al_map_rgba_f(1,1,1,o->opacity), o->pos.x, o->pos.y, 0);
+				//al_draw_bitmap(o->image, o->pos.x, o->pos.y, 0);
 			}
 		}
 	}

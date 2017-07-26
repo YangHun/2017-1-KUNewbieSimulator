@@ -73,6 +73,7 @@ int push_stack(objstack_t *stack, object_t obj) {
 int pull_stack(objstack_t *stack) {
 
 	if (!(stack->is_empty(stack))) {
+		al_destroy_bitmap(stack->objs[stack->counter].image);
 		stack->counter--;
 		return 0;
 	}
@@ -159,9 +160,18 @@ object_t create_object(char* imgpath, float x, float y) {
 
 	object_t obj;
 
-	obj.image = al_load_bitmap(imgpath);
-	if (obj.image == NULL) {
-		printf("failed load bitmap image! \n");
+	
+
+	if (imgpath != NULL) {
+		obj.image = al_load_bitmap(imgpath);
+
+		if (obj.image == NULL) {
+			printf("failed load bitmap image! \n");
+		}
+	}
+	else {
+		obj.image = NULL;
+
 	}
 
 	obj.enable = true;
@@ -169,13 +179,43 @@ object_t create_object(char* imgpath, float x, float y) {
 	obj.angle = 0.0f;
 	obj.opacity = 1.0f;
 
-	obj.rect.width = al_get_bitmap_width(obj.image);
-	obj.rect.height = al_get_bitmap_height(obj.image);
-	obj.rect.left = x;
-	obj.rect.top = y;
+	if (obj.image != NULL) {
+
+		obj.rect.width = al_get_bitmap_width(obj.image);
+		obj.rect.height = al_get_bitmap_height(obj.image);
+		obj.rect.left = x;
+		obj.rect.top = y;
+	}
+	else {
+		obj.rect.width = 0;
+		obj.rect.height = 0;
+		obj.rect.left = 0;
+		obj.rect.top = 0;
+	}
 
 	obj.pos.x = x;
 	obj.pos.y = y;
+
+	return obj;
+}
+
+object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float top, float left){
+
+	object_t obj;
+
+	obj.color = c;
+	obj.image = NULL;
+
+	obj.enable = true;
+	obj.rotated = false;
+	obj.angle = 0.0f;
+	obj.opacity = 1.0f;
+
+	obj.rect.width = width;
+	obj.rect.height = height;
+	obj.rect.left = top;
+	obj.rect.top = left;
+
 
 	return obj;
 }
