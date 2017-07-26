@@ -11,13 +11,21 @@ typedef enum _classifyNumber {
 	CLASSIFY_DEFAULT,
 	SELECTIVE,//선택교양
 	MAJOR, //전공관련교양
-	NUCLEAR //핵심교양
+	CORE //핵심교양
 } classifyNumber;
 
 typedef enum _roomNumber {
 	ROOM_DEFAULT,
 	EDUCATE, // 교육관
-	REFINEMENT // 교양관
+	REFINEMENT, // 교양관
+	INFORMATICS, // 정통관
+	SCI_LIBRARY, // 과도관
+	SCIENCE_HALL, // 이학관
+	NEW_LAW_HALL, // 법학관신관
+	LP_HALL, // L-P관
+	WEST_HALL, // 서관
+	POLITIC // 정경관
+
 } roomNumber;
 
 typedef enum _ratingNumber {
@@ -28,14 +36,14 @@ typedef enum _ratingNumber {
 } ratingNumber;
 
 typedef enum _whatDay {
-	DAY_DEFAULT,
 	MON,
 	TUE,
 	WED,
 	THU,
 	FRI,
 	SAT,
-	SUN
+	SUN,
+	DAY_DEFAULT
 } whatDay;
 
 typedef struct _timeBlock {
@@ -53,10 +61,12 @@ typedef timeList* timeListPtr;
 typedef struct _lectureInfo {
 	int classNumber; // 분반
 	int credit; //학점
-	char* identifyNumber; //학술번호
-	char* name; // 강의명
+	unsigned char identifyNumber[8]; //학술번호
+	unsigned char name[75]; // 강의명
 	enum classifyNumber classify; // 전공관련/핵심/선택 교양 분류
 	enum roomNumber room; // 강의실
 	enum Rating klueRating; // klue평가
+	int distance; // 거리
 	timeListPtr lectureTime;
+	unsigned char timeString[30];
 } lectureInfo;
