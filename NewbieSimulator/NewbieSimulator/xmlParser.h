@@ -90,7 +90,6 @@ void xmlParse(lectureInfo lectureTable[]) {
 	xmlNodePtr savePoint2;
 	xmlChar* key;
 	unsigned char* nameString;
-	int atoiCustomStore;
 	int i;
 	int keyLength = 0;
 	doc = xmlParseFile("Resources\\xml\\dummy-data.xml");
@@ -126,7 +125,7 @@ void xmlParse(lectureInfo lectureTable[]) {
 				if (getElementMessage(nameString) != XML_MESSAGE_DEFAULT) {
 					cur = cur->children;
 					key = xmlNodeListGetString(doc, cur, 1);
-					keyLength = strlen(key);
+					keyLength = (int)strlen(key);
 					switch (getElementMessage(nameString)) {
 					case CODE:
 						strcpy_s(lectureTable[i].identifyNumber, sizeof(lectureTable[i].identifyNumber), key);
