@@ -45,11 +45,14 @@ enum object_modifier_type_t {
 	OBJECT_MODIFIER_DRAWABLE_ONLY,
 	OBJECT_MODIFIER_BUTTON,
 	OBJECT_MODIFIER_FONT,
-	OBJECT_MODIFIER_SCROLLER
+	OBJECT_MODIFIER_SCROLLBAR
 };
 
 struct object_modifier_t;
 typedef struct object_modifier_t object_modifier_t;
+struct object_t;
+typedef struct object_t object_t;
+
 struct object_modifier_t {
 	object_modifier_type_t type;
 	union {
@@ -64,16 +67,15 @@ struct object_modifier_t {
 		}font_value;
 		struct {
 			ALLEGRO_MOUSE_STATE state;
-/*			object_t *target;
-			object_t *bar;
+			object_t *target;
+			object_t *body;
+			object_t *thumb;
 			object_t *button_top;
 			object_t *button_bottom;
-*/		}scroller;
+		}scrollbar;
 	} value;
 };
 
-struct object_t;
-typedef struct object_t object_t;
 struct object_t {
 	ALLEGRO_BITMAP *image;
 	ALLEGRO_COLOR color;
