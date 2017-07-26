@@ -5,8 +5,12 @@
 #include <allegro5\allegro.h>
 #include <allegro5\allegro_image.h>
 #include <allegro5\allegro_primitives.h>
-#include <stdbool.h>
 
+#include<allegro5\allegro_font.h>
+#include<allegro5\allegro_native_dialog.h>
+#include<allegro5\allegro_ttf.h>
+
+#include <stdbool.h>
 
 
 struct positioni_t;
@@ -40,27 +44,45 @@ typedef enum object_modifier_type_t object_modifier_type_t;
 enum object_modifier_type_t {
 	OBJECT_MODIFIER_DRAWABLE_ONLY,
 	OBJECT_MODIFIER_BUTTON,
+	OBJECT_MODIFIER_FONT,
+	OBJECT_MODIFIER_SCROLLBAR
 };
 
 struct object_modifier_t;
 typedef struct object_modifier_t object_modifier_t;
+struct object_t;
+typedef struct object_t object_t;
+
 struct object_modifier_t {
 	object_modifier_type_t type;
 	union {
 		struct {
 			void(*on_click)();
 		} button_value;
+		struct {
+			ALLEGRO_FONT *font;
+			int align;
+			ALLEGRO_COLOR color;
+			char* text;
+		}font_value;
+		struct {
+			ALLEGRO_MOUSE_STATE state;
+			object_t *target;
+			object_t *body;
+			object_t *thumb;
+			object_t *button_top;
+			object_t *button_bottom;
+		}scrollbar;
 	} value;
 };
 
-struct object_t;
-typedef struct object_t object_t;
 struct object_t {
 	ALLEGRO_BITMAP *image;
+	ALLEGRO_COLOR color;
 	position_t pos;
 
 	bool enable; // enable이면 draw, disable이면 not draw
-
+	
 	float opacity; //transparancy
 
 	bool rotated;
@@ -184,6 +206,8 @@ extern scene_t null_scene;
 extern int state_num;
 
 object_t create_object(char* imgpath, float x, float y);
+object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float top, float left);
+
 void rotate_object(object_t* obj, float angle);
 void enable_object(object_t*obj, bool b);
 
