@@ -80,7 +80,9 @@ static int engine() {
 
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_init_primitives_addon();
 	al_init_timeout(&timeout, 0.1);
+	
 
 	//core initialization
 	initialization();
@@ -222,6 +224,8 @@ void engine_draw_background() {
 
 void engine_draw_objs() {
 	
+	printf("enter");
+
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
 		object_t* o = &(Stack.objs[i]);
@@ -245,20 +249,23 @@ void engine_draw_objs() {
 				object_t* btop = o->modifier.value.scrollbar.button_top;
 				object_t* bbot = o->modifier.value.scrollbar.button_bottom;
 				object_t* thumb = o->modifier.value.scrollbar.thumb;
-				/*
+				
 				al_draw_tinted_bitmap(target->image, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), target->pos.x, target->pos.y, 0);
 				al_draw_filled_rectangle(body->pos.x, body->pos.y, body->pos.x + body->rect.width, body->pos.y + body->rect.height, body->color);
 				al_draw_tinted_bitmap(btop->image, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), btop->pos.x, btop->pos.y, 0);
 				al_draw_tinted_bitmap(bbot->image, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), bbot->pos.x, bbot->pos.y, 0);
-				al_draw_tinted_bitmap(thumb->image, al_map_rgba_f(1.0, 1.0, 1.0, 1.0), thumb->pos.x, thumb->pos.y, 0);
-				*/
+				al_draw_filled_rectangle(thumb->pos.x, thumb->pos.y, thumb->pos.x + thumb->rect.width, thumb->pos.y + thumb->rect.height, thumb->color);
+
+			}
+			else if (o->modifier.type == OBJECT_MODIFIER_SCROLLBAR_CHILD) {
+				// do nothing
 			}
 			else{
-				if (o->image != NULL) {
-					al_draw_tinted_bitmap(o->image, al_map_rgba_f(1, 1, 1, o->opacity), o->pos.x, o->pos.y, 0);
+				if (o->image == NULL) {
+					al_draw_filled_rectangle(o->pos.x, o->pos.y, o->pos.x + o->rect.width, o->pos.y + o->rect.height, o->color);
 				}
 				else {
-					al_draw_filled_rectangle(o->pos.x, o->pos.y, o->pos.x + o->rect.width, o->pos.y + o->rect.height, o->color);
+					al_draw_tinted_bitmap(o->image, al_map_rgba_f(1, 1, 1, o->opacity), o->pos.x, o->pos.y, 0);
 				}
 				//al_set_target_bitmap(o->image);
 				//al_set_blender(ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA, ALLEGRO_ALPHA);

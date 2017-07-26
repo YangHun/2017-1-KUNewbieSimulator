@@ -16,12 +16,13 @@ int scene_0_init() {
 	ui_set_on_click_listener(&hos, on_click_button_0);
 	Stack.push(&Stack, hos);
 
-
+	
 	object_t scrollbar = create_object("Resources\\dummy\\scroller\\object.png", 150, 150);
-	object_t target = create_object("Resources\\dummy\\scroller\\target.png", 150, 150);
-	ui_set_scrollbar(&scrollbar, &target, "Resources\\dummy\\scroller\\b_top.png", "Resources\\dummy\\scroller\\b_bot.png", al_map_rgb(255, 255, 255), al_map_rgb(0, 0, 0));
 	Stack.push(&Stack, scrollbar);
-
+	object_t target = create_object("Resources\\dummy\\scroller\\target.png", 150, 150);
+	Stack.push(&Stack, target);
+	ui_set_scrollbar(&Stack.objs[1], &Stack.objs[2], "Resources\\dummy\\scroller\\b_top.png", "Resources\\dummy\\scroller\\b_bot.png", al_map_rgb(255, 255, 255), al_map_rgb(0, 0, 0));
+	
 	return 0;
 }
 
