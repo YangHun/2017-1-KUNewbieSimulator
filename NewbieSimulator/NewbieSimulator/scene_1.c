@@ -4,7 +4,7 @@
 static void scene_1_on_click_button_0();
 float brightness, transparency;
 
-#define EVENTCOUNT 6
+#define EVENTCOUNT 7
 
 ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* timer_event_queue;
@@ -12,6 +12,7 @@ ALLEGRO_EVENT timer_event;
 ALLEGRO_FONT *font;
 ALLEGRO_CONFIG *conf;
 
+void invitation();
 void first_meeting();
 void newbie_before_study();
 void newbie_meeting();
@@ -24,8 +25,8 @@ int explain_stat = 0;
 
 int spritex = 640, spritey = 360;
 
-float health_point = 0;
-float social_point = 0;
+int health_point = 0;
+int social_point = 0;
 char hpstr[10], spstr[10];
 
 struct event_function {
@@ -40,6 +41,13 @@ object_t timebar, popup;
 object_t character[8];
 
 bool clicked = false;
+
+int event_num = 0;
+void clicked_yes();
+void clicked_no();
+
+#define HP_TEXT Stack.objs[5]
+#define SP_TEXT Stack.objs[6]
 
 int scene_1_init(){
 
@@ -75,13 +83,16 @@ int scene_1_init(){
 
 
 	object_t hp = create_object(NULL, 300, 150);
-	sprintf(hpstr, "%0.1f", health_point);
+	sprintf(hpstr, "%0.1f", health_point/10.0);
 	ui_set_text(&hp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hpstr, 24);
 	Stack.push(&Stack, hp);
+
 	object_t sp = create_object(NULL, 300, 200);
-	sprintf(spstr, "%0.1f", social_point);
+	sprintf(spstr, "%0.1f", social_point/10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 	Stack.push(&Stack, sp);
+
+
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
 
@@ -111,12 +122,13 @@ int scene_1_init(){
 	CHARACTER_0.enable = true;
 
 	//이벤트 함수 모음
-	event_func[0].func = first_meeting;
-	event_func[1].func = newbie_before_study;
-	event_func[2].func = newbie_meeting;
-	event_func[3].func = newbie_study;
-	event_func[4].func = newbie_OT;
-	event_func[5].func = scene_1_finish;
+	event_func[0].func = invitation;
+	event_func[1].func = first_meeting;
+	event_func[2].func = newbie_before_study;
+	event_func[3].func = newbie_meeting;
+	event_func[4].func = newbie_study;
+	event_func[5].func = newbie_OT;
+	event_func[6].func = scene_1_finish;
 
 	for (i = 0; i < EVENTCOUNT; i++)
 		event_func[i].isStarted = false;
@@ -190,42 +202,33 @@ int scene_1_update() {
 		ui_set_text(&text4, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "explain_stat_4"), 36);
 		Stack.push(&Stack, text4);
 	}
-	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) {//아무데나 누르면 팝업 없애기
-		
-		clicked = true;
-		
-	}
-	else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && clicked) {
+
+	if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && clicked && explain_stat && !event_func[0].isStarted) {
+		int c = Stack.counter;
 		clicked = false;
-		Stack.pull(&Stack);
-		Stack.pull(&Stack);
-		Stack.pull(&Stack);
-		Stack.pull(&Stack);
-		Stack.pull(&Stack);
-
-	}
-	/*if (Stack.objs[1].enable) {
-		if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-			Stack.objs[2].enable = false;
-			al_start_timer(timer);
-			printf("start timer\n");
-			al_wait_for_event(timer_event_queue, &timer_event);
-			printf("wait event\n");
+		
+		for (int i = 5; i > 0; i--) {
+			Stack.objs[c - i].enable = false;
 		}
-	}*/
+		al_start_timer(timer);
+		printf("timer start\n");
+	}
+	else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) {//아무데나 누르면 팝업 없애기
+		clicked = true;
+	}
 
-	if (al_get_timer_count(timer) - timer_set > (5*1000)) {
+
+#define EVENT_TIME 1
+	if (al_get_timer_count(timer) - timer_set > (EVENT_TIME*1000)) {
 		printf("timer : %lld\n", al_get_timer_count(timer));
 		timer_set = al_get_timer_count(timer);
-		al_stop_timer(timer);
-		for (int i = 0; i < EVENTCOUNT; i++) {
-			if (!event_func[i].isStarted) {
-				
-				event_func[i].func();
+		for (event_num = 0; event_num < EVENTCOUNT; event_num++) {
+			if (!event_func[event_num].isStarted) {
+				event_func[event_num].func();
+				printf("%d event start\n", event_num);
 				break;
 			}
 		}
-		al_start_timer(timer);
 	}
 
 	re_draw();
@@ -238,6 +241,10 @@ int scene_1_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
+
+	al_destroy_config(conf);
+	al_destroy_font(font);
+	al_destroy_timer(timer);
 
 	return 0;
 }
@@ -253,58 +260,268 @@ void scene_1_on_click_button_0() {
 	puts("clicked");
 }
 
-//미리정모
-void first_meeting() { 
-	printf("first_meeting\n");
+
+//단톡방 초대
+void invitation() {
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
+	printf("invitation\n");
 	event_func[0].isStarted = true;
+	object_t eback = create_object("Resources\\dummy\\event_background.png", 0,0);
+	Stack.push(&Stack, eback);
 
 	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
 	Stack.push(&Stack, messagebox);
-	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 310);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
 	ui_set_button(&yes);
-	//ui_set_on_click_listener();
+	ui_set_on_click_listener(&yes, clicked_yes);
 	Stack.push(&Stack, yes);
-	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 310);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
 	ui_set_button(&no);
-	//ui_set_on_click_listener();
+	ui_set_on_click_listener(&no, clicked_no);
 	Stack.push(&Stack, no);
-	object_t message1_1 = create_object(NULL, 400, 230);
-	ui_set_text(&message1_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "message1_1"), 36);
-	Stack.push(&Stack, message1_1);
-	object_t message1_2 = create_object(NULL, 400, 270);
-	ui_set_text(&message1_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "message1_2"), 36);
-	Stack.push(&Stack, message1_2);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message0_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message0_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message0_2"), 32);
+	Stack.push(&Stack, message_2);
+}
+
+
+//미리정모
+void first_meeting() { 
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
+	printf("first_meeting\n");
+	event_func[1].isStarted = true;
+	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
+	Stack.push(&Stack, messagebox);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
+	ui_set_button(&yes);
+	ui_set_on_click_listener(&yes, clicked_yes);
+	Stack.push(&Stack, yes);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
+	ui_set_button(&no);
+	ui_set_on_click_listener(&no,clicked_no);
+	Stack.push(&Stack, no);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message1_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message1_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message1_2"), 32);
+	Stack.push(&Stack, message_2);
 } 
 
 //새내기 미리배움터
-void newbie_before_study() { 
+void newbie_before_study() { 	
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
 	printf("newbie_before_study\n");
-	event_func[1].isStarted = true;
+	event_func[2].isStarted = true;
+	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
+	Stack.push(&Stack, messagebox);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
+	ui_set_button(&yes);
+	ui_set_on_click_listener(&yes, clicked_yes);
+	Stack.push(&Stack, yes);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
+	ui_set_button(&no);
+	ui_set_on_click_listener(&no, clicked_no);
+	Stack.push(&Stack, no);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message2_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message2_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message2_2"), 32);
+	Stack.push(&Stack, message_2);
 }
 
 //새내기 정모
 void newbie_meeting() { 
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
 	printf("newbie_meeting\n");
-	event_func[2].isStarted = true;
+	event_func[3].isStarted = true;
+	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
+	Stack.push(&Stack, messagebox);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
+	ui_set_button(&yes);
+	ui_set_on_click_listener(&yes, clicked_yes);
+	Stack.push(&Stack, yes);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
+	ui_set_button(&no);
+	ui_set_on_click_listener(&no, clicked_no);
+	Stack.push(&Stack, no);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message3_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message3_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message3_2"), 32);
+	Stack.push(&Stack, message_2);
 }
 
 //새내기 배움터
 void newbie_study() { 
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
 	printf("newbie_study\n");
-	event_func[3].isStarted = true;
+	event_func[4].isStarted = true;
+	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
+	Stack.push(&Stack, messagebox);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
+	ui_set_button(&yes);
+	ui_set_on_click_listener(&yes, clicked_yes);
+	Stack.push(&Stack, yes);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
+	ui_set_button(&no);
+	ui_set_on_click_listener(&no, clicked_no);
+	Stack.push(&Stack, no);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message4_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message4_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message4_2"), 32);
+	Stack.push(&Stack, message_2);
 }
 
 //신입생 OT
 void newbie_OT() { 
+	al_stop_timer(timer);
+	printf("stop timer\n");
+
 	printf("newbie_OT\n");
-	event_func[4].isStarted = true;
+	event_func[5].isStarted = true;
+	object_t messagebox = create_object("Resources\\dummy\\kakaotalk.png", 365, 210);
+	Stack.push(&Stack, messagebox);
+	object_t yes = create_object("Resources\\dummy\\yes_button.png", 365, 380);
+	ui_set_button(&yes);
+	ui_set_on_click_listener(&yes, clicked_yes);
+	Stack.push(&Stack, yes);
+	object_t no = create_object("Resources\\dummy\\no_button.png", 640, 380);
+	ui_set_button(&no);
+	ui_set_on_click_listener(&no, clicked_no);
+	Stack.push(&Stack, no);
+	object_t message_0 = create_object(NULL, 470, 245);
+	ui_set_text(&message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message5_0"), 40);
+	Stack.push(&Stack, message_0);
+	object_t message_1 = create_object(NULL, 470, 295);
+	ui_set_text(&message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message5_1"), 32);
+	Stack.push(&Stack, message_1);
+	object_t message_2 = create_object(NULL, 470, 335);
+	ui_set_text(&message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "message5_2"), 32);
+	Stack.push(&Stack, message_2);
 }
+
+
 
 //마지막 이벤트 후 씬 종료
 void scene_1_finish() {
-	event_func[5].isStarted = true;
-	al_destroy_config(conf);
-	al_destroy_font(font);
+	event_func[6].isStarted = true;
+	
 	load_scene(Scenes.scenes[2]);
+}
 
+void clicked_yes()
+{
+	switch (event_num)
+	{
+	case 0:
+		social_point += 5;
+		Stack.objs[Stack.counter - 7].enable =false;
+		break;
+	case 1:
+		social_point += 1;
+		break;
+	case 2:
+		social_point += 1;
+		break;
+	case 3:
+		social_point += 2;
+		break;
+	case 4:
+		social_point += 2;
+		break;
+	case 5:
+		social_point += 2;
+		break;
+	default:
+		printf("default and event_num : %d\n",event_num);
+		exit(0);
+		break;
+	}
+
+	sprintf(spstr, "%0.1f", social_point/10.0);
+	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
+
+	al_start_timer(timer);
+	int c = Stack.counter;
+
+	for (int i = 6; i > 0; i--) {
+		Stack.objs[c - i].enable = false;
+	}
+}
+
+void clicked_no()
+{
+	switch (event_num)
+	{
+	case 0:
+		social_point -= 10;
+		for (int i = 0; i < EVENTCOUNT - 1; i++)
+		{
+			event_func[i].isStarted = true;
+		}
+		Stack.objs[Stack.counter - 7].enable = false;
+		break;
+	case 1:
+		social_point -= 1;
+		break;
+	case 2:
+		social_point -= 1;
+		break;
+	case 3:
+		social_point -= 1;
+		break;
+	case 4:
+		social_point -= 2;
+		break;
+	case 5:
+		social_point -= 2;
+		break;
+	default:
+		printf("default and event_num : %d\n", event_num);
+		exit(0);
+		break;
+	}
+
+	sprintf(spstr, "%0.1f", social_point / 10.0);
+	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
+
+	al_start_timer(timer);
+	int c = Stack.counter;
+
+	for (int i = 6; i > 0; i--) {
+		Stack.objs[c - i].enable = false;
+	}
 }
