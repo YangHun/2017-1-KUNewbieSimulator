@@ -57,4 +57,4 @@ NewbieSimulator.vcxproj 프로젝트는 NewbieSimulatorEngine.vcxproj 프로젝�
 1. (프로젝트)/packages/libxml2-vc140-static-32_64.2.9.4/build/native/libxml2-vc140-static-32_64.targets 파일을 연다.
 2. 9번째 줄에 있는 libxml2.lib;%(AdditionalDependencies) 를 %(AdditionalDependencies);libxml2.lib 로 수정한다.
 3. 저장한 후 리빌드를 실행한다.
-4. 만약에 안되면 nuget에서 libxml2를 지운 후 기존 libxml2가 32_64였다면 64를, 64였다면 32_64를 설치한다.
+4. 만약에 안되면 nuget에서 libxml2를 지운 후 기존 libxml2가 32_64였다면 64를, 64였다면 32_64를 설치한다. 그 후 1-3을 반복한다.
