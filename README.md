@@ -51,3 +51,10 @@ NewbieSimulator.vcxproj 프로젝트는 NewbieSimulatorEngine.vcxproj 프로젝�
 1. 빌드 순서. NewbieSimulator 이전에 NewbieSimulatorEngine이 빌드하도록 하였다.
 2. 포함 경로. NewbieSimulator의 포함 경로로 NewbieSimulatorEngine의 소스 폴더를 지정하였다.
 3. 링크 파일. NewbieSimulator의 빌드에 NewbieSimulatorEngine.lib이 함께 링크된다.
+
+### 콘솔창이 잠시 나타났다가 사라질 때에 해결법
+
+1. (프로젝트)/packages/libxml2-vc140-static-32_64.2.9.4/build/native/libxml2-vc140-static-32_64.targets 파일을 연다.
+2. 9번째 줄에 있는 libxml2.lib;%(AdditionalDependencies) 를 %(AdditionalDependencies);libxml2.lib 로 수정한다.
+3. 저장한 후 리빌드를 실행한다.
+4. 만약에 안되면 nuget에서 libxml2를 지운 후 기존 libxml2가 32_64였다면 64를, 64였다면 32_64를 설치한다. 그 후 1-3을 반복한다.
