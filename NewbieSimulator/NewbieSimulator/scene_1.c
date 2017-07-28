@@ -6,9 +6,12 @@ float brightness, transparency;
 
 #define EVENTCOUNT 7
 
+ALLEGRO_TIMER* event_timer;
+ALLEGRO_EVENT_QUEUE* event_timer_event_queue;
+ALLEGRO_TIMER* character_timer;
+ALLEGRO_EVENT_QUEUE* character_event_queue;
 ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* timer_event_queue;
-ALLEGRO_EVENT timer_event;
 ALLEGRO_FONT *font;
 ALLEGRO_CONFIG *conf;
 
@@ -20,14 +23,19 @@ void newbie_study();
 void newbie_OT();
 void scene_1_finish();
 
+int event_timer_set = 0;
+int character_timer_set = 0;
 int timer_set = 0;
 int explain_stat = 0;
 
-int spritex = 640, spritey = 360;
+int spritex = 640, spritey = 360; 
 
 int health_point = 0;
 int social_point = 0;
 char hpstr[10], spstr[10];
+
+int dir = 0, img = 0;
+int change_img = 0, change_dir = 0;
 
 struct event_function {
 	void(*func)();
@@ -37,7 +45,7 @@ struct event_function {
 typedef struct event_function event_function;
 event_function event_func[EVENTCOUNT];
 
-object_t timebar, popup;
+object_t popup;
 object_t character[8];
 
 bool clicked = false;
@@ -62,14 +70,27 @@ int scene_1_init(){
 	object_t bg = create_object("Resources\\dummy\\background.png", 0, 0);
 	Background = bg;
 
+	event_timer = al_create_timer(1.0 / 1000);
+	event_timer_event_queue = al_create_event_queue();
+	al_register_event_source(event_timer_event_queue, al_get_timer_event_source(event_timer));
+
+	character_timer = al_create_timer(1.0 / 1000);
+	character_event_queue = al_create_event_queue();
+	al_register_event_source(character_event_queue, al_get_timer_event_source(character_timer));
+	al_start_timer(character_timer);
+
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();
 	al_register_event_source(timer_event_queue, al_get_timer_event_source(timer));
+	al_start_timer(timer);
+
 
 	object_t stat_window = create_object("Resources\\dummy\\stat_window.png", 0, 0);
 	Stack.push(&Stack, stat_window);
-	timebar = create_object("Resources\\dummy\\timebar.png", 700, 0);
-	Stack.push(&Stack, timebar);
+
+	Stack.push(&Stack, create_object("Resources\\dummy\\timebar.png", 0, 0));
+#define timebar Stack.objs[1]
+	
 
 	object_t health = create_object(NULL, 60, 150);
 	ui_set_text(&health, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "health"), 24);
@@ -82,16 +103,20 @@ int scene_1_init(){
 	Stack.push(&Stack, attend);
 
 
-	object_t hp = create_object(NULL, 300, 150);
+	object_t hp = create_object(NULL, 240, 150);
 	sprintf(hpstr, "%0.1f", health_point/10.0);
 	ui_set_text(&hp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hpstr, 24);
 	Stack.push(&Stack, hp);
 
-	object_t sp = create_object(NULL, 300, 200);
+	object_t sp = create_object(NULL, 240, 190);
 	sprintf(spstr, "%0.1f", social_point/10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 	Stack.push(&Stack, sp);
 
+	/*
+	object_t yellow = create_colored_object(al_map_rgb(251, 226, 138), 100, 100, 100, 100);
+	Stack.push(&Stack, yellow);
+	*/
 
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
@@ -109,17 +134,7 @@ int scene_1_init(){
 		Stack.push(&Stack, character[i]);
 	}
 #define CHARACTER_START	7
-#define CHARACTER_0 Stack.objs[5]
-#define CHARACTER_1 Stack.objs[6]
-#define CHARACTER_2 Stack.objs[7]
-#define CHARACTER_3 Stack.objs[8]
-#define CHARACTER_4 Stack.objs[9]
-#define CHARACTER_5 Stack.objs[10]
-#define CHARACTER_6 Stack.objs[11]
-#define CHARACTER_7 Stack.objs[12]
-
-
-	CHARACTER_0.enable = true;
+	Stack.objs[CHARACTER_START].enable = true;
 
 	//이벤트 함수 모음
 	event_func[0].func = invitation;
@@ -132,36 +147,47 @@ int scene_1_init(){
 
 	for (i = 0; i < EVENTCOUNT; i++)
 		event_func[i].isStarted = false;
-	
+
 	return 0;
 }
 
-void move_up()
+void move_character(int dir)
 {
-	int i;
-	for (i = 0; i < 8; i++)
-		Stack.objs[CHARACTER_START+i].pos.y -= 3.0;
-}
-
-void move_down()
-{
-	int i;
-	for (i = 0; i < 8; i++)
-		Stack.objs[CHARACTER_START+i].pos.y += 3.0;
-}
-
-void move_left()
-{
-	int i;
-	for (i = 0; i < 8; i++)
-		Stack.objs[CHARACTER_START+i].pos.x -= 3.0;
-}
-
-void move_right()
-{
-	int i;
-	for (i = 0; i < 8; i++)
-		Stack.objs[CHARACTER_START +i].pos.x += 3.0;
+	// x : 300~1000 y : 100~420
+	switch (dir) {
+	case 0: 
+		if (Stack.objs[CHARACTER_START].pos.x < 300) {
+			change_dir = rand() % 4;
+			break;
+		}
+		for (int i = 0; i < 8; i++)
+			Stack.objs[CHARACTER_START + i].pos.x -= 3.0;
+		break;
+	case 1: 
+		if (Stack.objs[CHARACTER_START].pos.y < 100) {
+			change_dir = rand() % 4;
+			break;
+		}
+		for (int i = 0; i < 8; i++)
+			Stack.objs[CHARACTER_START + i].pos.y -= 3.0;
+		break;
+	case 2:
+		if (Stack.objs[CHARACTER_START].pos.x > 1000) {
+			change_dir = rand() % 4;
+			break;
+		}
+		for (int i = 0; i < 8; i++)
+			Stack.objs[CHARACTER_START + i].pos.x += 3.0;
+		break;
+	case 3: 
+		if (Stack.objs[CHARACTER_START].pos.y > 420) {
+			change_dir = rand() % 4;
+			break;
+		}
+		for (int i = 0; i < 8; i++)
+			Stack.objs[CHARACTER_START + i].pos.y += 3.0;
+		break;
+	}
 }
 
 int scene_1_update() {
@@ -169,21 +195,39 @@ int scene_1_update() {
 	//Scene 1의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 
-	int dir = rand() % 4, img = rand() % 8, i;
-	for (i = 0; i < 8; i++) {
-		if (img == i) Stack.objs[CHARACTER_START + i].enable = true;
-		else Stack.objs[CHARACTER_START + i].enable = false;
-	}
-	//al_draw_bitmap(al_load_bitmap(path), spritex, spritey, NULL);
-	//al_flip_display();
-	switch (dir) {
-	case 0: move_left(); break;
-	case 1: move_up(); break;
-	case 2: move_right(); break;
-	case 3: move_down(); break;
+	//랜덤 캐릭터 변경
+
+	if (al_get_timer_count(character_timer) - character_timer_set > (1 * 10)) {
+		
+		character_timer_set = al_get_timer_count(character_timer);
+
+		if (al_get_timer_count(character_timer) % 500 == 0)
+		{
+			do {
+				change_img = rand() % 8;
+			} while (change_img == img);
+
+			int change_img = rand() % 8;
+
+			Stack.objs[CHARACTER_START + img].enable = false;
+			Stack.objs[CHARACTER_START + change_img].enable = true;
+			img = change_img;
+	//		printf("image change , character_timer = %d\n", al_get_timer_count(character_timer));
+		}
+
+		if (al_get_timer_count(character_timer) % 30 == 0)
+		{
+			do {
+				change_dir = rand() % 4;
+			} while (change_dir == dir);
+		}
+
+		move_character(change_dir);
+		dir = change_dir;
+	//	printf("dir change, character_timer = %d\n", al_get_timer_count(character_timer));
 	}
 
-	//al_clear_to_color(al_map_rgb(204, 225, 152));
+	
 
 	if (!explain_stat) { //stat설명 팝업 띄우기
 		explain_stat=1;
@@ -210,7 +254,7 @@ int scene_1_update() {
 		for (int i = 5; i > 0; i--) {
 			Stack.objs[c - i].enable = false;
 		}
-		al_start_timer(timer);
+		al_start_timer(event_timer);
 		printf("timer start\n");
 	}
 	else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) {//아무데나 누르면 팝업 없애기
@@ -218,10 +262,10 @@ int scene_1_update() {
 	}
 
 
-#define EVENT_TIME 1
-	if (al_get_timer_count(timer) - timer_set > (EVENT_TIME*1000)) {
-		printf("timer : %lld\n", al_get_timer_count(timer));
-		timer_set = al_get_timer_count(timer);
+#define EVENT_TIME 20
+	if (al_get_timer_count(event_timer) - event_timer_set > (EVENT_TIME*1000)) {
+		printf("timer : %lld\n", al_get_timer_count(event_timer));
+		event_timer_set = al_get_timer_count(event_timer);
 		for (event_num = 0; event_num < EVENTCOUNT; event_num++) {
 			if (!event_func[event_num].isStarted) {
 				event_func[event_num].func();
@@ -229,6 +273,13 @@ int scene_1_update() {
 				break;
 			}
 		}
+	}
+
+	
+	//타임바 이동
+	if (al_get_timer_count(timer) - timer_set > 7) {
+		timer_set = al_get_timer_count(timer);
+		timebar.pos.x += 1024 / (20.0 * 100);
 	}
 
 	re_draw();
@@ -244,7 +295,7 @@ int scene_1_fin() {
 
 	al_destroy_config(conf);
 	al_destroy_font(font);
-	al_destroy_timer(timer);
+	al_destroy_timer(event_timer);
 
 	return 0;
 }
@@ -263,7 +314,7 @@ void scene_1_on_click_button_0() {
 
 //단톡방 초대
 void invitation() {
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("invitation\n");
@@ -295,7 +346,7 @@ void invitation() {
 
 //미리정모
 void first_meeting() { 
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("first_meeting\n");
@@ -323,7 +374,7 @@ void first_meeting() {
 
 //새내기 미리배움터
 void newbie_before_study() { 	
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("newbie_before_study\n");
@@ -351,7 +402,7 @@ void newbie_before_study() {
 
 //새내기 정모
 void newbie_meeting() { 
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("newbie_meeting\n");
@@ -379,7 +430,7 @@ void newbie_meeting() {
 
 //새내기 배움터
 void newbie_study() { 
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("newbie_study\n");
@@ -407,7 +458,7 @@ void newbie_study() {
 
 //신입생 OT
 void newbie_OT() { 
-	al_stop_timer(timer);
+	al_stop_timer(event_timer);
 	printf("stop timer\n");
 
 	printf("newbie_OT\n");
@@ -474,7 +525,7 @@ void clicked_yes()
 	sprintf(spstr, "%0.1f", social_point/10.0);
 	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 
-	al_start_timer(timer);
+	al_start_timer(event_timer);
 	int c = Stack.counter;
 
 	for (int i = 6; i > 0; i--) {
@@ -518,7 +569,7 @@ void clicked_no()
 	sprintf(spstr, "%0.1f", social_point / 10.0);
 	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 
-	al_start_timer(timer);
+	al_start_timer(event_timer);
 	int c = Stack.counter;
 
 	for (int i = 6; i > 0; i--) {
