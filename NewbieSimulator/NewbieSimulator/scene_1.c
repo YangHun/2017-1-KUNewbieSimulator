@@ -57,6 +57,9 @@ void clicked_no();
 #define HP_TEXT Stack.objs[5]
 #define SP_TEXT Stack.objs[6]
 
+#define timeline Stack.objs[2]
+#define timebar Stack.objs[3]
+
 int scene_1_init(){
 
 	int i;
@@ -88,9 +91,15 @@ int scene_1_init(){
 	object_t stat_window = create_object("Resources\\dummy\\stat_window.png", 0, 0);
 	Stack.push(&Stack, stat_window);
 
+	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 70, 0, 0);
+	Stack.push(&Stack, bar_bg);
+
+	object_t yellow = create_colored_object(al_map_rgb(251, 226, 138), 0, 70, 0, 0);
+	Stack.push(&Stack, yellow);
+
 	Stack.push(&Stack, create_object("Resources\\dummy\\timebar.png", 0, 0));
-#define timebar Stack.objs[1]
-	
+
+
 
 	object_t health = create_object(NULL, 60, 150);
 	ui_set_text(&health, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "health"), 24);
@@ -113,10 +122,8 @@ int scene_1_init(){
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 	Stack.push(&Stack, sp);
 
-	/*
-	object_t yellow = create_colored_object(al_map_rgb(251, 226, 138), 100, 100, 100, 100);
-	Stack.push(&Stack, yellow);
-	*/
+
+	
 
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
@@ -133,7 +140,7 @@ int scene_1_init(){
 		character[i].enable = false;
 		Stack.push(&Stack, character[i]);
 	}
-#define CHARACTER_START	7
+#define CHARACTER_START	9
 	Stack.objs[CHARACTER_START].enable = true;
 
 	//이벤트 함수 모음
@@ -280,6 +287,7 @@ int scene_1_update() {
 	if (al_get_timer_count(timer) - timer_set > 7) {
 		timer_set = al_get_timer_count(timer);
 		timebar.pos.x += 1024 / (20.0 * 100);
+		timeline.rect.width = timebar.pos.x+5;
 	}
 
 	re_draw();

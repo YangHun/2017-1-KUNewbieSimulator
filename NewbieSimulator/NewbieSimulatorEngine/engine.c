@@ -80,6 +80,7 @@ static int engine() {
 
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_init_primitives_addon();
 	al_init_timeout(&timeout, 0.1);
 
 	//core initialization
