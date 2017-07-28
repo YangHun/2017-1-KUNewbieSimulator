@@ -50,7 +50,7 @@ void ui_set_scrollbar(object_t *o, object_t *target, char *b_top_path, char *b_b
 
 	mbbot.modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
 	Stack.push(&Stack, mbbot);
-	o->modifier.value.scrollbar.button_bottom = &mbbot; //it must be free();
+	o->modifier.value.scrollbar.button_bottom = &Stack.objs[Stack.counter - 1]; //it must be free();
 	
 	printf("enter\n");
 

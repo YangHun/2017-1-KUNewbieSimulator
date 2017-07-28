@@ -45,6 +45,20 @@ static int engine() {
 		return -1;
 	}
 
+	if (!al_init_font_addon()) {
+		fprintf(stderr, "failed to initialize the font!\n");
+		return -1;
+	}
+	if (!al_init_ttf_addon()) {
+		fprintf(stderr, "failed to initialize the ttf!\n");
+		return -1;
+	}
+	if (!al_init_primitives_addon()) {
+		fprintf(stderr, "failed to initialize the primitives addon!\n");
+		return -1;
+	}
+
+
 	timer = al_create_timer(1.0 / FPS);
 	if (!timer) {
 		fprintf(stderr, "failed to create timer!\n");
@@ -66,6 +80,7 @@ static int engine() {
 		return -1;
 	}
 
+
 	event_queue = al_create_event_queue();
 	if (!event_queue) {
 		fprintf(stderr, "failed to create event_queue!\n");
@@ -78,9 +93,7 @@ static int engine() {
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-	al_init_font_addon();
-	al_init_ttf_addon();
-	al_init_primitives_addon();
+	
 	al_init_timeout(&timeout, 0.1);
 	
 

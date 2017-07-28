@@ -21,7 +21,8 @@ int scene_0_init() {
 	Stack.push(&Stack, scrollbar);
 	object_t target = create_object("Resources\\dummy\\scroller\\target.png", 150, 150);
 	Stack.push(&Stack, target);
-	ui_set_scrollbar(&Stack.objs[1], &Stack.objs[2], "Resources\\dummy\\scroller\\b_top.png", "Resources\\dummy\\scroller\\b_bot.png", al_map_rgb(255, 255, 255), al_map_rgb(0, 0, 0));
+	ui_set_scrollbar(&Stack.objs[1], &Stack.objs[2], "Resources\\dummy\\scroller\\b_top.png", 
+		"Resources\\dummy\\scroller\\b_bot.png", al_map_rgb(255, 255, 255), al_map_rgb(0, 0, 0));
 	
 	return 0;
 }
