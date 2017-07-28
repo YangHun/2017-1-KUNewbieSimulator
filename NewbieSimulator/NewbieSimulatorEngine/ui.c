@@ -24,32 +24,48 @@ void ui_set_scrollbar(object_t *o, object_t *target, char *b_top_path, char *b_b
 	// button_top, bot : button in this scrollbar
 	// buttons must be square.
 
-	object_t *mbody = malloc(sizeof(object_t));
-	object_t *mbtop = malloc(sizeof(object_t));
-	object_t *mbbot = malloc(sizeof(object_t));
-	object_t *mthumb = malloc(sizeof(object_t));
-	int button_size;
+	int button_size = al_get_bitmap_width(al_load_bitmap(b_top_path));
 	int thumb_size = 0;
+
+	object_t mbody = create_colored_object(body_color, button_size, o->rect.height, o->rect.top, o->rect.left + o->rect.width - button_size);
+	object_t mbtop = create_object(b_top_path, mbody.pos.x, mbody.pos.y);
+	object_t mbbot = create_object(b_bot_path, mbody.pos.x, mbody.pos.y + o->rect.height - button_size);
+	object_t mthumb;
+
+	//al_set_clipping_rectangle(o->pos.x, o->pos.y, o->rect.width, o->rect.height);
 
 	o->modifier.type = OBJECT_MODIFIER_SCROLLBAR;
 	o->modifier.value.scrollbar.target = target;
 
+	target->modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
 	(o->modifier.value.scrollbar.target) = target;
 
-	*mbtop = create_object(b_top_path, mbody->pos.x, mbody->pos.y);
-	button_size = mbtop->rect.width;
-	o->modifier.value.scrollbar.button_top = mbtop; //it must be free();
+	mbody.modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
+	Stack.push(&Stack, mbody);
+	o->modifier.value.scrollbar.body = &Stack.objs[Stack.counter - 1]; 
 
-	*mbbot = create_object(b_bot_path, mbody->pos.x, mbody->pos.y);;
-	o->modifier.value.scrollbar.button_bottom = mbbot; //it must be free();
+	mbtop.modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
+	Stack.push(&Stack, mbtop);
+	o->modifier.value.scrollbar.button_top = &Stack.objs[Stack.counter - 1];
 
-	*mbody = (create_colored_object(body_color, button_size, o->rect.height, o->rect.top, o->rect.left + o->rect.width - button_size));
-	o->modifier.value.scrollbar.body = mbody; //it must be free();
-		
+	mbbot.modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
+	Stack.push(&Stack, mbbot);
+	o->modifier.value.scrollbar.button_bottom = &Stack.objs[Stack.counter - 1]; //it must be free();
+	
+	printf("enter\n");
+
 	if (target->rect.height > o->rect.height) {
-		thumb_size = (int)(o->rect.height / target->rect.height * o->rect.height);
+
+		thumb_size = (int)(((float)o->rect.height / (float)target->rect.height * ((float)o->rect.height - (float)button_size * 2.0)));
 	}
-	*mthumb = create_colored_object(thumb_color, button_size, thumb_size, mbody->rect.top, mbody->rect.left);
-	o->modifier.value.scrollbar.thumb = mthumb; //it must be free();
+
+	
+
+	mthumb.modifier.type = OBJECT_MODIFIER_SCROLLBAR_CHILD;
+	mthumb = create_colored_object(thumb_color, button_size, thumb_size, mbody.rect.top + button_size, mbody.rect.left);
+	Stack.push(&Stack, mthumb);
+	o->modifier.value.scrollbar.thumb = &Stack.objs[Stack.counter - 1];
+
+
 }
 

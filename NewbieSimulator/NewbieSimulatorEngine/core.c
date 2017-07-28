@@ -213,8 +213,8 @@ object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float
 
 	obj.rect.width = width;
 	obj.rect.height = height;
-	obj.rect.left = top;
-	obj.rect.top = left;
+	obj.rect.left = left;
+	obj.rect.top = top;
 
 	obj.pos.x = left;
 	obj.pos.y = top;
@@ -320,7 +320,7 @@ void initialization() {
 	prev = FSMs.states[0];
 	next = NULLFSM;
 
-	current_scene = Scenes.scenes[2];
+	current_scene = Scenes.scenes[0];
 	next_scene = NULLSCENE;
 	
 }
