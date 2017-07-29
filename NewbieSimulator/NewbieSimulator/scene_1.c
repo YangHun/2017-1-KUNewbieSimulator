@@ -61,7 +61,8 @@ void clicked_no();
 #define timebar Stack.objs[3]
 
 int scene_1_init(){
-
+	//scene_1_finish();
+	//testcode for scene_2
 	int i;
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	printf("Scene 1 start!");
