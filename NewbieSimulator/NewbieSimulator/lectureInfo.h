@@ -58,8 +58,14 @@ typedef struct _timeList {
 
 typedef timeList* timeListPtr;
 
+
+
+typedef struct _evalList {
+
+	struct _evalList* next;
+} evalList;
+
 typedef struct _lectureInfo {
-	int classNumber; // 분반
 	int credit; //학점
 	unsigned char identifyNumber[8]; //학술번호
 	unsigned char name[75]; // 강의명
