@@ -176,6 +176,7 @@
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
     <ClCompile Include="scene_2.c" />
+    <ClCompile Include="scene_3.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

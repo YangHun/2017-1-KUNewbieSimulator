@@ -42,6 +42,7 @@ void start () {
 	register_scene_obj(&Scenes.scenes[0], scene_0_init, scene_0_update, scene_0_fin);
 	register_scene_obj(&Scenes.scenes[1], scene_1_init, scene_1_update, scene_1_fin);
 	register_scene_obj(&Scenes.scenes[2], scene_2_init, scene_2_update, scene_2_fin);
+	register_scene_obj(&Scenes.scenes[3], scene_3_init, scene_3_update, scene_3_fin);
 
 
 
