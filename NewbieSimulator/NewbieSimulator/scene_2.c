@@ -59,8 +59,9 @@ static void on_click_lectureList_10();
 
 int onListLecture[LIST_SIZE];
 int previousListLecture[LIST_SIZE];
-//void arrangeLectureList(int selectedScroll);
+void arrangeLectureList(int selectedScroll);
 int canUseKlue; // 클루 사용 가능 여부
+object_t listTextArray[11][5];
 
 int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -174,14 +175,27 @@ int scene_2_init() {
 	object_t downscroll_button = create_object("Resources\\UI\\enroll\\b_scroll_down.jpg", 649, 383);
 	Stack.push(&Stack, downscroll_button); //stack 17
 	
-	
+	/*
 	initList(); //18 ~ 28
+	for (int p = 0; p < 11; p++) { //29 ~ 83
+		listTextArray[p][0] = create_object(NULL, 100, 56 + (p * 33));
+		listTextArray[p][1] = create_object(NULL, 197, 56 + (p * 33));
+		listTextArray[p][2] = create_object(NULL, 238, 56 + (p * 33));
+		listTextArray[p][3] = create_object(NULL, 454, 56 + (p * 33));
+		listTextArray[p][4] = create_object(NULL, 557, 56 + (p * 33));
+
+		Stack.push(&Stack, listTextArray[p][0]);
+		Stack.push(&Stack, listTextArray[p][1]);
+		Stack.push(&Stack, listTextArray[p][2]);
+		Stack.push(&Stack, listTextArray[p][3]);
+		Stack.push(&Stack, listTextArray[p][4]);
+	}
 	for (int i = 0; i < 11; i++) {
 		onListLecture[i] = -1;
 		previousListLecture[i] = -1;
 	}
+	*/
 	printLecture(0);
-	
 	//printLecture_test();
 	return 0;
 }
@@ -192,15 +206,8 @@ int scene_2_update() {
 	//while문 안에 있다 --> 매 frame마다 실행됨
 	sprintf(gradepoint_str, "%d", mySchedule.gradePoint);
 	re_draw();
-
-	/*
-	printSchedule(mySchedule);
-
 	scanf("%d", &input);
-	fflush(stdin);
-
-
-
+	
 	analyzeMessage = analyzeSchedule(lectureTable, mySchedule, input);
 	switch (analyzeMessage)
 	{
@@ -223,7 +230,7 @@ int scene_2_update() {
 	default:
 	break;
 	}
-	*/
+	
 	return 0;
 }
 
@@ -339,7 +346,74 @@ void printLecture(int index) {
 
 
 }
+/*
+void arrangeLectureList(int selectedScroll) {
+	int i = 0;
+	int j = 0;
+	for (int k = 0; k < LIST_SIZE; k++) {
+		previousListLecture[k] = onListLecture[k];
+		onListLecture[k] = -1;
+	}
+	while (i < LIST_SIZE && j < LECTURE_SIZE) {
+		if (lectureTable[j].classify == isActive) {
+			onListLecture[i] = j;
+			i++;
+		}
+		j++;
+	}
+	for (int k = 0; k < LIST_SIZE; k++) {
+		printf("%d ", onListLecture[k]);
+	}
+	printf("\n");
+	int p = 29; // 29부터 83까지가 List text의 위치
+	
+	for (int k = 0; k < LIST_SIZE; k++) {
+		if (onListLecture[k] != -1) {
+			
+			if (previousListLecture[k] != -1) {
+				al_destroy_font(&Stack.objs[p++].modifier.value.font_value.font); //o->modifier.value.font_value.font
+				al_destroy_font(&Stack.objs[p++].modifier.value.font_value.font);
+				al_destroy_font(&Stack.objs[p++].modifier.value.font_value.font);
+				al_destroy_font(&Stack.objs[p++].modifier.value.font_value.font);
+				al_destroy_font(&Stack.objs[p++].modifier.value.font_value.font);
+				p -= 5;
+			}
+			
+			ui_set_text(&Stack.objs[p++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, lectureTable[onListLecture[k]].identifyNumber, 18);
+			ui_set_text(&Stack.objs[p++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "00", 18);
+			ui_set_text(&Stack.objs[p++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "name", lectureTable[onListLecture[k]].identifyNumber), 17);
+			ui_set_text(&Stack.objs[p++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "room", lectureTable[onListLecture[k]].identifyNumber), 17);
+			ui_set_text(&Stack.objs[p++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "time", lectureTable[onListLecture[k]].identifyNumber), 17);
+			
+		}
+		else {
 
+		}
+		
+		object_t text_idnumber = create_object(NULL, 105, 22);
+		ui_set_text(&text_idnumber, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "idnumber"), 18);
+		Stack.push(&Stack, text_idnumber);
+
+		object_t text_separate_class = create_object(NULL, 195, 22);
+		ui_set_text(&text_separate_class, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "separate_class"), 18);
+		Stack.push(&Stack, text_separate_class);
+
+		object_t text_lecture_name = create_object(NULL, 303, 22);
+		ui_set_text(&text_lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "lecture_name"), 18);
+		Stack.push(&Stack, text_lecture_name);
+
+		object_t text_lecture_room = create_object(NULL, 470, 22);
+		ui_set_text(&text_lecture_room, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "lecture_room"), 18);
+		Stack.push(&Stack, text_lecture_room);
+
+		object_t text_lecture_time = create_object(NULL, 570, 22);
+		ui_set_text(&text_lecture_time, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "lecture_time"), 18);
+		Stack.push(&Stack, text_lecture_time);
+		
+	}
+	
+}
+*/
 void initList() {
 	void(*fp)(void) = NULL;
 	int i = 0;

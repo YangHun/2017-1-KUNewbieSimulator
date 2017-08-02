@@ -40,13 +40,12 @@ timeListPtr registerTimeList(char* key) {
 				if (timePhase == 0 || timePhase == 2) {
 					endTime = startTime;
 				}
-				for (int q = startTime; q <= endTime; q++) {
-					timeListPtr tempNode = (timeListPtr)malloc(sizeof(timeList));
-					tempNode->timeblock.dayofWeek = whatDayFunc(hangul);
-					tempNode->timeblock.period = q;
-					tempNode->next = nullNode->next;
-					nullNode->next = tempNode;
-				}
+				timeListPtr tempNode = (timeListPtr)malloc(sizeof(timeList));
+				tempNode->timeblock.dayofWeek = whatDayFunc(hangul);
+				tempNode->timeblock.period = startTime;
+				tempNode->timeblock.interval = endTime - startTime;
+				tempNode->next = nullNode->next;
+				nullNode->next = tempNode;
 				startTime = 0;
 				endTime = 0;
 				timePhase = 0;

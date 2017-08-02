@@ -52,6 +52,7 @@ typedef enum _whatDay {
 typedef struct _timeBlock {
 	enum whatDay dayofWeek; //요일
 	int period; //교시
+	int interval; //연강
 } timeBlock;
 
 typedef struct _timeList {
