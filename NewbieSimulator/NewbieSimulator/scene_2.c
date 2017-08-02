@@ -161,7 +161,7 @@ int scene_2_init() {
 	ui_set_text(&text_lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "lecture_name"), 18);
 	Stack.push(&Stack, text_lecture_name);//stack 13
 
-	object_t text_lecture_room = create_object(NULL, 453, 22);
+	object_t text_lecture_room = create_object(NULL, 445, 22);
 	ui_set_text(&text_lecture_room, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "lecture_room"), 18);
 	Stack.push(&Stack, text_lecture_room); //stack 14
 
@@ -181,8 +181,8 @@ int scene_2_init() {
 	for (int p = 0; p < 11; p++) { //29 ~ 83
 		listTextArray[p][0] = create_object(NULL, 100, 56 + (p * 33));
 		listTextArray[p][1] = create_object(NULL, 197, 56 + (p * 33));
-		listTextArray[p][2] = create_object(NULL, 337, 56 + (p * 33));
-		listTextArray[p][3] = create_object(NULL, 479, 56 + (p * 33));
+		listTextArray[p][2] = create_object(NULL, 237, 56 + (p * 33));
+		listTextArray[p][3] = create_object(NULL, 449, 56 + (p * 33));
 		listTextArray[p][4] = create_object(NULL, 520, 56 + (p * 33));
 
 		
@@ -192,11 +192,11 @@ int scene_2_init() {
 		Stack.push(&Stack, listTextArray[p][3]);
 		Stack.push(&Stack, listTextArray[p][4]);
 
-		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 18);
-		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 18);
-		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_CENTER, "", 17);
-		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_CENTER, "", 17);
-		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 17);
+		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 16);
+		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 16);
+		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 16);
+		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 16);
+		ui_set_text(&Stack.objs[my_stackcounter_1++], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 16);
 	}
 	for (int i = 0; i < 11; i++) {
 		onListLecture[i] = -1;
