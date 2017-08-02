@@ -58,7 +58,6 @@ static void on_click_lectureList_9();
 static void on_click_lectureList_10();
 
 int onListLecture[LIST_SIZE];
-int previousListLecture[LIST_SIZE];
 void arrangeLectureList(int selectedScroll);
 int canUseKlue; // 클루 사용 가능 여부
 object_t listTextArray[11][5];
@@ -96,7 +95,7 @@ int scene_2_init() {
 	ui_set_button(&button_core);
 	ui_set_on_click_listener(&button_core, on_click_button_core);
 	Stack.push(&Stack, button_core);
-#define BUTTON_CORE Stack.objs[2] //누르면 터진다???
+#define BUTTON_CORE Stack.objs[2] 
 
 	pushed_selective = create_object("Resources\\UI\\enroll\\b_select_pushed.png", 0, 34);
 	Stack.push(&Stack, pushed_selective);
@@ -176,9 +175,9 @@ int scene_2_init() {
 	Stack.push(&Stack, downscroll_button); //stack 17
 	
 	
-	initList(); //18 ~ 28
-	int my_stackcounter_1 = 29;
-	for (int p = 0; p < 11; p++) { //29 ~ 83
+	initList(); //18 ~ 61
+	int my_stackcounter_1 = 62;
+	for (int p = 0; p < 11; p++) { //62 ~ 116
 		listTextArray[p][0] = create_object(NULL, 100, 56 + (p * 33));
 		listTextArray[p][1] = create_object(NULL, 197, 56 + (p * 33));
 		listTextArray[p][2] = create_object(NULL, 237, 56 + (p * 33));
@@ -200,10 +199,44 @@ int scene_2_init() {
 	}
 	for (int i = 0; i < 11; i++) {
 		onListLecture[i] = -1;
-		previousListLecture[i] = -1;
 	}
-	
-	printLecture(0);
+
+	//------------------------------------------------
+	// lecture showing
+	//------------------------------------------------
+
+	//y좌표 강의명460 | 시간/강의실 495 | 학수번호 530 | 이수구분 565 | 수업 방법 600 | 평가방법 670 (간격 35)
+	//lecture_name : 강의명
+
+	object_t lecture_name = create_object(NULL, 191, 460);
+	ui_set_text(&lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_name); //117
+
+	//lecture_time : 시간/강의실
+	object_t lecture_time = create_object(NULL, 191, 495);
+	ui_set_text(&lecture_time, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_time); //118
+
+	//lecture_number : 학수번호
+	object_t lecture_number = create_object(NULL, 191, 530);
+	ui_set_text(&lecture_number, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_number); //119
+
+	//lecture_credit : 이수구분.학점
+	object_t lecture_credit = create_object(NULL, 191, 565);
+	ui_set_text(&lecture_credit, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_credit); //120
+
+	//lecture_class : 수업 방법
+	object_t lecture_class = create_object(NULL, 191, 600);
+	ui_set_text(&lecture_class, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_class); //121
+
+	//lecture_eval : 평가 방법
+	object_t lecture_eval = create_object(NULL, 191, 670);
+	ui_set_text(&lecture_eval, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_eval); //122
+
 	//printLecture_test();
 	return 0;
 }
@@ -260,7 +293,35 @@ int scene_2_fin() {
 }
 
 void on_click_add_lecture(void) {
+	int input;
+	for (int k = 0; k < LIST_SIZE; k++) {
+		if (Stack.objs[21 + k * 4].enable == true) {
+			input = onListLecture[k];
+		}
+	}
+	printf("%d input \n", input);
+	analyzeMessage = analyzeSchedule(lectureTable, mySchedule, input);
+	switch (analyzeMessage)
+	{
+	case EXCEED_POINT:
+		printf("point Exceeded. delete other Lecture\n");
+		break;
 
+	case NO_OVERLAP:
+		addLectureToSchedule(lectureTable, mySchedulePtr, input);
+		break;
+
+	case TIME_OVERLAP:
+		printf("time overlapped. try again\n");
+		break;
+
+	case ALREADY_EXIST:
+		deleteLectureFromSchedule(lectureTable, mySchedulePtr, input);
+		break;
+
+	default:
+		break;
+	}
 }
 
 void on_click_campus_map(void) {
@@ -288,7 +349,7 @@ void on_click_button_core() {
 	}
 }
 
-void toggle_button(ActiveButton active) {
+void toggle_button(ActiveButton active) { // 좌측 3개를 눌렀을 때
 	PUSHED_CORE.enable = false;
 	PUSHED_MAJOR.enable = false;
 	PUSHED_SELECTIVE.enable = false;
@@ -316,52 +377,41 @@ void toggle_button(ActiveButton active) {
 //---------------------------
 
 
-void printLecture(int index) {
-	lectureInfo lecture = lectureTable[index];
-
-	printf("%s\n", lecture.identifyNumber);
-	printf("<%s>\n", al_get_config_value(conf, "name", lecture.identifyNumber));
-	//y좌표 강의명460 | 시간/강의실 495 | 학수번호 530 | 이수구분 565 | 수업 방법 600 | 평가방법 670 (간격 35)
-	//lecture_name : 강의명
-
-	object_t lecture_name = create_object(NULL, 191, 460);
-	ui_set_text(&lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "name", lecture.identifyNumber), 25);
-	Stack.push(&Stack, lecture_name);
-
-	//lecture_time : 시간/강의실
-	object_t lecture_time = create_object(NULL, 191, 495);
-	ui_set_text(&lecture_time, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "time", lecture.identifyNumber), 25);
-	Stack.push(&Stack, lecture_time);
-
-
-	//lecture_number : 학수번호
-	object_t lecture_number = create_object(NULL, 191, 530);
-	ui_set_text(&lecture_number, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, lecture.identifyNumber, 25);
-	Stack.push(&Stack, lecture_number);
-
-	//lecture_credit : 이수구분.학점
-	object_t lecture_credit = create_object(NULL, 191, 565);
-	ui_set_text(&lecture_credit, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "credit", lecture.identifyNumber), 25);
-	Stack.push(&Stack, lecture_credit);
-
-	//lecture_class : 수업 방법
-	object_t lecture_class = create_object(NULL, 191, 600);
-	ui_set_text(&lecture_class, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "tuition_method", lecture.identifyNumber), 25);
-	Stack.push(&Stack, lecture_class);
-
-	//lecture_eval : 평가 방법
-	object_t lecture_eval = create_object(NULL, 191, 670);
-	ui_set_text(&lecture_eval, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "evaluation_method", lecture.identifyNumber), 25);
-	Stack.push(&Stack, lecture_eval);
-
-
+void printLecture(int index) { //좌측 하단 출력
+	lectureInfo lecture = lectureTable[onListLecture[index]];
+	// 117 강의명 118 시간/강의실 119 학수번호 120 이수구분/학점 121 수업방법 122 평가방법
+	
+	Stack.objs[117].modifier.value.font_value.text = al_get_config_value(conf, "name", lecture.identifyNumber);
+	Stack.objs[118].modifier.value.font_value.text = al_get_config_value(conf, "time_room", lecture.identifyNumber);
+	Stack.objs[119].modifier.value.font_value.text = lecture.identifyNumber;
+	Stack.objs[120].modifier.value.font_value.text = al_get_config_value(conf, "classify_credit", lecture.identifyNumber);
+	Stack.objs[121].modifier.value.font_value.text = al_get_config_value(conf, "tuition_method", lecture.identifyNumber);
+	Stack.objs[122].modifier.value.font_value.text = al_get_config_value(conf, "evaluation_method", lecture.identifyNumber);
 }
 
-void arrangeLectureList(int selectedScroll) {
+void resetLectureList(){ // List 색 초기화
+	for (int k = 0; k < LIST_SIZE; k++) {
+		Stack.objs[(4 * k) + 18].enable = true;
+		Stack.objs[(4 * k) + 19].enable = false;
+		Stack.objs[(4 * k) + 20].enable = false;
+		Stack.objs[(4 * k) + 21].enable = false;
+		if (onListLecture[k] >= 0) {
+			if (lectureTable[onListLecture[k]].klueRating == GOOD) {
+				Stack.objs[(4 * k) + 18].enable = false;
+				Stack.objs[(4 * k) + 19].enable = true;
+			}
+			else if (lectureTable[onListLecture[k]].klueRating == BAD) {
+				Stack.objs[(4 * k) + 18].enable = false;
+				Stack.objs[(4 * k) + 20].enable = true;
+			}
+		}
+	}
+}
+
+void arrangeLectureList(int selectedScroll) { // 좌측 버튼을 만질 경우 재정렬
 	int i = 0;
 	int j = 0;
 	for (int k = 0; k < LIST_SIZE; k++) {
-		previousListLecture[k] = onListLecture[k];
 		onListLecture[k] = -1;
 	}
 	while (i < LIST_SIZE && j < LECTURE_SIZE) {
@@ -371,12 +421,12 @@ void arrangeLectureList(int selectedScroll) {
 		}
 		j++;
 	}
+	resetLectureList();
 	for (int k = 0; k < LIST_SIZE; k++) {
 		printf("%d ", onListLecture[k]);
 	}
 	printf("\n");
-	int p = 29; // 29부터 83까지가 List text의 위치
-	
+	int p = 62; // 62부터 116까지가 List text의 위치
 	for (int k = 0; k < LIST_SIZE; k++) {
 		if (onListLecture[k] != -1) {
 
@@ -400,14 +450,20 @@ void arrangeLectureList(int selectedScroll) {
 	
 }
 
-void initList() {
+void initList() { //강의 리스트 부분 초기화 // 18 ~ 61
 	void(*fp)(void) = NULL;
 	int i = 0;
-	object_t lectureButton[LIST_SIZE];
-	while (i != LIST_SIZE) {
-		lectureButton[i] = create_object("Resources\\UI\\enroll\\bar_normal_lecture.jpg", 92, 45 + (i * 33));
+	object_t lectureButton[LIST_SIZE * 4];
+	for (i = 0; i < LIST_SIZE * 4; i += 4) {
+		lectureButton[i] = create_object("Resources\\UI\\enroll\\bar_normal_lecture.jpg", 92, 45 + ((i/4) * 33));
+		lectureButton[i + 1] = create_object("Resources\\UI\\enroll\\bar_honey_lecture.jpg", 92, 45 + ((i/4) * 33));
+		lectureButton[i + 2] = create_object("Resources\\UI\\enroll\\bar_bomb_lecture.jpg", 92, 45 + ((i/4) * 33));
+		lectureButton[i + 3] = create_object("Resources\\UI\\enroll\\bar_selected_lecture.jpg", 92, 45 + ((i/4) * 33));
 		ui_set_button(&lectureButton[i]);
-		switch (i)
+		ui_set_button(&lectureButton[i + 1]);
+		ui_set_button(&lectureButton[i + 2]);
+		ui_set_button(&lectureButton[i + 3]);
+		switch (i/4)
 		{
 		case 0:
 			fp = on_click_lectureList_0;
@@ -446,12 +502,21 @@ void initList() {
 			break;
 		}
 		ui_set_on_click_listener(&lectureButton[i], fp);
-		Stack.push(&Stack, lectureButton[i]);
-		i++;
-	}
-	
-}
+		ui_set_on_click_listener(&lectureButton[i + 1], fp);
+		ui_set_on_click_listener(&lectureButton[i + 2], fp);
+		ui_set_on_click_listener(&lectureButton[i + 3], fp);
 
+		Stack.push(&Stack, lectureButton[i]);
+		Stack.push(&Stack, lectureButton[i + 1]);
+		Stack.push(&Stack, lectureButton[i + 2]);
+		Stack.push(&Stack, lectureButton[i + 3]);
+		Stack.objs[19 + i].enable = false;
+		Stack.objs[20 + i].enable = false;
+		Stack.objs[21 + i].enable = false;
+	}
+
+}
+/*
 void printLecture_test(void) {
 	lectureInfo lecture = lectureTable[0];
 
@@ -472,37 +537,126 @@ void printLecture_test(void) {
 	al_get_config_value(conf, "name", lecture.identifyNumber);
 
 }
-
+*/
 static void on_click_lectureList_0() {
-
+	if (onListLecture[0] != -1) { // 만약 이 칸에 강의가 채워져 있다면
+		resetLectureList();
+		Stack.objs[18].enable = false;
+		Stack.objs[19].enable = false;
+		Stack.objs[20].enable = false;
+		Stack.objs[21].enable = true;
+		printf("0 call \n");
+		printLecture(0);
+	}
 }
 static void on_click_lectureList_1() {
+	if (onListLecture[1] != -1) {
+		resetLectureList();
+		Stack.objs[22].enable = false;
+		Stack.objs[23].enable = false;
+		Stack.objs[24].enable = false;
+		Stack.objs[25].enable = true;
+		printf("1 call \n");
+		printLecture(1);
+	}
 
 }
 static void on_click_lectureList_2() {
-	
+	if (onListLecture[2] != -1) {
+		resetLectureList();
+		Stack.objs[26].enable = false;
+		Stack.objs[27].enable = false;
+		Stack.objs[28].enable = false;
+		Stack.objs[29].enable = true;
+		printf("2 call \n");
+		printLecture(2);
+	}
 }
 static void on_click_lectureList_3() {
-	
+	if (onListLecture[3] != -1) {
+		resetLectureList();
+		Stack.objs[30].enable = false;
+		Stack.objs[31].enable = false;
+		Stack.objs[32].enable = false;
+		Stack.objs[33].enable = true;
+		printf("3 call \n");
+		printLecture(3);
+	}
 }
 static void on_click_lectureList_4() {
-	
+	if (onListLecture[4] != -1) {
+		resetLectureList();
+		Stack.objs[34].enable = false;
+		Stack.objs[35].enable = false;
+		Stack.objs[36].enable = false;
+		Stack.objs[37].enable = true;
+		printf("4 call \n");
+		printLecture(4);
+	}
 }
 static void on_click_lectureList_5() {
-	
+	if (onListLecture[5] != -1) {
+		resetLectureList();
+		Stack.objs[38].enable = false;
+		Stack.objs[39].enable = false;
+		Stack.objs[40].enable = false;
+		Stack.objs[41].enable = true;
+		printf("5 call \n");
+		printLecture(5);
+	}
 }
 static void on_click_lectureList_6() {
-	
+	if (onListLecture[6] != -1) {
+		resetLectureList();
+		Stack.objs[42].enable = false;
+		Stack.objs[43].enable = false;
+		Stack.objs[44].enable = false;
+		Stack.objs[45].enable = true;
+		printf("6 call \n");
+		printLecture(6);
+	}
 }
 static void on_click_lectureList_7() {
-	
+	if (onListLecture[7] != -1) {
+		resetLectureList();
+		Stack.objs[46].enable = false;
+		Stack.objs[47].enable = false;
+		Stack.objs[48].enable = false;
+		Stack.objs[49].enable = true;
+		printf("7 call \n");
+		printLecture(7);
+	}
 }
 static void on_click_lectureList_8() {
-	
+	if (onListLecture[8] != -1) {
+		resetLectureList();
+		Stack.objs[50].enable = false;
+		Stack.objs[51].enable = false;
+		Stack.objs[52].enable = false;
+		Stack.objs[53].enable = true;
+		printf("8 call \n");
+		printLecture(8);
+	}
 }
 static void on_click_lectureList_9() {
-	
+	if (onListLecture[9] != -1) {
+		resetLectureList();
+		Stack.objs[54].enable = false;
+		Stack.objs[55].enable = false;
+		Stack.objs[56].enable = false;
+		Stack.objs[57].enable = true;
+		printf("9 call \n");
+		printLecture(9);
+	}
 }
 static void on_click_lectureList_10() {
-
+	if (onListLecture[10] != -1) {
+		resetLectureList();
+		Stack.objs[58].enable = false;
+		Stack.objs[59].enable = false;
+		Stack.objs[60].enable = false;
+		Stack.objs[61].enable = true;
+		printf("10 call \n");
+		printLecture(10);
+	}
 }
