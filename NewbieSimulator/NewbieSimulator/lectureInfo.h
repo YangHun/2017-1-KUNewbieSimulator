@@ -95,9 +95,9 @@ typedef enum _tuition_index {
 } tuition_index;
 
 typedef enum _attendance {
-	LOOSE, //´À½¼
+	ATT_LOOSE, //´À½¼
 	ATT_NORMAL, // º¸Åë
-	TIGHT // ºýºýÇÔ
+	ATT_TIGHT // ºýºýÇÔ
 } AttendanceRate;
 
 typedef struct _lectureInfo {

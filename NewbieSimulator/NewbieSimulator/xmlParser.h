@@ -344,13 +344,13 @@ void xmlParse(lectureInfo lectureTable[]) {
 		}
 		switch (lectureTable[i].Att)
 		{
-		case LOOSE:
+		case ATT_LOOSE:
 			printf("%s \n", u8"´À½¼");
 			break;
 		case ATT_NORMAL:
 			printf("%s \n", u8"º¸Åë");
 			break;
-		case BAD:
+		case ATT_TIGHT:
 			printf("%s \n", u8"Ä®°°À½");
 			break;
 		default:

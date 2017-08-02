@@ -66,9 +66,9 @@ int getKlueMessage(char* name) {
 int getAttMessage(char* name) {
 	switchs(name) {
 		cases("TIGHT")
-			return TIGHT;
+			return ATT_TIGHT;
 		cases("LOOSE")
-			return LOOSE;
+			return ATT_LOOSE;
 		cases("NORMAL")
 			return ATT_NORMAL;
 		defaults

@@ -85,7 +85,7 @@ int pull_stack(objstack_t *stack) {
 
 int clear_stack(objstack_t *stack) {
 
-	printf("enter \n");
+	//printf("enter \n");
 
 	if (!(stack->is_empty(stack))) {
 

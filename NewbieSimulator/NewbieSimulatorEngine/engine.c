@@ -238,7 +238,7 @@ void engine_draw_background() {
 
 void engine_draw_objs() {
 	
-	printf("enter");
+//	printf("enter");
 
 	int i = 0;
 	for (i = 0; i < Stack.counter; i++) {
