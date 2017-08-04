@@ -8,7 +8,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	mySchedulePtr->idNumberList->str = NULL;
 	mySchedulePtr->idNumberList->next = NULL;
 
-	mySchedulePtr->gradePoint = 0;
+	mySchedulePtr->credit = 0;
 
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
@@ -41,6 +41,7 @@ void printSchedule(schedule mySchedule) {
 	}
 }
 void addLectureToSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, int index) {
+	mySchedulePtr->credit += lectureTable[index].credit;
 	for (strListPtr p = mySchedulePtr->idNumberList; p != NULL; p = p->next) {
 		if (p->next == NULL) {
 			strListPtr tempNode = (strListPtr)malloc(sizeof(strList));
@@ -116,7 +117,7 @@ int analyzeSchedule(lectureInfo lectureTable[], schedule mySchedule, int index) 
 	}
 
 	//학점초과 확인
-	if (mySchedule.gradePoint + target.credit > MAX_CREDIT)
+	if (mySchedule.credit + target.credit > MAX_CREDIT)
 		return EXCEED_POINT;
 
 	// if (currentPtr == NULL)

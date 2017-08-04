@@ -6,12 +6,13 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
-#define LECTURE_SIZE 17
+#define LECTURE_SIZE 12
+#define MAX_DEFAULT_STACK 172
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
 int input = 0;
 int analyzeMessage = MESSAGE_DEFAULT;
-
+int protectOverlapClick = 0;
 char gradepoint_str[3];
 
 schedule mySchedule;
@@ -22,26 +23,25 @@ ALLEGRO_BITMAP* tempimage = NULL;
 ALLEGRO_FONT *font;
 ALLEGRO_CONFIG *conf;
 
-typedef enum { B_INIT, B_SELECTIVE, B_MAJOR, B_CORE, B_UPSCROLL, B_DOWNSCROLL }ActiveButton;
+typedef enum { B_INIT, B_SELECTIVE, B_MAJOR, B_CORE}ActiveButton;
 ActiveButton isActive = B_INIT;
 
 object_t pushed_major;
 object_t pushed_core;
 object_t pushed_selective;
 
-
 void printLecture(int index);
-void printLecture_test(void);
 void initList();
-
-
 static void toggle_button(ActiveButton active);
 
 static void on_click_button_0();
 static void on_click_button_selective();
 static void on_click_button_major();
 static void on_click_button_core();
-
+static void on_click_button_scroll_up();
+static void on_click_button_scroll_down();
+static void on_click_reset();
+static void on_click_finish();
 static void on_click_add_lecture();
 static void on_click_campus_map();
 
@@ -57,10 +57,15 @@ static void on_click_lectureList_8();
 static void on_click_lectureList_9();
 static void on_click_lectureList_10();
 
+char* getBlockImageAddr(int key);
 int onListLecture[LIST_SIZE];
 void arrangeLectureList(int selectedScroll);
+void addTimeblockImage(int input, int isRegister);
+void deleteTimeblockImage(int input);
 int canUseKlue; // 클루 사용 가능 여부
-object_t listTextArray[11][5];
+int colorArray[7]; // -1 미사용 index 사용중
+int selectedLectureIndex;
+int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
 
 int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -68,6 +73,31 @@ int scene_2_init() {
 	printf("Scene 2 start!");
 
 	canUseKlue = 1; // true
+	selectedLectureIndex = -1;
+	for (int i = 0; i < 7; i++) {
+		colorArray[i] = -1;
+	}
+	majorStart = majorEnd = coreStart = coreEnd = selectiveStart = selectiveEnd = -1;
+	for (int i = 0; i < LECTURE_SIZE; i++) {
+		if (majorStart == -1 && lectureTable[i].classify == MAJOR) {
+			majorStart = i;
+		}
+		if (coreStart == -1 && lectureTable[i].classify == CORE) {
+			coreStart = i;
+		}
+		if (selectiveStart == -1 && lectureTable[i].classify == SELECTIVE) {
+			selectiveStart = i;
+		}
+		if (majorStart != -1 && lectureTable[i].classify == MAJOR) {
+			majorEnd = i;
+		}
+		if (coreStart != -1 && lectureTable[i].classify == CORE) {
+			coreEnd = i;
+		}
+		if (selectiveStart != -1 && lectureTable[i].classify == SELECTIVE) {
+			selectiveEnd = i;
+		}
+	}
 
 	object_t bg = create_object("Resources\\UI\\enroll\\background.jpg", 0, 0);
 	Background = bg;
@@ -129,7 +159,7 @@ int scene_2_init() {
 	// Texts
 	//------------------------------------------------
 
-	object_t n = create_object(NULL, 1026, 615);
+	object_t n = create_object(NULL, 1020, 613);
 	ui_set_text(&n, al_map_rgb(155, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, gradepoint_str, 30);
 	Stack.push(&Stack, n); //stack 8
 
@@ -169,14 +199,19 @@ int scene_2_init() {
 	Stack.push(&Stack, text_lecture_time); //stack 15
 
 	object_t upscroll_button = create_object("Resources\\UI\\enroll\\b_scroll_up.jpg", 649, 18);
+	ui_set_button(&upscroll_button);
+	ui_set_on_click_listener(&upscroll_button, on_click_button_scroll_up);
 	Stack.push(&Stack, upscroll_button);//stack 16
 
 	object_t downscroll_button = create_object("Resources\\UI\\enroll\\b_scroll_down.jpg", 649, 383);
+	ui_set_button(&downscroll_button);
+	ui_set_on_click_listener(&downscroll_button, on_click_button_scroll_down);
 	Stack.push(&Stack, downscroll_button); //stack 17
 	
 	
 	initList(); //18 ~ 61
 	int my_stackcounter_1 = 62;
+	object_t listTextArray[11][5];;
 	for (int p = 0; p < 11; p++) { //62 ~ 116
 		listTextArray[p][0] = create_object(NULL, 100, 56 + (p * 33));
 		listTextArray[p][1] = create_object(NULL, 197, 56 + (p * 33));
@@ -202,7 +237,7 @@ int scene_2_init() {
 	}
 
 	//------------------------------------------------
-	// lecture showing
+	// lecture info screen
 	//------------------------------------------------
 
 	//y좌표 강의명460 | 시간/강의실 495 | 학수번호 530 | 이수구분 565 | 수업 방법 600 | 평가방법 670 (간격 35)
@@ -237,7 +272,55 @@ int scene_2_init() {
 	ui_set_text(&lecture_eval, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
 	Stack.push(&Stack, lecture_eval); //122
 
-	//printLecture_test();
+	//------------------------------------------------
+	// timetable Block
+	//------------------------------------------------
+
+	object_t timeBlockArray[5][9];
+	for (int p = 0; p < 9; p++) { //123 ~ 167
+		timeBlockArray[0][p] = create_object(NULL, 741, 37 + (p * 46));
+		timeBlockArray[1][p] = create_object(NULL, 823, 37 + (p * 46));
+		timeBlockArray[2][p] = create_object(NULL, 905, 37 + (p * 46));
+		timeBlockArray[3][p] = create_object(NULL, 987, 37 + (p * 46));
+		timeBlockArray[4][p] = create_object(NULL, 1069, 37 + (p * 46));
+
+		Stack.push(&Stack, timeBlockArray[0][p]);
+		Stack.push(&Stack, timeBlockArray[1][p]);
+		Stack.push(&Stack, timeBlockArray[2][p]);
+		Stack.push(&Stack, timeBlockArray[3][p]);
+		Stack.push(&Stack, timeBlockArray[4][p]);
+	}
+	
+	//------------------------------------------------
+	// KLUE
+	//------------------------------------------------
+
+	object_t KlueHoneyPanel = create_object("Resources\\UI\\enroll\\popup_klue_honey.png", 679, 481);
+	Stack.push(&Stack, KlueHoneyPanel); //168
+	Stack.objs[168].enable = false;
+
+	object_t KlueBombPanel = create_object("Resources\\UI\\enroll\\popup_klue_honey.png", 679, 481);
+	Stack.push(&Stack, KlueBombPanel); //169
+	Stack.objs[169].enable = false;
+
+	//------------------------------------------------
+	// Big button
+	//------------------------------------------------
+
+	object_t Reset_button = create_object("Resources\\UI\\enroll\\b_reset.png", 1160, 254);
+	ui_set_button(&Reset_button);
+	ui_set_on_click_listener(&Reset_button, on_click_reset);
+	Stack.push(&Stack, Reset_button); //170
+
+	object_t Finish_button = create_object("Resources\\UI\\enroll\\b_finish.png", 1160, 365);
+	ui_set_button(&Finish_button);
+	ui_set_on_click_listener(&Finish_button, on_click_finish);
+	Stack.push(&Stack, Finish_button); //171
+
+	//------------------------------------------------
+	// KLUE Text
+	//------------------------------------------------
+
 	return 0;
 }
 
@@ -246,34 +329,8 @@ int scene_2_update() {
 	//Scene 2의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 
-	sprintf(gradepoint_str, "%d", mySchedule.gradePoint);
+	sprintf(gradepoint_str, "%d", mySchedule.credit);
 	re_draw();
-	/*
-	scanf("%d", &input);
-	
-	analyzeMessage = analyzeSchedule(lectureTable, mySchedule, input);
-	switch (analyzeMessage)
-	{
-	case EXCEED_POINT:
-	printf("point Exceeded. delete other Lecture\n");
-	break;
-
-	case NO_OVERLAP:
-	addLectureToSchedule(lectureTable, mySchedulePtr, input);
-	break;
-
-	case TIME_OVERLAP:
-	printf("time overlapped. try again\n");
-	break;
-
-	case ALREADY_EXIST:
-	deleteLectureFromSchedule(lectureTable, mySchedulePtr, input);
-	break;
-
-	default:
-	break;
-	}
-	*/
 	return 0;
 }
 
@@ -288,11 +345,11 @@ int scene_2_fin() {
 	al_destroy_config(conf);
 	al_destroy_font(font);
 
-
 	return 0;
 }
 
 void on_click_add_lecture(void) {
+
 	int input;
 	for (int k = 0; k < LIST_SIZE; k++) {
 		if (Stack.objs[21 + k * 4].enable == true) {
@@ -308,7 +365,9 @@ void on_click_add_lecture(void) {
 		break;
 
 	case NO_OVERLAP:
+		selectedLectureIndex = -1;
 		addLectureToSchedule(lectureTable, mySchedulePtr, input);
+		addTimeblockImage(input, 1);
 		break;
 
 	case TIME_OVERLAP:
@@ -316,7 +375,9 @@ void on_click_add_lecture(void) {
 		break;
 
 	case ALREADY_EXIST:
+		selectedLectureIndex = -1;
 		deleteLectureFromSchedule(lectureTable, mySchedulePtr, input);
+		deleteTimeblockImage(input);
 		break;
 
 	default:
@@ -325,6 +386,20 @@ void on_click_add_lecture(void) {
 }
 
 void on_click_campus_map(void) {
+
+}
+
+void on_click_reset(void) {
+	for (int i = 0; i < 7; i++) {
+		if (colorArray[i] != -1) {
+			selectedLectureIndex = -1;
+			deleteLectureFromSchedule(lectureTable, mySchedulePtr, colorArray[i]);
+			deleteTimeBlockImage(colorArray[i]);
+		}
+	}
+}
+
+void on_click_finish(void) {
 
 }
 
@@ -349,6 +424,218 @@ void on_click_button_core() {
 	}
 }
 
+void on_click_button_scroll_up() {
+	int i = 0;
+	int j = 0;
+	int sw;
+	int intv = 0;
+	switch (isActive) {
+	case B_MAJOR:
+		sw = majorStart;
+		break;
+	case B_CORE:
+		sw = coreStart;
+		break;
+	case B_SELECTIVE:
+		sw = selectiveStart;
+		break;
+	default:
+		sw = 0;
+		break;
+	}
+	if (onListLecture[0] > sw) {
+		for (i = onListLecture[0] - 1; i >= sw; i--) {
+			if (lectureTable[i].classify == isActive) {
+				intv++;
+				if (intv == 11) { break; }
+			}
+		}
+		if (intv == 11) {
+			j = i;
+		}
+		else {
+			j = i + 1;
+		}
+		i = 0;
+		while (i < LIST_SIZE && j < LECTURE_SIZE) {
+			if (lectureTable[j].classify == isActive) {
+				onListLecture[i] = j;
+				i++;
+			}
+			j++;
+		}
+		resetLectureList();
+		selectedLectureIndex = -1;
+		for (int k = 0; k < LIST_SIZE; k++) {
+			printf("%d ", onListLecture[k]);
+		}
+		printf("\n");
+		int p = 62; // 62부터 116까지가 List text의 위치
+		for (int k = 0; k < LIST_SIZE; k++) {
+			if (onListLecture[k] != -1) {
+
+				Stack.objs[p++].modifier.value.font_value.text = lectureTable[onListLecture[k]].identifyNumber;
+				Stack.objs[p++].modifier.value.font_value.text = "00";
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "name", lectureTable[onListLecture[k]].identifyNumber);
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "room", lectureTable[onListLecture[k]].identifyNumber);
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "time", lectureTable[onListLecture[k]].identifyNumber);
+
+			}
+			else {
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+			}
+
+
+		}
+	}
+}
+
+void on_click_button_scroll_down() {
+	int i = 0;
+	int j = 0;
+	int sw;
+	switch (isActive) {
+	case B_MAJOR:
+		sw = majorEnd;
+		break;
+	case B_CORE:
+		sw = coreEnd;
+		break;
+	case B_SELECTIVE:
+		sw = selectiveEnd;
+		break;
+	default:
+		sw = 0;
+		break;
+	}
+	if (onListLecture[10] != -1 && onListLecture[10] < sw) {
+		for (int k = 0; k < LIST_SIZE; k++) {
+			onListLecture[k] = -1;
+		}
+		j = onListLecture[10] + 1;
+		while (i < LIST_SIZE && j < sw) {
+			if (lectureTable[j].classify == isActive) {
+				onListLecture[i] = j;
+				i++;
+			}
+			j++;
+		}
+		resetLectureList();
+		selectedLectureIndex = -1;
+		for (int k = 0; k < LIST_SIZE; k++) {
+			printf("%d ", onListLecture[k]);
+		}
+		printf("\n");
+		int p = 62; // 62부터 116까지가 List text의 위치
+		for (int k = 0; k < LIST_SIZE; k++) {
+			if (onListLecture[k] != -1) {
+
+				Stack.objs[p++].modifier.value.font_value.text = lectureTable[onListLecture[k]].identifyNumber;
+				Stack.objs[p++].modifier.value.font_value.text = "00";
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "name", lectureTable[onListLecture[k]].identifyNumber);
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "room", lectureTable[onListLecture[k]].identifyNumber);
+				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "time", lectureTable[onListLecture[k]].identifyNumber);
+
+			}
+			else {
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+				Stack.objs[p++].modifier.value.font_value.text = "";
+			}
+		}
+	}
+}
+
+void addTimeblockImage(int input, int isRegister) { //시간표에 블록 모양 추가
+	
+	lectureInfo target = lectureTable[input];
+	char blockString[200];
+	char* blockString1;
+	int chooseColor;
+	if (isRegister == 1) {
+		for (int i = 0; i < 7; i++) {
+			if (colorArray[i] == -1) {
+				colorArray[i] = input;
+				chooseColor = i;
+				break;
+			}
+		}
+	}
+	for (timeListPtr cur = target.lectureTime->next; cur != NULL; cur = cur->next) {
+		whatDay dayofweek = cur->timeblock.dayofWeek;
+		int peri = cur->timeblock.period;
+		int intv = cur->timeblock.interval;
+		int stackIndex = 123 + (5 * (peri - 1)) + dayofweek;
+		object_t* obj = &Stack.objs[stackIndex];
+		
+		if (isRegister == 1) {
+			int selectedColor = (10 * chooseColor) + intv;
+			strcpy(blockString, getBlockImageAddr(selectedColor));
+			//blockString = "Resources\\UI\\enroll\\table_1_gray.png";
+			//printf("%d \n", strcmp(blockString, blockString1));
+			if (obj->image != NULL) {
+				al_destroy_bitmap(obj->image);
+				obj->image = NULL;
+			}
+			obj->image = al_load_bitmap(blockString);
+			obj->rect.width = al_get_bitmap_width(obj->image);
+			obj->rect.height = al_get_bitmap_height(obj->image);
+			obj->rect.left = obj->pos.x;
+			obj->rect.top = obj->pos.y;
+			for (int i = Stack.counter; i > MAX_DEFAULT_STACK; i--) {
+				if (Stack.counter > 0 && Stack.objs[Stack.counter - 1].image != NULL) {
+					Stack.counter--;
+					al_destroy_bitmap(Stack.objs[Stack.counter].image);
+				}
+			}
+		}
+		else {
+			object_t grayblock;
+			char* addr;
+			switch (intv) {
+			case 1:
+				addr = "Resources\\UI\\enroll\\table_1_gray.png";
+				break;
+			case 2:
+				addr = "Resources\\UI\\enroll\\table_2_gray.png";
+				break;
+			case 3:
+				addr = "Resources\\UI\\enroll\\table_3_gray.png";
+				break;
+			default:
+				break;
+			}
+			grayblock = create_object(addr, obj->pos.x, obj->pos.y);
+			Stack.push(&Stack, grayblock);
+		}
+	}
+	
+}
+
+void deleteTimeblockImage(int input) {
+	lectureInfo target = lectureTable[input];
+	for (timeListPtr cur = target.lectureTime->next; cur != NULL; cur = cur->next) {
+		whatDay dayofweek = cur->timeblock.dayofWeek;
+		int peri = cur->timeblock.period;
+		int stackIndex = 123 + (5 * (peri - 1)) + dayofweek;
+		al_destroy_bitmap(Stack.objs[stackIndex].image);
+		Stack.objs[stackIndex].image = NULL;
+	}
+	for (int i = 0; i < 7; i++) {
+		if (colorArray[i] == input) {
+			colorArray[i] = -1;
+		}
+	}
+}
+
+
+
 void toggle_button(ActiveButton active) { // 좌측 3개를 눌렀을 때
 	PUSHED_CORE.enable = false;
 	PUSHED_MAJOR.enable = false;
@@ -372,11 +659,6 @@ void toggle_button(ActiveButton active) { // 좌측 3개를 눌렀을 때
 
 }
 
-//---------------------------
-//requires A LOT OF revision!
-//---------------------------
-
-
 void printLecture(int index) { //좌측 하단 출력
 	lectureInfo lecture = lectureTable[onListLecture[index]];
 	// 117 강의명 118 시간/강의실 119 학수번호 120 이수구분/학점 121 수업방법 122 평가방법
@@ -389,13 +671,13 @@ void printLecture(int index) { //좌측 하단 출력
 	Stack.objs[122].modifier.value.font_value.text = al_get_config_value(conf, "evaluation_method", lecture.identifyNumber);
 }
 
-void resetLectureList(){ // List 색 초기화
+void resetLectureList(){ // List 색 초기화, 눌러보고 생긴 회색 블록 제거
 	for (int k = 0; k < LIST_SIZE; k++) {
 		Stack.objs[(4 * k) + 18].enable = true;
 		Stack.objs[(4 * k) + 19].enable = false;
 		Stack.objs[(4 * k) + 20].enable = false;
 		Stack.objs[(4 * k) + 21].enable = false;
-		if (onListLecture[k] >= 0) {
+		if (onListLecture[k] >= 0 && canUseKlue == 1) {
 			if (lectureTable[onListLecture[k]].klueRating == GOOD) {
 				Stack.objs[(4 * k) + 18].enable = false;
 				Stack.objs[(4 * k) + 19].enable = true;
@@ -405,6 +687,15 @@ void resetLectureList(){ // List 색 초기화
 				Stack.objs[(4 * k) + 20].enable = true;
 			}
 		}
+	}
+	if (selectedLectureIndex != -1) { 
+		for (int i = Stack.counter; i > MAX_DEFAULT_STACK; i--) {
+			if (Stack.counter > 0 && Stack.objs[Stack.counter - 1].image != NULL) {
+				Stack.counter--;
+				al_destroy_bitmap(Stack.objs[Stack.counter].image);
+			}
+		}
+		
 	}
 }
 
@@ -422,6 +713,7 @@ void arrangeLectureList(int selectedScroll) { // 좌측 버튼을 만질 경우 재정렬
 		j++;
 	}
 	resetLectureList();
+	selectedLectureIndex = -1;
 	for (int k = 0; k < LIST_SIZE; k++) {
 		printf("%d ", onListLecture[k]);
 	}
@@ -516,147 +808,384 @@ void initList() { //강의 리스트 부분 초기화 // 18 ~ 61
 	}
 
 }
-/*
-void printLecture_test(void) {
-	lectureInfo lecture = lectureTable[0];
 
-	if (conf == NULL)
-		printf("NULL!!\n");
-	else
-		printf("%x\n", conf);
-
-	object_t aa = create_object(NULL, 191, 460);
-	ui_set_text(&aa, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, lecture.identifyNumber, 30);
-	Stack.push(&Stack, aa);
-
-	object_t lecture_name = create_object(NULL, 191, 495);
-	ui_set_text(&lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "name", "COSE101"), 30);
-	Stack.push(&Stack, lecture_name);
-	al_get_config_value(conf, "name", lecture.identifyNumber);
-	printf("%s hello", NULL);
-	al_get_config_value(conf, "name", lecture.identifyNumber);
-
-}
-*/
 static void on_click_lectureList_0() {
-	if (onListLecture[0] != -1) { // 만약 이 칸에 강의가 채워져 있다면
-		resetLectureList();
-		Stack.objs[18].enable = false;
-		Stack.objs[19].enable = false;
-		Stack.objs[20].enable = false;
-		Stack.objs[21].enable = true;
-		printf("0 call \n");
-		printLecture(0);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[0] != -1) { // 만약 이 칸에 강의가 채워져 있다면
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[0]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[0];
+			Stack.objs[18].enable = false;
+			Stack.objs[19].enable = false;
+			Stack.objs[20].enable = false;
+			Stack.objs[21].enable = true;
+			printf("0 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[0]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[0], 0);
+			}
+			printLecture(0);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_1() {
-	if (onListLecture[1] != -1) {
-		resetLectureList();
-		Stack.objs[22].enable = false;
-		Stack.objs[23].enable = false;
-		Stack.objs[24].enable = false;
-		Stack.objs[25].enable = true;
-		printf("1 call \n");
-		printLecture(1);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[1] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[1]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[1];
+			Stack.objs[22].enable = false;
+			Stack.objs[23].enable = false;
+			Stack.objs[24].enable = false;
+			Stack.objs[25].enable = true;
+			printf("1 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[1]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[1], 0);
+			}
+			printLecture(1);
+		}
 	}
-
+	else {
+		protectOverlapClick = 0;
+	}
 }
 static void on_click_lectureList_2() {
-	if (onListLecture[2] != -1) {
-		resetLectureList();
-		Stack.objs[26].enable = false;
-		Stack.objs[27].enable = false;
-		Stack.objs[28].enable = false;
-		Stack.objs[29].enable = true;
-		printf("2 call \n");
-		printLecture(2);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[2] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[2]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[2];
+			Stack.objs[26].enable = false;
+			Stack.objs[27].enable = false;
+			Stack.objs[28].enable = false;
+			Stack.objs[29].enable = true;
+			printf("2 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[2]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[2], 0);
+			}
+			printLecture(2);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_3() {
-	if (onListLecture[3] != -1) {
-		resetLectureList();
-		Stack.objs[30].enable = false;
-		Stack.objs[31].enable = false;
-		Stack.objs[32].enable = false;
-		Stack.objs[33].enable = true;
-		printf("3 call \n");
-		printLecture(3);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[3] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[3]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[3];
+			Stack.objs[30].enable = false;
+			Stack.objs[31].enable = false;
+			Stack.objs[32].enable = false;
+			Stack.objs[33].enable = true;
+			printf("3 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[3]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[3], 0);
+			}
+			printLecture(3);
+
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_4() {
-	if (onListLecture[4] != -1) {
-		resetLectureList();
-		Stack.objs[34].enable = false;
-		Stack.objs[35].enable = false;
-		Stack.objs[36].enable = false;
-		Stack.objs[37].enable = true;
-		printf("4 call \n");
-		printLecture(4);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[4] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[4]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[4];
+			Stack.objs[34].enable = false;
+			Stack.objs[35].enable = false;
+			Stack.objs[36].enable = false;
+			Stack.objs[37].enable = true;
+			printf("4 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[4]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[4], 0);
+			}
+			printLecture(4);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_5() {
-	if (onListLecture[5] != -1) {
-		resetLectureList();
-		Stack.objs[38].enable = false;
-		Stack.objs[39].enable = false;
-		Stack.objs[40].enable = false;
-		Stack.objs[41].enable = true;
-		printf("5 call \n");
-		printLecture(5);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[5] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[5]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[5];
+			Stack.objs[38].enable = false;
+			Stack.objs[39].enable = false;
+			Stack.objs[40].enable = false;
+			Stack.objs[41].enable = true;
+			printf("5 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[5]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[5], 0);
+			}
+			printLecture(5);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_6() {
-	if (onListLecture[6] != -1) {
-		resetLectureList();
-		Stack.objs[42].enable = false;
-		Stack.objs[43].enable = false;
-		Stack.objs[44].enable = false;
-		Stack.objs[45].enable = true;
-		printf("6 call \n");
-		printLecture(6);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[6] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[6]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[6];
+			Stack.objs[42].enable = false;
+			Stack.objs[43].enable = false;
+			Stack.objs[44].enable = false;
+			Stack.objs[45].enable = true;
+			printf("6 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[6]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[6], 0);
+			}
+			printLecture(6);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_7() {
-	if (onListLecture[7] != -1) {
-		resetLectureList();
-		Stack.objs[46].enable = false;
-		Stack.objs[47].enable = false;
-		Stack.objs[48].enable = false;
-		Stack.objs[49].enable = true;
-		printf("7 call \n");
-		printLecture(7);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[7] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[7]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[7];
+			Stack.objs[46].enable = false;
+			Stack.objs[47].enable = false;
+			Stack.objs[48].enable = false;
+			Stack.objs[49].enable = true;
+			printf("7 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[7]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[7], 0);
+			}
+			printLecture(7);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_8() {
-	if (onListLecture[8] != -1) {
-		resetLectureList();
-		Stack.objs[50].enable = false;
-		Stack.objs[51].enable = false;
-		Stack.objs[52].enable = false;
-		Stack.objs[53].enable = true;
-		printf("8 call \n");
-		printLecture(8);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[8] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[8]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[8];
+			Stack.objs[50].enable = false;
+			Stack.objs[51].enable = false;
+			Stack.objs[52].enable = false;
+			Stack.objs[53].enable = true;
+			printf("8 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[8]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[8], 0);
+			}
+			printLecture(8);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_9() {
-	if (onListLecture[9] != -1) {
-		resetLectureList();
-		Stack.objs[54].enable = false;
-		Stack.objs[55].enable = false;
-		Stack.objs[56].enable = false;
-		Stack.objs[57].enable = true;
-		printf("9 call \n");
-		printLecture(9);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[9] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[9]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[9];
+			Stack.objs[54].enable = false;
+			Stack.objs[55].enable = false;
+			Stack.objs[56].enable = false;
+			Stack.objs[57].enable = true;
+			printf("9 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[9]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[9], 0);
+			}
+			printLecture(9);
+		}
+	}
+	else {
+		protectOverlapClick = 0;
 	}
 }
 static void on_click_lectureList_10() {
-	if (onListLecture[10] != -1) {
-		resetLectureList();
-		Stack.objs[58].enable = false;
-		Stack.objs[59].enable = false;
-		Stack.objs[60].enable = false;
-		Stack.objs[61].enable = true;
-		printf("10 call \n");
-		printLecture(10);
+	if (protectOverlapClick == 0) {
+		if (onListLecture[10] != -1) {
+			resetLectureList();
+			if (selectedLectureIndex == onListLecture[10]) {
+				protectOverlapClick = 0;
+			}
+			else {
+				protectOverlapClick = 1;
+			}
+			selectedLectureIndex = onListLecture[10];
+			Stack.objs[58].enable = false;
+			Stack.objs[59].enable = false;
+			Stack.objs[60].enable = false;
+			Stack.objs[61].enable = true;
+			printf("10 call \n");
+			int k = 1;
+			for (int i = 0; i < 7; i++) {
+				if (colorArray[i] == onListLecture[10]) { k = 0; break; }
+			}
+			if (k == 1) {
+				addTimeblockImage(onListLecture[10], 0);
+			}
+			printLecture(10);
+		}
 	}
+	else {
+		protectOverlapClick = 0;
+	}
+}
+
+char* getBlockImageAddr(int key) {
+	char buf[200];
+	int cx1;
+	int cx2;
+	cx1 = snprintf(buf, 200, "Resources\\UI\\enroll\\table_");
+	switch (key % 10) {
+	case 1:
+		cx2 = snprintf(buf + cx1, 200 - cx1, "1_");
+		break;
+	case 2:
+		cx2 = snprintf(buf + cx1, 200 - cx1, "2_");
+		break;
+	case 3:
+		cx2 = snprintf(buf + cx1, 200 - cx1, "3_");
+		break;
+	default:
+		break;
+	}
+	switch (key / 10) {
+	case 0:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "blue.png");
+		break;
+	case 1:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "cyan.png");
+		break;
+	case 2:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "green.png");
+		break;
+	case 3:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "pink.png");
+		break;
+	case 4:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "purple.png");
+		break;
+	case 5:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "red.png");
+		break;
+	case 6:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "yellow.png");
+		break;
+	case 9:
+		snprintf(buf + cx1 + cx2, 200 - cx1 - cx2, "gray.png");
+		break;
+	default:
+		break;
+	}
+	return buf;
 }

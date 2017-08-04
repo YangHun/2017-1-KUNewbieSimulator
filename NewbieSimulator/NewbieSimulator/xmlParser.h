@@ -43,7 +43,7 @@ timeListPtr registerTimeList(char* key) {
 				timeListPtr tempNode = (timeListPtr)malloc(sizeof(timeList));
 				tempNode->timeblock.dayofWeek = whatDayFunc(hangul);
 				tempNode->timeblock.period = startTime;
-				tempNode->timeblock.interval = endTime - startTime;
+				tempNode->timeblock.interval = endTime - startTime + 1;
 				tempNode->next = nullNode->next;
 				nullNode->next = tempNode;
 				startTime = 0;

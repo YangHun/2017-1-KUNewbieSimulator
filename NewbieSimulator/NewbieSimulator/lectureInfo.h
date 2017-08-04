@@ -39,7 +39,7 @@ typedef enum _ratingNumber {
 } ratingNumber;
 
 typedef enum _whatDay {
-	MON,
+	MON = 0,
 	TUE,
 	WED,
 	THU,
