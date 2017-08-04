@@ -72,7 +72,7 @@ int scene_1_init(){
 
 	object_t bg = create_object("Resources\\dummy\\background.png", 0, 0);
 	Background = bg;
-
+	
 	event_timer = al_create_timer(1.0 / 1000);
 	event_timer_event_queue = al_create_event_queue();
 	al_register_event_source(event_timer_event_queue, al_get_timer_event_source(event_timer));
