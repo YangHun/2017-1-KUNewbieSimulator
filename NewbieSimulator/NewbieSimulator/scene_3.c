@@ -47,13 +47,11 @@ int scene_3_init() {
 	al_register_event_source(click_event, al_get_timer_event_source(click_timer));
 	//al_start_timer(click_timer);
 
-	object_t navy_red = create_object("Resources\\UI\\enroll_2\\navyism_red.png", 0, 41);
+//	object_t navy_red = create_object("Resources\\UI\\enroll_2\\navyism_red.png", 0, 41);
+	object_t navy_red = create_colored_object(al_map_rgb(255, 255, 255), 681, 679, 0, 0);
 	Stack.push(&Stack, navy_red);
 #define NAVY_RED Stack.objs[0]
 
-	ALLEGRO_COLOR abc =  {0 , 0, 0 };
-	al_convert_mask_to_alpha(NAVY_RED.image, abc);
-	
 	
 	object_t bt[6];	//신청버튼 출력
 	bt[0] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 225);
@@ -244,6 +242,14 @@ void display_timer(void) {
 		ui_set_text(&text, al_map_rgb(0, 150, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", string), 60);
 		Stack.push(&Stack, text);
 	}
+	if (renew_timer_text) {
+		if (count < 10 && count > 1)
+			NAVY_RED.color = al_map_rgb(255, 255 - 35 * (count-2), 255 - 35 * (count-2));
+		else
+			NAVY_RED.color = al_map_rgb(255, 255, 255);
+	}
+	
+
 	renew_timer_text = false;
 }
 
