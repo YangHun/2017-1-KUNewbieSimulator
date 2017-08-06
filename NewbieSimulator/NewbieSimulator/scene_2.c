@@ -7,7 +7,7 @@
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
 #define LECTURE_SIZE 12
-#define MAX_DEFAULT_STACK 172
+#define MAX_DEFAULT_STACK 174
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
 int input = 0;
@@ -68,6 +68,12 @@ int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
 int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
 int grayblockNumber;
+
+ALLEGRO_TIMER* sugang_timer;
+ALLEGRO_EVENT_QUEUE* sugang_timer_event_queue;
+int sugang_timer_set = 0;
+#define timeline Stack.objs[173]
+#define timebar Stack.objs[174]
 
 int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -319,6 +325,17 @@ int scene_2_init() {
 	ui_set_on_click_listener(&Finish_button, on_click_finish);
 	Stack.push(&Stack, Finish_button); //171
 
+	sugang_timer = al_create_timer(1.0 / 1000);
+	sugang_timer_event_queue = al_create_event_queue();
+	al_register_event_source(sugang_timer_event_queue, al_get_timer_event_source(sugang_timer));
+	al_start_timer(sugang_timer);
+
+	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
+	Stack.push(&Stack, bar_bg); //172
+
+	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
+	Stack.push(&Stack, red); //173
+
 	//------------------------------------------------
 	// KLUE Text
 	//------------------------------------------------
@@ -330,6 +347,13 @@ int scene_2_update() {
 
 	//Scene 2의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
+
+#define SUGANG_TIME 120.0
+	if (al_get_timer_count(sugang_timer) - sugang_timer_set > 10) {
+		sugang_timer_set = al_get_timer_count(sugang_timer);
+		timebar.pos.x += 1280 / (SUGANG_TIME * 100);
+		timeline.rect.width = timebar.pos.x + 5;
+	}
 
 	sprintf(gradepoint_str, "%d", mySchedule.credit);
 	re_draw();
@@ -402,7 +426,7 @@ void on_click_reset(void) {
 }
 
 void on_click_finish(void) {
-
+	load_scene(Scenes.scenes[3]);
 }
 
 void on_click_button_selective() {
