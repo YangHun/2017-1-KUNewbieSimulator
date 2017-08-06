@@ -679,7 +679,10 @@ void deleteTimeblockImage(int input) {
 	for (k = i - (howManyLoop - 1); k + howManyLoop < Stack.counter; k++) {
 		Stack.objs[k].modifier.value.font_value.text = Stack.objs[k + howManyLoop].modifier.value.font_value.text;
 	}
-	
+	for (int i = k; i < Stack.counter; i++) {
+		al_destroy_font(Stack.objs[i].modifier.value.font_value.font);
+	}
+	Stack.counter = k;
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] == input) {
 			colorArray[i] = -1;
