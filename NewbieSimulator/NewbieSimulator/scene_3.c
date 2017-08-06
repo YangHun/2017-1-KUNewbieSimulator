@@ -48,7 +48,7 @@ int scene_3_init() {
 	//al_start_timer(click_timer);
 
 //	object_t navy_red = create_object("Resources\\UI\\enroll_2\\navyism_red.png", 0, 41);
-	object_t navy_red = create_colored_object(al_map_rgb(255, 255, 255), 681, 679, 0, 0);
+	object_t navy_red = create_colored_object(al_map_rgb(255, 255, 255), 681, 679, 41, 0);
 	Stack.push(&Stack, navy_red);
 #define NAVY_RED Stack.objs[0]
 
@@ -120,7 +120,7 @@ int scene_3_update() {
 		//
 
 #define GAMESTART_COUNT 10
-		if (!game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1000)) {	//10초지나면 수강신청 열림
+		if (!game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1000)) { //10초지나면 수강신청 열림
 			game_start = true;
 		}
 		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1500)) {
@@ -148,6 +148,7 @@ void on_click_startbt() {
 void pressed1() {
 	if (!game_start || pressed[0]) return; //수강신청 안열렸으면 의미없음
 	printf("pressed!");
+	//Sleep(1000);
 	pressed[0] = true;
 	pressed_time[0] = al_get_timer_count(click_timer);
 }
@@ -185,27 +186,32 @@ void pressed6() {
 void result() {
 	int i;
 	for (i = 0; i < 6; i++) {
+		if (!pressed[i]) {
+			printf("not pressed!\n");
+			continue;
+		}
 		if (probability_judge(std_dist(pressed_time[i], 2))) {
+			printf("[%d]time: %d\n",i, pressed_time[i]);
+			printf("prob: %lf\n", std_dist(pressed_time[i], 2));
 			printf("[%d]success!!\n", i);
 		}
 	}
-	Sleep(5000);
+	Sleep(50000);
 }
 
 double std_dist(int t, int d) { //standard_distribution
 // t: timer tick, d: difficulty : 수강신청 난이도
 //수강신청 난이도: 1:어려움 2:보통 3:쉬움
 //#include <math.h> : 하면 터짐
-	int sec = t - 10000;
 	double p;
 	double sigma = 0.25 * d;// 몇초를 1sigma의 기준으로?
-	double z = (t - 10000) / 1000 / sigma;
+	double z = ((double)t - 10000) / 1000 / sigma;
 	double coeff = 2.506628274; // sqrt(2*PI)
 
-	p = z - (1 / (6 * z*z*z)) + (1 / (40 * z*z*z*z*z)) - (1 / (336 * z*z*z*z*z*z*z)); //taylor series
+	p = z + ((double)1 / 6 * z*z*z) - ((double)1 / 40 * z*z*z*z*z) + ((double)1 / 336 * z*z*z*z*z*z*z); //taylor series
 	p /= coeff;
 
-	return p + 0.5;
+	return 0.5 + p;
 }
 
 bool probability_judge(double p) {
