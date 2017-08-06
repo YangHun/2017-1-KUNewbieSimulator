@@ -72,8 +72,8 @@ int grayblockNumber;
 ALLEGRO_TIMER* sugang_timer;
 ALLEGRO_EVENT_QUEUE* sugang_timer_event_queue;
 int sugang_timer_set = 0;
+float timeline_location = 0;
 #define timeline Stack.objs[173]
-#define timebar Stack.objs[174]
 
 int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -351,8 +351,8 @@ int scene_2_update() {
 #define SUGANG_TIME 120.0
 	if (al_get_timer_count(sugang_timer) - sugang_timer_set > 10) {
 		sugang_timer_set = al_get_timer_count(sugang_timer);
-		timebar.pos.x += 1280 / (SUGANG_TIME * 100);
-		timeline.rect.width = timebar.pos.x + 5;
+		timeline_location += 1280 / (SUGANG_TIME * 100);
+		timeline.rect.width = timeline_location + 5;
 	}
 
 	sprintf(gradepoint_str, "%d", mySchedule.credit);
