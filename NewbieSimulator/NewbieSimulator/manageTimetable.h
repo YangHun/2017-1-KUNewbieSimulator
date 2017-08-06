@@ -42,15 +42,11 @@ void printSchedule(schedule mySchedule) {
 }
 void addLectureToSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, int index) {
 	mySchedulePtr->credit += lectureTable[index].credit;
-	for (strListPtr p = mySchedulePtr->idNumberList; p != NULL; p = p->next) {
-		if (p->next == NULL) {
-			strListPtr tempNode = (strListPtr)malloc(sizeof(strList));
-			tempNode->next = NULL;
-			tempNode->str = lectureTable[index].identifyNumber;
-			p->next = tempNode;
-			break;
-		}
-	}
+	strListPtr p = mySchedulePtr->idNumberList;
+	strListPtr tempNode = (strListPtr)malloc(sizeof(strList));
+	tempNode->next = p->next;
+	tempNode->str = lectureTable[index].identifyNumber;
+	p->next = tempNode;
 
 	for (timeListPtr k = lectureTable[index].lectureTime->next; k != NULL; k = k->next) {
 		int i = k->timeblock.dayofWeek;

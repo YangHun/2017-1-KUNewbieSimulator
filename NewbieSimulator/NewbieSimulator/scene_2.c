@@ -61,11 +61,13 @@ char* getBlockImageAddr(int key);
 int onListLecture[LIST_SIZE];
 void arrangeLectureList(int selectedScroll);
 void addTimeblockImage(int input, int isRegister);
+void resetLectureList();
 void deleteTimeblockImage(int input);
 int canUseKlue; // 클루 사용 가능 여부
 int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
 int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
+int grayblockNumber;
 
 int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -394,7 +396,7 @@ void on_click_reset(void) {
 		if (colorArray[i] != -1) {
 			selectedLectureIndex = -1;
 			deleteLectureFromSchedule(lectureTable, mySchedulePtr, colorArray[i]);
-			deleteTimeBlockImage(colorArray[i]);
+			deleteTimeblockImage(colorArray[i]);
 		}
 	}
 }
@@ -588,12 +590,19 @@ void addTimeblockImage(int input, int isRegister) { //시간표에 블록 모양 추가
 			obj->rect.height = al_get_bitmap_height(obj->image);
 			obj->rect.left = obj->pos.x;
 			obj->rect.top = obj->pos.y;
-			for (int i = Stack.counter; i > MAX_DEFAULT_STACK; i--) {
+			while (grayblockNumber != 0) {
 				if (Stack.counter > 0 && Stack.objs[Stack.counter - 1].image != NULL) {
 					Stack.counter--;
 					al_destroy_bitmap(Stack.objs[Stack.counter].image);
+					grayblockNumber--;
 				}
 			}
+			float textX = 781 + (82 * dayofweek);
+			float textY = 50 + (46.4 * (peri - 1)) + (23 * (intv - 1));
+			object_t blockText = create_object(NULL, textX, textY);
+			ui_set_text(&blockText, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "room", target.identifyNumber), 17);
+			Stack.push(&Stack, blockText);
+			
 		}
 		else {
 			object_t grayblock;
@@ -613,6 +622,7 @@ void addTimeblockImage(int input, int isRegister) { //시간표에 블록 모양 추가
 			}
 			grayblock = create_object(addr, obj->pos.x, obj->pos.y);
 			Stack.push(&Stack, grayblock);
+			grayblockNumber++;
 		}
 	}
 	
@@ -620,13 +630,32 @@ void addTimeblockImage(int input, int isRegister) { //시간표에 블록 모양 추가
 
 void deleteTimeblockImage(int input) {
 	lectureInfo target = lectureTable[input];
+	int howManyLoop = 0;
+	int i, k;
 	for (timeListPtr cur = target.lectureTime->next; cur != NULL; cur = cur->next) {
 		whatDay dayofweek = cur->timeblock.dayofWeek;
 		int peri = cur->timeblock.period;
+		int intv = cur->timeblock.interval;
 		int stackIndex = 123 + (5 * (peri - 1)) + dayofweek;
 		al_destroy_bitmap(Stack.objs[stackIndex].image);
 		Stack.objs[stackIndex].image = NULL;
+		float textX = 781 + (82 * dayofweek);
+		float textY = 50 + (46.4 * (peri - 1)) + (23 * (intv - 1));
+		i = Stack.counter - 1;
+		while (i >= 0) {
+			if (Stack.objs[i].pos.x - textX < 1 && Stack.objs[i].pos.x - textX > -1) {
+				if (Stack.objs[i].pos.y - textY < 1 && Stack.objs[i].pos.y - textY > -1) {
+					break;
+				}
+			}
+			i--;
+		}
+		howManyLoop++;
 	}
+	for (k = i - (howManyLoop - 1); k + howManyLoop < Stack.counter; k++) {
+		Stack.objs[k].modifier.value.font_value.text = Stack.objs[k + howManyLoop].modifier.value.font_value.text;
+	}
+	
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] == input) {
 			colorArray[i] = -1;
@@ -689,10 +718,11 @@ void resetLectureList(){ // List 색 초기화, 눌러보고 생긴 회색 블록 제거
 		}
 	}
 	if (selectedLectureIndex != -1) { 
-		for (int i = Stack.counter; i > MAX_DEFAULT_STACK; i--) {
+		while ( grayblockNumber != 0) {
 			if (Stack.counter > 0 && Stack.objs[Stack.counter - 1].image != NULL) {
 				Stack.counter--;
 				al_destroy_bitmap(Stack.objs[Stack.counter].image);
+				grayblockNumber--;
 			}
 		}
 		
