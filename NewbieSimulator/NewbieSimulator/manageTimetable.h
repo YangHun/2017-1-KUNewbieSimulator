@@ -59,6 +59,8 @@ void addLectureToSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, i
 	}
 }
 void deleteLectureFromSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, int index) {
+	mySchedulePtr->credit -= lectureTable[index].credit;
+
 	strListPtr current = mySchedulePtr->idNumberList->next;
 	strListPtr previous = NULL;
 

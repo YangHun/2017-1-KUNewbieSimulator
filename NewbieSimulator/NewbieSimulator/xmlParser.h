@@ -162,7 +162,7 @@ void xmlParse(lectureInfo lectureTable[]) {
 	int i;
 	int keyLength = 0;
 
-	doc = xmlParseFile("Resources\\xml\\dummy-new.xml");
+	doc = xmlParseFile("Resources\\xml\\dummy-beta.xml");
 	if (doc == NULL) {
 		printf("Document not parsed successfully. \n");
 		return;

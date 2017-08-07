@@ -1,7 +1,7 @@
 #pragma once
 #define TUITION_SIZE 6
 #define EVALUATION_SIZE 7
-#define LECTURETABLE_SIZE 12
+#define LECTURETABLE_SIZE 20
 typedef enum _messageNumber {
 	MESSAGE_DEFAULT,
 	NO_OVERLAP,

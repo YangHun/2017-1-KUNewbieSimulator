@@ -6,8 +6,8 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
-#define LECTURE_SIZE 12
-#define MAX_DEFAULT_STACK 174
+#define LECTURE_SIZE 20
+#define MAX_DEFAULT_STACK 175
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
 int input = 0;
@@ -63,6 +63,8 @@ void arrangeLectureList(int selectedScroll);
 void addTimeblockImage(int input, int isRegister);
 void resetLectureList();
 void deleteTimeblockImage(int input);
+void popupHoney(int index);
+void popupBomb(int index);
 int canUseKlue; // 클루 사용 가능 여부
 int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
@@ -85,33 +87,12 @@ int scene_2_init() {
 	for (int i = 0; i < 7; i++) {
 		colorArray[i] = -1;
 	}
-	majorStart = majorEnd = coreStart = coreEnd = selectiveStart = selectiveEnd = -1;
-	for (int i = 0; i < LECTURE_SIZE; i++) {
-		if (majorStart == -1 && lectureTable[i].classify == MAJOR) {
-			majorStart = i;
-		}
-		if (coreStart == -1 && lectureTable[i].classify == CORE) {
-			coreStart = i;
-		}
-		if (selectiveStart == -1 && lectureTable[i].classify == SELECTIVE) {
-			selectiveStart = i;
-		}
-		if (majorStart != -1 && lectureTable[i].classify == MAJOR) {
-			majorEnd = i;
-		}
-		if (coreStart != -1 && lectureTable[i].classify == CORE) {
-			coreEnd = i;
-		}
-		if (selectiveStart != -1 && lectureTable[i].classify == SELECTIVE) {
-			selectiveEnd = i;
-		}
-	}
 
 	object_t bg = create_object("Resources\\UI\\enroll\\background.jpg", 0, 0);
 	Background = bg;
 
 	font = al_load_font("Resources\\font\\BMDOHYEON.ttf", 36, 0);
-	conf = al_load_config_file("Resources\\korean\\lecture_info.ini");
+	conf = al_load_config_file("Resources\\korean\\lecture_info_beta.ini");
 
 	//------------------------------------------------
 	// Buttons
@@ -177,6 +158,27 @@ int scene_2_init() {
 
 
 	xmlParse(lectureTable);	
+	majorStart = majorEnd = coreStart = coreEnd = selectiveStart = selectiveEnd = -1;
+	for (int i = 0; i < LECTURE_SIZE; i++) {
+		if (majorStart == -1 && lectureTable[i].classify == MAJOR) {
+			majorStart = i;
+		}
+		if (coreStart == -1 && lectureTable[i].classify == CORE) {
+			coreStart = i;
+		}
+		if (selectiveStart == -1 && lectureTable[i].classify == SELECTIVE) {
+			selectiveStart = i;
+		}
+		if (majorStart != -1 && lectureTable[i].classify == MAJOR) {
+			majorEnd = i;
+		}
+		if (coreStart != -1 && lectureTable[i].classify == CORE) {
+			coreEnd = i;
+		}
+		if (selectiveStart != -1 && lectureTable[i].classify == SELECTIVE) {
+			selectiveEnd = i;
+		}
+	}
 	init_mySchedule(mySchedulePtr);
 
 	//------------------------------------------------
@@ -307,7 +309,7 @@ int scene_2_init() {
 	Stack.push(&Stack, KlueHoneyPanel); //168
 	Stack.objs[168].enable = false;
 
-	object_t KlueBombPanel = create_object("Resources\\UI\\enroll\\popup_klue_honey.png", 679, 481);
+	object_t KlueBombPanel = create_object("Resources\\UI\\enroll\\popup_klue_bomb.png", 679, 481);
 	Stack.push(&Stack, KlueBombPanel); //169
 	Stack.objs[169].enable = false;
 
@@ -325,6 +327,11 @@ int scene_2_init() {
 	ui_set_on_click_listener(&Finish_button, on_click_finish);
 	Stack.push(&Stack, Finish_button); //171
 
+
+	//------------------------------------------------
+	// timer
+	//------------------------------------------------
+
 	sugang_timer = al_create_timer(1.0 / 1000);
 	sugang_timer_event_queue = al_create_event_queue();
 	al_register_event_source(sugang_timer_event_queue, al_get_timer_event_source(sugang_timer));
@@ -339,6 +346,18 @@ int scene_2_init() {
 	//------------------------------------------------
 	// KLUE Text
 	//------------------------------------------------
+
+	object_t lecture_review = create_object(NULL, 908, 600);
+	ui_set_text(&lecture_review, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_review); //174
+
+	object_t lecture_Attdence = create_object(NULL, 908, 635);
+	ui_set_text(&lecture_Attdence, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_Attdence); //175
+
+	object_t lecture_Distance = create_object(NULL, 908, 670);
+	ui_set_text(&lecture_Distance, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
+	Stack.push(&Stack, lecture_Distance); //176
 
 	return 0;
 }
@@ -539,11 +558,11 @@ void on_click_button_scroll_down() {
 		break;
 	}
 	if (onListLecture[10] != -1 && onListLecture[10] < sw) {
+		j = onListLecture[10] + 1;
 		for (int k = 0; k < LIST_SIZE; k++) {
 			onListLecture[k] = -1;
 		}
-		j = onListLecture[10] + 1;
-		while (i < LIST_SIZE && j < sw) {
+		while (i < LIST_SIZE && j <= sw) {
 			if (lectureTable[j].classify == isActive) {
 				onListLecture[i] = j;
 				i++;
@@ -678,6 +697,8 @@ void deleteTimeblockImage(int input) {
 	}
 	for (k = i - (howManyLoop - 1); k + howManyLoop < Stack.counter; k++) {
 		Stack.objs[k].modifier.value.font_value.text = Stack.objs[k + howManyLoop].modifier.value.font_value.text;
+		Stack.objs[k].pos.x = Stack.objs[k + howManyLoop].pos.x;
+		Stack.objs[k].pos.y = Stack.objs[k + howManyLoop].pos.y;
 	}
 	for (int i = k; i < Stack.counter; i++) {
 		al_destroy_font(Stack.objs[i].modifier.value.font_value.font);
@@ -877,6 +898,18 @@ static void on_click_lectureList_0() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[0];
+			if (Stack.objs[18].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[19].enable == true) {
+				popupHoney(0);
+			}
+			else if (Stack.objs[20].enable == true) {
+				popupBomb(0);
+			}
 			Stack.objs[18].enable = false;
 			Stack.objs[19].enable = false;
 			Stack.objs[20].enable = false;
@@ -907,6 +940,18 @@ static void on_click_lectureList_1() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[1];
+			if (Stack.objs[22].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[23].enable == true) {
+				popupHoney(1);
+			}
+			else if (Stack.objs[24].enable == true) {
+				popupBomb(1);
+			}
 			Stack.objs[22].enable = false;
 			Stack.objs[23].enable = false;
 			Stack.objs[24].enable = false;
@@ -937,6 +982,18 @@ static void on_click_lectureList_2() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[2];
+			if (Stack.objs[26].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[27].enable == true) {
+				popupHoney(2);
+			}
+			else if (Stack.objs[28].enable == true) {
+				popupBomb(2);
+			}
 			Stack.objs[26].enable = false;
 			Stack.objs[27].enable = false;
 			Stack.objs[28].enable = false;
@@ -967,6 +1024,18 @@ static void on_click_lectureList_3() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[3];
+			if (Stack.objs[30].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[31].enable == true) {
+				popupHoney(3);
+			}
+			else if (Stack.objs[32].enable == true) {
+				popupBomb(3);
+			}
 			Stack.objs[30].enable = false;
 			Stack.objs[31].enable = false;
 			Stack.objs[32].enable = false;
@@ -998,6 +1067,18 @@ static void on_click_lectureList_4() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[4];
+			if (Stack.objs[34].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[35].enable == true) {
+				popupHoney(4);
+			}
+			else if (Stack.objs[36].enable == true) {
+				popupBomb(4);
+			}
 			Stack.objs[34].enable = false;
 			Stack.objs[35].enable = false;
 			Stack.objs[36].enable = false;
@@ -1028,6 +1109,18 @@ static void on_click_lectureList_5() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[5];
+			if (Stack.objs[38].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[39].enable == true) {
+				popupHoney(5);
+			}
+			else if (Stack.objs[40].enable == true) {
+				popupBomb(5);
+			}
 			Stack.objs[38].enable = false;
 			Stack.objs[39].enable = false;
 			Stack.objs[40].enable = false;
@@ -1058,6 +1151,18 @@ static void on_click_lectureList_6() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[6];
+			if (Stack.objs[42].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[43].enable == true) {
+				popupHoney(6);
+			}
+			else if (Stack.objs[44].enable == true) {
+				popupBomb(6);
+			}
 			Stack.objs[42].enable = false;
 			Stack.objs[43].enable = false;
 			Stack.objs[44].enable = false;
@@ -1088,6 +1193,18 @@ static void on_click_lectureList_7() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[7];
+			if (Stack.objs[46].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[47].enable == true) {
+				popupHoney(7);
+			}
+			else if (Stack.objs[48].enable == true) {
+				popupBomb(7);
+			}
 			Stack.objs[46].enable = false;
 			Stack.objs[47].enable = false;
 			Stack.objs[48].enable = false;
@@ -1118,6 +1235,18 @@ static void on_click_lectureList_8() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[8];
+			if (Stack.objs[50].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[51].enable == true) {
+				popupHoney(8);
+			}
+			else if (Stack.objs[52].enable == true) {
+				popupBomb(8);
+			}
 			Stack.objs[50].enable = false;
 			Stack.objs[51].enable = false;
 			Stack.objs[52].enable = false;
@@ -1148,6 +1277,18 @@ static void on_click_lectureList_9() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[9];
+			if (Stack.objs[54].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[55].enable == true) {
+				popupHoney(9);
+			}
+			else if (Stack.objs[56].enable == true) {
+				popupBomb(9);
+			}
 			Stack.objs[54].enable = false;
 			Stack.objs[55].enable = false;
 			Stack.objs[56].enable = false;
@@ -1178,6 +1319,18 @@ static void on_click_lectureList_10() {
 				protectOverlapClick = 1;
 			}
 			selectedLectureIndex = onListLecture[10];
+			if (Stack.objs[58].enable == true) {
+				Stack.objs[168].enable = Stack.objs[169].enable = false;
+				Stack.objs[174].modifier.value.font_value.text = "";
+				Stack.objs[175].modifier.value.font_value.text = "";
+				Stack.objs[176].modifier.value.font_value.text = "";
+			}
+			else if (Stack.objs[59].enable == true) {
+				popupHoney(10);
+			}
+			else if (Stack.objs[60].enable == true) {
+				popupBomb(10);
+			}
 			Stack.objs[58].enable = false;
 			Stack.objs[59].enable = false;
 			Stack.objs[60].enable = false;
@@ -1197,7 +1350,17 @@ static void on_click_lectureList_10() {
 		protectOverlapClick = 0;
 	}
 }
+void popupHoney(int index) {
+	Stack.objs[169].enable = false;
+	Stack.objs[168].enable = true;
+	lectureInfo target = lectureTable[onListLecture[index]];
+	//Stack.objs[174].modifier.value.font_value.text = 
+}
 
+void popupBomb(int index) {
+	Stack.objs[168].enable = false;
+	Stack.objs[169].enable = true;
+}
 char* getBlockImageAddr(int key) {
 	char buf[200];
 	int cx1;
