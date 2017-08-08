@@ -54,21 +54,25 @@ int getClassifyMessage(char* name) {
 int getKlueMessage(char* name) {
 	switchs(name) {
 		cases(u8"Áö·Ú")
-			return BAD;
+			return KLUE_BAD;
 		cases(u8"²Ü°­")
-			return GOOD;
+			return KLUE_GOOD;
 		defaults
-			return NORMAL;
+			return KLUE_NORMAL;
 	} switchs_end;
 	return 0;
 }
 
 int getAttMessage(char* name) {
 	switchs(name) {
+		cases("VTIGHT")
+			return ATT_VTIGHT;
 		cases("TIGHT")
 			return ATT_TIGHT;
 		cases("LOOSE")
 			return ATT_LOOSE;
+		cases("VLOOSE")
+			return ATT_VLOOSE;
 		cases("NORMAL")
 			return ATT_NORMAL;
 		defaults

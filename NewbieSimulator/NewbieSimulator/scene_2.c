@@ -92,7 +92,7 @@ int scene_2_init() {
 	Background = bg;
 
 	font = al_load_font("Resources\\font\\BMDOHYEON.ttf", 36, 0);
-	conf = al_load_config_file("Resources\\korean\\lecture_info_beta.ini");
+	conf = al_load_config_file("Resources\\korean\\lecture_info.ini");
 
 	//------------------------------------------------
 	// Buttons
@@ -755,11 +755,11 @@ void resetLectureList(){ // List 색 초기화, 눌러보고 생긴 회색 블록 제거
 		Stack.objs[(4 * k) + 20].enable = false;
 		Stack.objs[(4 * k) + 21].enable = false;
 		if (onListLecture[k] >= 0 && canUseKlue == 1) {
-			if (lectureTable[onListLecture[k]].klueRating == GOOD) {
+			if (lectureTable[onListLecture[k]].klueRating == KLUE_GOOD) {
 				Stack.objs[(4 * k) + 18].enable = false;
 				Stack.objs[(4 * k) + 19].enable = true;
 			}
-			else if (lectureTable[onListLecture[k]].klueRating == BAD) {
+			else if (lectureTable[onListLecture[k]].klueRating == KLUE_BAD) {
 				Stack.objs[(4 * k) + 18].enable = false;
 				Stack.objs[(4 * k) + 20].enable = true;
 			}
@@ -1354,7 +1354,7 @@ void popupHoney(int index) {
 	Stack.objs[169].enable = false;
 	Stack.objs[168].enable = true;
 	lectureInfo target = lectureTable[onListLecture[index]];
-	//Stack.objs[174].modifier.value.font_value.text = 
+	Stack.objs[174].modifier.value.font_value.text = al_get_config_value(conf, "", target.identifyNumber);
 }
 
 void popupBomb(int index) {

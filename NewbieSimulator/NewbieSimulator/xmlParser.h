@@ -329,13 +329,13 @@ void xmlParse(lectureInfo lectureTable[]) {
 		printf("%d%s \n", lectureTable[i].distance, u8"ºÐ");
 		switch (lectureTable[i].klueRating)
 		{
-		case GOOD:
+		case KLUE_GOOD:
 			printf("%s \n", u8"²Ü°­");
 			break;
-		case NORMAL:
+		case KLUE_NORMAL:
 			printf("%s \n", u8"º¸Åë");
 			break;
-		case BAD:
+		case KLUE_BAD:
 			printf("%s \n", u8"Áö·Ú");
 			break;
 		default:

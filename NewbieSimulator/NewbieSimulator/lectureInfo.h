@@ -32,10 +32,12 @@ typedef enum _roomNumber {
 } roomNumber;
 
 typedef enum _ratingNumber {
-	RATING_DEFAULT,
-	GOOD,
-	NORMAL,
-	BAD
+	KLUE_RATING_DEFAULT,
+	KLUE_VGOOD,
+	KLUE_GOOD,
+	KLUE_NORMAL,
+	KLUE_VBAD,
+	KLUE_BAD
 } ratingNumber;
 
 typedef enum _whatDay {
@@ -96,9 +98,11 @@ typedef enum _tuition_index {
 } tuition_index;
 
 typedef enum _attendance {
-	ATT_LOOSE, //´À½¼
+	ATT_VLOOSE, //´À½¼
+	ATT_LOOSE,
 	ATT_NORMAL, // º¸Åë
-	ATT_TIGHT // ºýºýÇÔ
+	ATT_TIGHT, //
+	ATT_VTIGHT // ºýºýÇÔ
 } AttendanceRate;
 
 typedef struct _lectureInfo {
