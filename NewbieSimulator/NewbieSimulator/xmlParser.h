@@ -162,7 +162,7 @@ void xmlParse(lectureInfo lectureTable[]) {
 	int i;
 	int keyLength = 0;
 
-	doc = xmlParseFile("Resources\\xml\\dummy-beta.xml");
+	doc = xmlParseFile("Resources\\xml\\dummy-custom.xml");
 	if (doc == NULL) {
 		printf("Document not parsed successfully. \n");
 		return;
@@ -245,7 +245,7 @@ void xmlParse(lectureInfo lectureTable[]) {
 		cur = savePoint1;
 		cur = cur->next;
 	}
-	for (int i = 0; i < LECTURETABLE_SIZE; i++) {
+	for (int i = 0; i < LECTURE_SIZE; i++) {
 		printf("%s \n", lectureTable[i].identifyNumber);
 		switch (lectureTable[i].classify)
 		{
@@ -329,28 +329,40 @@ void xmlParse(lectureInfo lectureTable[]) {
 		printf("%d%s \n", lectureTable[i].distance, u8"분");
 		switch (lectureTable[i].klueRating)
 		{
-		case KLUE_GOOD:
-			printf("%s \n", u8"꿀강");
+		case RATING_VGOOD:
+			printf("%s \n", u8"절평");
 			break;
-		case KLUE_NORMAL:
+		case RATING_GOOD:
+			printf("%s \n", u8"전달력좋음");
+			break;
+		case RATING_NORMAL:
 			printf("%s \n", u8"보통");
 			break;
-		case KLUE_BAD:
-			printf("%s \n", u8"지뢰");
+		case RATING_BAD:
+			printf("%s \n", u8"전달력나쁨");
+			break;
+		case RATING_VBAD:
+			printf("%s \n", u8"전달력나쁨");
 			break;
 		default:
 			break;
 		}
 		switch (lectureTable[i].Att)
 		{
+		case ATT_VLOOSE:
+			printf("%s \n", u8"안부름");
+			break;
 		case ATT_LOOSE:
-			printf("%s \n", u8"느슨");
+			printf("%s \n", u8"가끔부름");
 			break;
 		case ATT_NORMAL:
 			printf("%s \n", u8"보통");
 			break;
 		case ATT_TIGHT:
-			printf("%s \n", u8"칼같음");
+			printf("%s \n", u8"자주부름");
+			break;
+		case ATT_VTIGHT:
+			printf("%s \n", u8"매일부름");
 			break;
 		default:
 			break;

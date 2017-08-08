@@ -53,12 +53,18 @@ int getClassifyMessage(char* name) {
 }
 int getKlueMessage(char* name) {
 	switchs(name) {
-		cases(u8"지뢰")
-			return KLUE_BAD;
-		cases(u8"꿀강")
-			return KLUE_GOOD;
+		cases(u8"절평")
+			return RATING_VGOOD;
+		cases(u8"전달력좋음")
+			return RATING_GOOD;
+		cases(u8"보통")
+			return RATING_NORMAL;
+		cases(u8"전달력나쁨")
+			return RATING_BAD;
+		cases(u8"쓰레기")
+			return RATING_VBAD;
 		defaults
-			return KLUE_NORMAL;
+			return RATING_NORMAL;
 	} switchs_end;
 	return 0;
 }
@@ -71,7 +77,7 @@ int getAttMessage(char* name) {
 			return ATT_TIGHT;
 		cases("LOOSE")
 			return ATT_LOOSE;
-		cases("VLOOSE")
+		cases("LOOSE")
 			return ATT_VLOOSE;
 		cases("NORMAL")
 			return ATT_NORMAL;

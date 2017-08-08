@@ -6,7 +6,6 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
-#define LECTURE_SIZE 20
 #define MAX_DEFAULT_STACK 175
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
@@ -65,12 +64,13 @@ void resetLectureList();
 void deleteTimeblockImage(int input);
 void popupHoney(int index);
 void popupBomb(int index);
+int estimateKLUE(lectureInfo target);
 int canUseKlue; // 클루 사용 가능 여부
 int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
 int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
 int grayblockNumber;
-
+typedef enum _KLUElecture { KLUE_HONEY, KLUE_BOMB, KLUE_NORMAL } KLUElecture;
 ALLEGRO_TIMER* sugang_timer;
 ALLEGRO_EVENT_QUEUE* sugang_timer_event_queue;
 int sugang_timer_set = 0;
@@ -92,7 +92,7 @@ int scene_2_init() {
 	Background = bg;
 
 	font = al_load_font("Resources\\font\\BMDOHYEON.ttf", 36, 0);
-	conf = al_load_config_file("Resources\\korean\\lecture_info.ini");
+	conf = al_load_config_file("Resources\\korean\\lecture_info_custom.ini");
 
 	//------------------------------------------------
 	// Buttons
@@ -518,7 +518,7 @@ void on_click_button_scroll_up() {
 		int p = 62; // 62부터 116까지가 List text의 위치
 		for (int k = 0; k < LIST_SIZE; k++) {
 			if (onListLecture[k] != -1) {
-
+				
 				Stack.objs[p++].modifier.value.font_value.text = lectureTable[onListLecture[k]].identifyNumber;
 				Stack.objs[p++].modifier.value.font_value.text = "00";
 				Stack.objs[p++].modifier.value.font_value.text = al_get_config_value(conf, "name", lectureTable[onListLecture[k]].identifyNumber);
@@ -755,11 +755,11 @@ void resetLectureList(){ // List 색 초기화, 눌러보고 생긴 회색 블록 제거
 		Stack.objs[(4 * k) + 20].enable = false;
 		Stack.objs[(4 * k) + 21].enable = false;
 		if (onListLecture[k] >= 0 && canUseKlue == 1) {
-			if (lectureTable[onListLecture[k]].klueRating == KLUE_GOOD) {
+			if (estimateKLUE(lectureTable[onListLecture[k]]) == KLUE_HONEY) {
 				Stack.objs[(4 * k) + 18].enable = false;
 				Stack.objs[(4 * k) + 19].enable = true;
 			}
-			else if (lectureTable[onListLecture[k]].klueRating == KLUE_BAD) {
+			else if (estimateKLUE(lectureTable[onListLecture[k]]) == KLUE_BOMB) {
 				Stack.objs[(4 * k) + 18].enable = false;
 				Stack.objs[(4 * k) + 20].enable = true;
 			}
@@ -1354,12 +1354,18 @@ void popupHoney(int index) {
 	Stack.objs[169].enable = false;
 	Stack.objs[168].enable = true;
 	lectureInfo target = lectureTable[onListLecture[index]];
-	Stack.objs[174].modifier.value.font_value.text = al_get_config_value(conf, "", target.identifyNumber);
+	Stack.objs[174].modifier.value.font_value.text = al_get_config_value(conf, "rating", target.identifyNumber);
+	Stack.objs[175].modifier.value.font_value.text = al_get_config_value(conf, "Attendance", target.identifyNumber);
+	Stack.objs[176].modifier.value.font_value.text = al_get_config_value(conf, "distance", target.identifyNumber);
 }
 
 void popupBomb(int index) {
 	Stack.objs[168].enable = false;
 	Stack.objs[169].enable = true;
+	lectureInfo target = lectureTable[onListLecture[index]];
+	Stack.objs[174].modifier.value.font_value.text = al_get_config_value(conf, "rating", target.identifyNumber);
+	Stack.objs[175].modifier.value.font_value.text = al_get_config_value(conf, "Attendance", target.identifyNumber);
+	Stack.objs[176].modifier.value.font_value.text = al_get_config_value(conf, "distance", target.identifyNumber);
 }
 char* getBlockImageAddr(int key) {
 	char buf[200];
@@ -1408,4 +1414,19 @@ char* getBlockImageAddr(int key) {
 		break;
 	}
 	return buf;
+}
+int estimateKLUE(lectureInfo target) {
+	if (target.klueRating == RATING_GOOD || target.klueRating == RATING_VGOOD) {
+		if (target.Att == ATT_LOOSE || target.Att == ATT_VLOOSE) {
+			if (target.distance < 10) {
+				return KLUE_HONEY;
+			}
+		}
+	}
+	else if (target.Att == ATT_TIGHT || target.Att == ATT_VTIGHT) {
+		if (target.distance > 15) {
+			return KLUE_BOMB;
+		}
+	}
+	return KLUE_NORMAL;
 }
