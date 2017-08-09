@@ -206,12 +206,10 @@ double std_dist(int t, int d) { //standard_distribution
 	double p;
 	double sigma = 0.25 * d;// 몇초를 1sigma의 기준으로?
 	double z = ((double)t - 10000) / 1000 / sigma;
-	double coeff = 2.506628274; // sqrt(2*PI)
 
-	p = z + ((double)1 / 6 * z*z*z) - ((double)1 / 40 * z*z*z*z*z) + ((double)1 / 336 * z*z*z*z*z*z*z); //taylor series
-	p /= coeff;
+	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z); //taylor series
 
-	return 0.5 + p;
+	return p;
 }
 
 bool probability_judge(double p) {
