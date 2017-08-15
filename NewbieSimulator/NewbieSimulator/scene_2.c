@@ -3,6 +3,8 @@
 #include "engine.h"
 #include "manageTimetable.h"
 #include "xmlParser.h"
+#include "data.h"
+
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
@@ -14,8 +16,8 @@ int analyzeMessage = MESSAGE_DEFAULT;
 int protectOverlapClick = 0;
 char gradepoint_str[3];
 
-schedule mySchedule;
-schedule* mySchedulePtr = &mySchedule;
+extern schedule mySchedule;
+extern schedule* mySchedulePtr = &mySchedule;
 
 ALLEGRO_BITMAP* tempimage = NULL;
 

@@ -1,5 +1,6 @@
 #include "engine.h"
-#include"schedule.h"
+#include "schedule.h"
+#include "data.h"
 
 ALLEGRO_CONFIG *conf;
 ALLEGRO_FONT *font;
