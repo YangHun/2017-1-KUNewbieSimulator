@@ -73,7 +73,7 @@ int push_stack(objstack_t *stack, object_t obj) {
 int pull_stack(objstack_t *stack) {
 
 	if (!(stack->is_empty(stack))) {
-		al_destroy_bitmap(stack->objs[stack->counter].image);
+		al_destroy_bitmap(stack->objs[stack->counter - 1].image);
 		stack->counter--;
 		return 0;
 	}
