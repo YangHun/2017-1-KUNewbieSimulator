@@ -16,8 +16,8 @@ int analyzeMessage = MESSAGE_DEFAULT;
 int protectOverlapClick = 0;
 char gradepoint_str[3];
 
-extern schedule mySchedule;
-extern schedule* mySchedulePtr = &mySchedule;
+//extern schedule mySchedule;
+//extern schedule* mySchedulePtr = &mySchedule;
 
 ALLEGRO_BITMAP* tempimage = NULL;
 

@@ -1,8 +1,8 @@
 #pragma once
 
 //scene 1
-int social_point;
+extern int social_point;
 
 //scene 2
-schedule mySchedule;
-schedule* mySchedulePtr = &mySchedule;
+extern schedule mySchedule;
+extern schedule* mySchedulePtr = &mySchedule;

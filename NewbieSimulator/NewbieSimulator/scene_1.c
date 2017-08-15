@@ -31,7 +31,7 @@ int explain_stat = 0;
 int spritex = 640, spritey = 360; 
 
 int health_point = 0;
-extern int social_point = 0;
+//extern int social_point = 0;
 char hpstr[10], spstr[10];
 
 int dir = 0, img = 0;
