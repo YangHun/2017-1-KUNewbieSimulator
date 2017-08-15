@@ -85,7 +85,7 @@ int pull_stack(objstack_t *stack) {
 
 int clear_stack(objstack_t *stack) {
 
-	printf("enter \n");
+	//printf("enter \n");
 
 	if (!(stack->is_empty(stack))) {
 
@@ -320,7 +320,7 @@ void initialization() {
 	prev = FSMs.states[0];
 	next = NULLFSM;
 
-	current_scene = Scenes.scenes[0];
+	current_scene = Scenes.scenes[2];
 	next_scene = NULLSCENE;
 	
 }

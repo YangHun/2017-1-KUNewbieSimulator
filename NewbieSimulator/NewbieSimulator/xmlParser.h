@@ -40,13 +40,12 @@ timeListPtr registerTimeList(char* key) {
 				if (timePhase == 0 || timePhase == 2) {
 					endTime = startTime;
 				}
-				for (int q = startTime; q <= endTime; q++) {
-					timeListPtr tempNode = (timeListPtr)malloc(sizeof(timeList));
-					tempNode->timeblock.dayofWeek = whatDayFunc(hangul);
-					tempNode->timeblock.period = q;
-					tempNode->next = nullNode->next;
-					nullNode->next = tempNode;
-				}
+				timeListPtr tempNode = (timeListPtr)malloc(sizeof(timeList));
+				tempNode->timeblock.dayofWeek = whatDayFunc(hangul);
+				tempNode->timeblock.period = startTime;
+				tempNode->timeblock.interval = endTime - startTime + 1;
+				tempNode->next = nullNode->next;
+				nullNode->next = tempNode;
 				startTime = 0;
 				endTime = 0;
 				timePhase = 0;
@@ -83,6 +82,76 @@ timeListPtr registerTimeList(char* key) {
 	return nullNode;
 }
 
+void registerEvaluation(char* key, int evaluationArray[]) {
+	unsigned char hangul[12];
+	unsigned char soojja[6];
+	int hangulMode = 1;
+	int i = 0;
+	int j = 0;
+	int whatEval;
+	int howMuch;
+	for (int k = 0; k < EVALUATION_SIZE; k++) {
+		evaluationArray[k] = 0;
+	}
+	while (key[i] != '\0') {
+		if (hangulMode == 1) {
+			if (key[i] == '(') {
+				hangul[j] = '\0';
+				j = 0;
+				hangulMode = 0;
+			}
+			else if (key[i] != ' ') {
+				hangul[j] = key[i];
+				j++;
+			}
+		}
+		else {
+			if (key[i] == ')') {
+				soojja[j] = '\0';
+				j = 0;
+				hangulMode = 1;
+				whatEval = getEvalMessage(hangul);
+				howMuch = atoiCustom(soojja, 0);
+				evaluationArray[whatEval] = howMuch;
+
+			}
+			else { // just number
+				soojja[j] = key[i];
+				j++;
+			}
+		}
+		i++;
+	}
+}
+
+void registerTuition(char* key, int tuitionArray[]) {
+	unsigned char hangul[9];
+	int hangulMode = 1;
+	int i = 0;
+	int j = 0;
+	int whatTuition;
+	for (int k = 0; k < TUITION_SIZE; k++) {
+		tuitionArray[k] = 0;
+	}
+	while (key[i] != '\0') {
+		if (key[i] != ' ') {
+			hangul[j] = key[i];
+			j++;
+		}
+		else {
+			hangul[j] = '\0';
+			whatTuition = getTuitionMessage(hangul);
+			tuitionArray[whatTuition] = 1;
+			j = 0;
+		}
+		i++;
+	}
+	hangul[j] = '\0';
+	whatTuition = getTuitionMessage(hangul);
+	tuitionArray[whatTuition] = 1;
+	j = 0;
+}
+
 void xmlParse(lectureInfo lectureTable[]) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -92,7 +161,8 @@ void xmlParse(lectureInfo lectureTable[]) {
 	unsigned char* nameString;
 	int i;
 	int keyLength = 0;
-	doc = xmlParseFile("Resources\\xml\\dummy-data.xml");
+
+	doc = xmlParseFile("Resources\\xml\\dummy-custom.xml");
 	if (doc == NULL) {
 		printf("Document not parsed successfully. \n");
 		return;
@@ -130,11 +200,6 @@ void xmlParse(lectureInfo lectureTable[]) {
 					case CODE:
 						strcpy_s(lectureTable[i].identifyNumber, sizeof(lectureTable[i].identifyNumber), key);
 						break;
-					case CLASS:
-						lectureTable[i].classNumber = atoiCustom(key, 0);
-						break;
-					case TYPE:
-						break;
 					case NAME:
 						strcpy_s(lectureTable[i].name, sizeof(lectureTable[i].name), key);
 						break;
@@ -154,6 +219,17 @@ void xmlParse(lectureInfo lectureTable[]) {
 					case KLUE:
 						lectureTable[i].klueRating = getKlueMessage(key);
 						break;
+					case ATTENDANCE:
+						lectureTable[i].Att = getAttMessage(key);
+						break;
+					case EVAL:
+						strcpy_s(lectureTable[i].evalString, sizeof(lectureTable[i].evalString), key);
+						registerEvaluation(key, lectureTable[i].evaluationArray);
+						break;
+					case TUITION:
+						strcpy_s(lectureTable[i].tuitionString, sizeof(lectureTable[i].tuitionString), key);
+						registerTuition(key, lectureTable[i].tuitionArray);
+						break;
 					case XML_MESSAGE_DEFAULT:
 						break;
 					default:
@@ -169,9 +245,8 @@ void xmlParse(lectureInfo lectureTable[]) {
 		cur = savePoint1;
 		cur = cur->next;
 	}
-	for (int i = 0; i < 17; i++) {
+	for (int i = 0; i < LECTURE_SIZE; i++) {
 		printf("%s \n", lectureTable[i].identifyNumber);
-		printf("%d \n", lectureTable[i].classNumber);
 		switch (lectureTable[i].classify)
 		{
 		case CORE:
@@ -254,19 +329,106 @@ void xmlParse(lectureInfo lectureTable[]) {
 		printf("%d%s \n", lectureTable[i].distance, u8"분");
 		switch (lectureTable[i].klueRating)
 		{
-		case GOOD:
-			printf("%s \n", u8"꿀강");
+		case RATING_VGOOD:
+			printf("%s \n", u8"절평");
 			break;
-		case NORMAL:
+		case RATING_GOOD:
+			printf("%s \n", u8"전달력좋음");
+			break;
+		case RATING_NORMAL:
 			printf("%s \n", u8"보통");
 			break;
-		case BAD:
-			printf("%s \n", u8"지뢰");
+		case RATING_BAD:
+			printf("%s \n", u8"전달력나쁨");
+			break;
+		case RATING_VBAD:
+			printf("%s \n", u8"전달력나쁨");
 			break;
 		default:
 			break;
 		}
-		printf("\n");
+		switch (lectureTable[i].Att)
+		{
+		case ATT_VLOOSE:
+			printf("%s \n", u8"안부름");
+			break;
+		case ATT_LOOSE:
+			printf("%s \n", u8"가끔부름");
+			break;
+		case ATT_NORMAL:
+			printf("%s \n", u8"보통");
+			break;
+		case ATT_TIGHT:
+			printf("%s \n", u8"자주부름");
+			break;
+		case ATT_VTIGHT:
+			printf("%s \n", u8"매일부름");
+			break;
+		default:
+			break;
+		}
+		printf("%s \n", lectureTable[i].evalString);
+		for (int ii = 0; ii < EVALUATION_SIZE; ii++) {
+			if (lectureTable[i].evaluationArray[ii] != 0) {
+				switch (ii) {
+				case EVAL_MIDDLE_EXAM:
+					printf(u8"중간 ");
+					break;
+				case EVAL_FINAL_EXAM:
+					printf(u8"기말 ");
+					break;
+				case EVAL_ASSIGNMENT:
+					printf(u8"중간 ");
+					break;
+				case EVAL_PRESENTATION:
+					printf(u8"중간 ");
+					break;
+				case EVAL_ATTENDANCE:
+					printf(u8"중간 ");
+					break;
+				case EVAL_UNDETERMINED_1:
+					printf(u8"중간 ");
+					break;
+				case EVAL_UNDETERMINED_2:
+					printf(u8"중간 ");
+					break;
+				default:
+					break;
+				}
+				printf("%d \n", lectureTable[i].evaluationArray[ii]);
+			}
+		}
+		printf("%s \n", lectureTable[i].tuitionString);
+		for (int ii = 0; ii < TUITION_SIZE; ii++) {
+			if (lectureTable[i].tuitionArray[ii] != 0) {
+				switch (ii) {
+				case TUI_DEBATION:
+					printf(u8"토론 ");
+					break;
+				case TUI_PRESENTATION:
+					printf(u8"발표 ");
+					break;
+				case TUI_LECTURE:
+					printf(u8"강의 ");
+					break;
+				case TUI_QUIZ:
+					printf(u8"퀴즈 ");
+					break;
+				case TUI_UNDETERMINED_3:
+					printf(u8"미3 ");
+					break;
+				case TUI_UNDETERMINED_4:
+					printf(u8"미4 ");
+					break;
+				case TUI_DEFAULT:
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		printf("\n\n");
 	}
 	xmlFreeDoc(doc);
 	xmlCleanupParser();

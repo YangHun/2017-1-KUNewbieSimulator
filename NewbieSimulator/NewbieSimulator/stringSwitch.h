@@ -31,7 +31,10 @@ typedef enum _XMLelementMessage {
 	TIME,
 	ROOM,
 	DISTANCE,
-	KLUE
+	KLUE,
+	ATTENDANCE,
+	EVAL,
+	TUITION
 } XMLelementMessage;
 
 int getClassifyMessage(char* name) {
@@ -50,15 +53,40 @@ int getClassifyMessage(char* name) {
 }
 int getKlueMessage(char* name) {
 	switchs(name) {
-		cases(u8"지뢰")
-			return BAD;
-		cases(u8"꿀강")
-			return GOOD;
+		cases(u8"절평")
+			return RATING_VGOOD;
+		cases(u8"전달력좋음")
+			return RATING_GOOD;
+		cases(u8"보통")
+			return RATING_NORMAL;
+		cases(u8"전달력나쁨")
+			return RATING_BAD;
+		cases(u8"쓰레기")
+			return RATING_VBAD;
 		defaults
-			return NORMAL;
+			return RATING_NORMAL;
 	} switchs_end;
 	return 0;
 }
+
+int getAttMessage(char* name) {
+	switchs(name) {
+		cases("VTIGHT")
+			return ATT_VTIGHT;
+		cases("TIGHT")
+			return ATT_TIGHT;
+		cases("LOOSE")
+			return ATT_LOOSE;
+		cases("LOOSE")
+			return ATT_VLOOSE;
+		cases("NORMAL")
+			return ATT_NORMAL;
+		defaults
+			return ATT_NORMAL;
+	} switchs_end;
+	return 0;
+}
+
 int getRoomMessage(char* name) {
 	switchs(name) {
 		cases(u8"교육관")
@@ -104,6 +132,12 @@ int getElementMessage(char* name) {
 			return DISTANCE;
 		cases("klue")
 			return KLUE;
+		cases("attendance")
+			return ATTENDANCE;
+		cases("eval")
+			return EVAL;
+		cases("tuition")
+			return TUITION;
 		defaults
 			return XML_MESSAGE_DEFAULT;
 	} switchs_end;
@@ -127,6 +161,50 @@ int whatDayFunc(char hangul[]) {
 			return SUN;
 		defaults
 			return DAY_DEFAULT;
+
+	} switchs_end;
+	return 0;
+}
+
+int getEvalMessage(char hangul[]) {
+	switchs(hangul) {
+		cases(u8"중간")
+			return EVAL_MIDDLE_EXAM;
+		cases(u8"기말")
+			return EVAL_FINAL_EXAM;
+		cases(u8"과제")
+			return EVAL_ASSIGNMENT;
+		cases(u8"발표")
+			return EVAL_PRESENTATION;
+		cases(u8"출석")
+			return EVAL_ATTENDANCE;
+		cases(u8"미1")
+			return EVAL_UNDETERMINED_1;
+		cases(u8"미2")
+			return EVAL_UNDETERMINED_2;
+		defaults
+			return EVAL_DEFALUT;
+
+	} switchs_end;
+	return 0;
+}
+
+int getTuitionMessage(char hangul[]) {
+	switchs(hangul) {
+		cases(u8"강의")
+			return TUI_LECTURE;
+		cases(u8"발표")
+			return TUI_PRESENTATION;
+		cases(u8"토론")
+			return TUI_DEBATION;
+		cases(u8"퀴즈")
+			return TUI_QUIZ;
+		cases(u8"미3")
+			return TUI_UNDETERMINED_3;
+		cases(u8"미4")
+			return TUI_UNDETERMINED_4;
+		defaults
+			return TUI_DEFAULT;
 
 	} switchs_end;
 	return 0;

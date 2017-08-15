@@ -86,7 +86,7 @@ int scene_1_init(){
 	timer = al_create_timer(1.0 / 1000);
 	timer_event_queue = al_create_event_queue();
 	al_register_event_source(timer_event_queue, al_get_timer_event_source(timer));
-	al_start_timer(timer);
+	//al_start_timer(timer);
 
 
 	object_t stat_window = create_object("Resources\\dummy\\stat_window.png", 0, 0);
@@ -263,6 +263,7 @@ int scene_1_update() {
 			Stack.objs[c - i].enable = false;
 		}
 		al_start_timer(event_timer);
+		al_start_timer(timer);
 		printf("timer start\n");
 	}
 	else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && explain_stat) {//아무데나 누르면 팝업 없애기
@@ -285,9 +286,9 @@ int scene_1_update() {
 
 	
 	//타임바 이동
-	if (al_get_timer_count(timer) - timer_set > 7) {
+	if (al_get_timer_count(timer) - timer_set > 10) {
 		timer_set = al_get_timer_count(timer);
-		timebar.pos.x += 1024 / (20.0 * 100);
+		timebar.pos.x += 1280 / (120.0 * 100);
 		timeline.rect.width = timebar.pos.x+5;
 	}
 
@@ -324,6 +325,7 @@ void scene_1_on_click_button_0() {
 //단톡방 초대
 void invitation() {
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
 	printf("stop timer\n");
 
 	printf("invitation\n");
@@ -356,6 +358,8 @@ void invitation() {
 //미리정모
 void first_meeting() { 
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
+
 	printf("stop timer\n");
 
 	printf("first_meeting\n");
@@ -384,6 +388,8 @@ void first_meeting() {
 //새내기 미리배움터
 void newbie_before_study() { 	
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
+
 	printf("stop timer\n");
 
 	printf("newbie_before_study\n");
@@ -412,6 +418,8 @@ void newbie_before_study() {
 //새내기 정모
 void newbie_meeting() { 
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
+
 	printf("stop timer\n");
 
 	printf("newbie_meeting\n");
@@ -440,6 +448,8 @@ void newbie_meeting() {
 //새내기 배움터
 void newbie_study() { 
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
+
 	printf("stop timer\n");
 
 	printf("newbie_study\n");
@@ -468,6 +478,8 @@ void newbie_study() {
 //신입생 OT
 void newbie_OT() { 
 	al_stop_timer(event_timer);
+	al_stop_timer(timer);
+
 	printf("stop timer\n");
 
 	printf("newbie_OT\n");
@@ -535,6 +547,7 @@ void clicked_yes()
 	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 
 	al_start_timer(event_timer);
+	al_start_timer(timer);
 	int c = Stack.counter;
 
 	for (int i = 6; i > 0; i--) {
@@ -579,6 +592,7 @@ void clicked_no()
 	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 
 	al_start_timer(event_timer);
+	al_start_timer(timer);
 	int c = Stack.counter;
 
 	for (int i = 6; i > 0; i--) {

@@ -8,7 +8,7 @@ void init_mySchedule(schedule* mySchedulePtr) {
 	mySchedulePtr->idNumberList->str = NULL;
 	mySchedulePtr->idNumberList->next = NULL;
 
-	mySchedulePtr->gradePoint = 0;
+	mySchedulePtr->credit = 0;
 
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
@@ -41,24 +41,26 @@ void printSchedule(schedule mySchedule) {
 	}
 }
 void addLectureToSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, int index) {
-	for (strListPtr p = mySchedulePtr->idNumberList; p != NULL; p = p->next) {
-		if (p->next == NULL) {
-			strListPtr tempNode = (strListPtr)malloc(sizeof(strList));
-			tempNode->next = NULL;
-			tempNode->str = lectureTable[index].identifyNumber;
-			p->next = tempNode;
-			break;
-		}
-	}
+	mySchedulePtr->credit += lectureTable[index].credit;
+	strListPtr p = mySchedulePtr->idNumberList;
+	strListPtr tempNode = (strListPtr)malloc(sizeof(strList));
+	tempNode->next = p->next;
+	tempNode->str = lectureTable[index].identifyNumber;
+	p->next = tempNode;
 
 	for (timeListPtr k = lectureTable[index].lectureTime->next; k != NULL; k = k->next) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
-		mySchedulePtr->timeTable[i][j].isEmptyBit = NONEMPTY;
-		mySchedulePtr->timeTable[i][j].index = index;
+		int z = k->timeblock.interval;
+		for (int w = 0; w < z; w++) {
+			mySchedulePtr->timeTable[i][j + w].isEmptyBit = NONEMPTY;
+			mySchedulePtr->timeTable[i][j + w].index = index;
+		}
 	}
 }
 void deleteLectureFromSchedule(lectureInfo lectureTable[], schedule* mySchedulePtr, int index) {
+	mySchedulePtr->credit -= lectureTable[index].credit;
+
 	strListPtr current = mySchedulePtr->idNumberList->next;
 	strListPtr previous = NULL;
 
@@ -85,13 +87,16 @@ void deleteLectureFromSchedule(lectureInfo lectureTable[], schedule* myScheduleP
 	for (timeListPtr k = lectureTable[index].lectureTime->next; k != NULL; k = k->next) {
 		int i = k->timeblock.dayofWeek;
 		int j = k->timeblock.period;
-		mySchedulePtr->timeTable[i][j].isEmptyBit = EMPTY;
-		mySchedulePtr->timeTable[i][j].index = -1;
+		int z = k->timeblock.interval;
+		for(int w = 0; w < z; w++){
+			mySchedulePtr->timeTable[i][j + w].isEmptyBit = EMPTY;
+			mySchedulePtr->timeTable[i][j + w].index = -1;
+		}
 	}
 }
 int analyzeSchedule(lectureInfo lectureTable[], schedule mySchedule, int index) {
 	int i, j;
-	int day, period;
+	int day, period, interval;
 
 	lectureInfo target = lectureTable[index];
 	timeListPtr currentPtr = target.lectureTime;
@@ -110,7 +115,7 @@ int analyzeSchedule(lectureInfo lectureTable[], schedule mySchedule, int index) 
 	}
 
 	//학점초과 확인
-	if (mySchedule.gradePoint + target.credit > MAX_CREDIT)
+	if (mySchedule.credit + target.credit > MAX_CREDIT)
 		return EXCEED_POINT;
 
 	// if (currentPtr == NULL)
@@ -118,7 +123,10 @@ int analyzeSchedule(lectureInfo lectureTable[], schedule mySchedule, int index) 
 	while (currentPtr != NULL) {
 		day = currentPtr->timeblock.dayofWeek;
 		period = currentPtr->timeblock.period;
-		targetTable[day][period] = NONEMPTY;
+		interval = currentPtr->timeblock.interval;
+		for (int w = 0; w < interval; w++) {
+			targetTable[day][period + w] = NONEMPTY;
+		}
 		currentPtr = currentPtr->next;
 	}
 

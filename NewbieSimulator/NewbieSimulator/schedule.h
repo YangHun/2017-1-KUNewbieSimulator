@@ -19,7 +19,7 @@ typedef struct _timetableInfo {
 } timetableInfo;
 
 typedef struct _schedule {
-	int gradePoint;
+	int credit;
 	strListPtr idNumberList;
 	timetableInfo timeTable[5][10]; //5요일 10교시
 } schedule;
