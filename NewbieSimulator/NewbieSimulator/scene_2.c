@@ -8,7 +8,6 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
-#define MAX_DEFAULT_STACK 175
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
 int input = 0;
@@ -16,8 +15,8 @@ int analyzeMessage = MESSAGE_DEFAULT;
 int protectOverlapClick = 0;
 char gradepoint_str[3];
 
-//extern schedule mySchedule;
-//extern schedule* mySchedulePtr = &mySchedule;
+schedule mySchedule;
+schedule* mySchedulePtr = &mySchedule;
 
 ALLEGRO_BITMAP* tempimage = NULL;
 
@@ -45,6 +44,7 @@ static void on_click_reset();
 static void on_click_finish();
 static void on_click_add_lecture();
 static void on_click_campus_map();
+static void on_click_map_screen();
 
 static void on_click_lectureList_0();
 static void on_click_lectureList_1();
@@ -83,8 +83,8 @@ int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	system("chcp 65001");
 	printf("Scene 2 start!");
-
-	canUseKlue = 1; // true
+	canUseKlue = 1;
+	canUseKlue = (social_point >= 2) ? 1 : 0;
 	selectedLectureIndex = -1;
 	for (int i = 0; i < 7; i++) {
 		colorArray[i] = -1;
@@ -345,9 +345,9 @@ int scene_2_init() {
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); //173
 
-							 //------------------------------------------------
-							 // KLUE Text
-							 //------------------------------------------------
+	 //------------------------------------------------
+	 // KLUE Text
+	 //------------------------------------------------
 
 	object_t lecture_review = create_object(NULL, 908, 600);
 	ui_set_text(&lecture_review, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
@@ -360,6 +360,17 @@ int scene_2_init() {
 	object_t lecture_Distance = create_object(NULL, 908, 670);
 	ui_set_text(&lecture_Distance, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
 	Stack.push(&Stack, lecture_Distance); //176
+
+	//------------------------------------------------
+	// CampusMap
+	//------------------------------------------------
+
+	object_t campus_map = create_object("Resources\\UI\\enroll\\campus_map.jpg", 0, 0);
+	ui_set_button(&campus_map);
+	ui_set_on_click_listener(&campus_map, on_click_map_screen);
+	Stack.push(&Stack, campus_map); //177
+	Stack.objs[177].enable = false;
+
 
 	return 0;
 }
@@ -433,6 +444,10 @@ void on_click_add_lecture(void) {
 }
 
 void on_click_campus_map(void) {
+
+}
+
+void on_click_map_screen(void) {
 
 }
 
