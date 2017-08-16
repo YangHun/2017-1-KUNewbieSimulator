@@ -1,8 +1,10 @@
+#pragma once
 #include "engine.h"
-#include "schedule.h"
 #include "data.h"
+#include "manageTimetable.h"
 
 ALLEGRO_CONFIG *conf;
+ALLEGRO_CONFIG *conf2;
 ALLEGRO_FONT *font;
 ALLEGRO_TIMER *click_timer;
 ALLEGRO_EVENT_QUEUE *click_event;
@@ -12,9 +14,12 @@ bool counting_start = false;	//초시계 시작
 bool timer_started = false;	//타이머 시작
 bool game_start = false;	//수강신청 시작
 bool pressed[6];
+bool success[6];
 bool renew_timer_text = false;
+bool lecturerepeat;
 
 int timer_text_count;
+int lectureindex[6];
 
 void on_click_startbt();
 void pressed1();
@@ -25,6 +30,8 @@ void pressed5();
 void pressed6();
 void result();
 
+void reSchedule(void);
+
 double std_dist(int t, int d);
 bool probability_judge(double p);
 void display_timer(void);
@@ -34,15 +41,20 @@ int pressed_time[6];
 int scene_3_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
-	int i;
+	int i, j, x;
+	int k = 0;
+	int lectureid;
 
 	printf("Scene 3 start! \n");
 
 	object_t bg = create_object("Resources\\UI\\enroll_2\\background.jpg", 0, 0);
 	Background = bg;
+	for (i = 0; i < 6; i++) {
+		lectureindex[i] = -1;
+	}
 
 	conf = al_load_config_file("Resources\\korean\\enroll_2.ini");
-
+	conf2 = al_load_config_file("Resources\\korean\\lecture_info.ini");
 	click_timer = al_create_timer(1.0 / 1000);
 	click_event = al_create_event_queue();
 	al_register_event_source(click_event, al_get_timer_event_source(click_timer));
@@ -66,8 +78,27 @@ int scene_3_init() {
 	for (i = 0; i < 6; i++) {
 		ui_set_button(&bt[i]);
 		pressed[i] = false;
+		success[i] = false;
 	}
 
+	for (i = 0; i < 5; i++) {
+		for (j = 0; j < 10; j++) {
+			lecturerepeat = false;
+			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
+				lectureid = mySchedule.timeTable[i][j].index;
+				for (x = 0; x < 6; x++) {
+					if (lectureid == lectureindex[x])
+						lecturerepeat = true;
+				}
+				if(lecturerepeat == false)
+					lectureindex[k++] = lectureid;
+			}
+		}
+	}
+/*	for (i = 0; i < 6; i++) {
+		printf("%d\n", lectureindex[i]);
+	}
+	Sleep(5000); */
 	ui_set_on_click_listener(&bt[0], pressed1);
 	ui_set_on_click_listener(&bt[1], pressed2);
 	ui_set_on_click_listener(&bt[2], pressed3);
@@ -79,7 +110,10 @@ int scene_3_init() {
 	object_t lecture[6];
 	for (i = 0; i < 6; i++) {
 		lecture[i] = create_object(NULL, 850, 235 + i * 74);
-		ui_set_text(&lecture[i], al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "something", 36); //과목명부분 바꿔야함
+		if (lectureindex[i] == -1)
+			ui_set_text(&lecture[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 36);
+		else
+			ui_set_text(&lecture[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf2, "name", lectureTable[lectureindex[i]].identifyNumber), 36);
 		Stack.push(&Stack, bt[i]);
 		Stack.push(&Stack, lecture[i]);
 	}
@@ -102,6 +136,7 @@ int scene_3_init() {
 	Stack.push(&Stack, start_bt);
 #define START_BT Stack.objs[16]
 
+	
 	return 0;
 }
 
@@ -188,15 +223,53 @@ void result() {
 	int i;
 	for (i = 0; i < 6; i++) {
 		if (!pressed[i]) {
-			printf("not pressed!\n");
 			continue;
 		}
 		if (probability_judge(std_dist(pressed_time[i], 2))) {
 			printf("[%d]time: %d\n",i, pressed_time[i]);
 			printf("prob: %lf\n", std_dist(pressed_time[i], 2));
 			printf("[%d]success!!\n", i);
+			success[i] = true;
+		}
+		else {
+			printf("[%d]time: %d\n", i, pressed_time[i]);
+			printf("prob: %lf\n", std_dist(pressed_time[i], 2));
+			printf("[%d]fail!!\n", i);
 		}
 	}
+	for (i = 0; i < 6; i++) {
+		if (success[i] == false && lectureindex[i] != -1) {
+			deleteLectureFromSchedule(lectureTable, mySchedulePtr, lectureindex[i]);
+			lectureindex[i] = -1;
+		}
+	}
+	//reSchedule();
+	printSchedule(mySchedule);
+	Sleep(50000);
+}
+
+void reSchedule() {
+	int i;
+	int newindex;
+	bool repeat = true;
+
+	newindex = rand() % LECTURE_SIZE;
+
+	for (i = 0; i < 6; i++) {
+		if (lectureindex[i] == -1) {
+			while (repeat) {
+				while (lectureTable[newindex].klueRating == RATING_VGOOD || lectureTable[newindex].klueRating == RATING_GOOD) {
+					newindex = rand() % LECTURE_SIZE;
+				}
+				if (analyzeSchedule(lectureTable, mySchedule, newindex) == NO_OVERLAP) {
+					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
+					repeat = false;
+				}
+			}
+		}
+	}
+
+	printSchedule(mySchedule);
 	Sleep(50000);
 }
 
@@ -205,10 +278,10 @@ double std_dist(int t, int d) { //standard_distribution
 //수강신청 난이도: 1:어려움 2:보통 3:쉬움
 //#include <math.h> : 하면 터짐
 	double p;
-	double sigma = 0.25 * d;// 몇초를 1sigma의 기준으로?
+	double sigma = 0.5 * d;// 몇초를 1sigma의 기준으로?
 	double z = ((double)t - 10000) / 1000 / sigma;
 
-	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z); //taylor series
+	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z) + ((double)1 / 384 * z*z*z*z*z*z*z*z); //taylor series
 
 	return p;
 }
@@ -258,6 +331,9 @@ void display_timer(void) {
 	renew_timer_text = false;
 }
 
+void displayresult(void) {
+	
+}
 
 int scene_3_fin() {
 
