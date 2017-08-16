@@ -36,6 +36,9 @@
     <ClCompile Include="manageTImetable.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="scene_4.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
