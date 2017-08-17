@@ -13,6 +13,24 @@ void calculate_second_per_day();
 void test_custom_schedule();
 schedule customSchedule; // to test
 
+void selected1();
+void selected2();
+bool ongoing1 = false, ongoing2 = false;
+bool isSet = false;
+int moving = 0;
+
+struct pos {
+	int x, y;
+}start_point, end_point;
+
+double nowx, nowy;
+double x_velocity, y_velocity;
+
+ALLEGRO_TIMER *timer;
+ALLEGRO_EVENT_QUEUE *event_queue;
+
+object_t player;
+
 int scene_4_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -42,7 +60,47 @@ int scene_4_init() {
 	today_of_week = MON;
 	test_custom_schedule();
 
+	player = create_object("Resources\\UI\\routegame\\character.png", 100, 150);
+	Stack.push(&Stack, player);
+#define CHARACTER 2
+
+	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
+	ui_set_button(&route1);
+	ui_set_on_click_listener(&route1, selected1);
+	Stack.push(&Stack, route1);
+	object_t route2 = create_object("Resources\\UI\\routegame\\route2.png", 100, 200);
+	ui_set_button(&route2);
+	ui_set_on_click_listener(&route2, selected2);
+	Stack.push(&Stack, route2);
+
+	timer = al_create_timer(1.0 / 1000);
+	event_queue = al_create_event_queue();
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));
+	al_start_timer(timer);
+
+	start_point.x = 100;
+	start_point.y = 150;
+
 	return 0;
+}
+
+static double FPS = 40.0;
+void setting()
+{
+	nowx = start_point.x;
+	nowy = start_point.y;
+	if (ongoing1) {
+		end_point.x = 190;
+		end_point.y = 100;
+		x_velocity = (double)(end_point.x - start_point.x) / FPS; //FPS조절하여 캐릭터 속도 조절
+		y_velocity = (double)(end_point.y - start_point.y) / FPS;
+	}
+	else {
+		end_point.x = 190;
+		end_point.y = 200;
+		x_velocity = (double)(end_point.x - start_point.x) / FPS;
+		y_velocity = (double)(end_point.y - start_point.y) / FPS;
+	}
 }
 
 int scene_4_update() {
@@ -76,6 +134,21 @@ int scene_4_update() {
 		al_start_timer(maingame_timer);
 	}
 
+	if (!ongoing1 && !ongoing2) return 0;
+	if (!isSet) {
+		isSet = true;
+		setting();
+	}
+
+	if (Stack.objs[CHARACTER].pos.x == (double)end_point.x && Stack.objs[CHARACTER].pos.y == (double)end_point.y) {
+		printf("reach the destination\n");
+		ongoing1 = false;
+		ongoing2 = false;
+	}
+
+	Stack.objs[CHARACTER].pos.x += x_velocity;
+	Stack.objs[CHARACTER].pos.y += y_velocity;
+
 	re_draw();
 
 	return 0;
@@ -85,6 +158,7 @@ int scene_4_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
+	al_destroy_timer(timer);
 
 	printf("counter : %d \n", Stack.counter);
 
@@ -141,4 +215,14 @@ void test_custom_schedule() { // to test
 	calculate_second_per_day();
 
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
+}
+
+void selected1()
+{
+	ongoing1 = true;
+}
+
+void selected2()
+{
+	ongoing2 = true;
 }
