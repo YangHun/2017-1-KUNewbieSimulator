@@ -62,7 +62,7 @@ int scene_4_update() {
 	}
 	
 	if (Stack.objs[1].rect.width > 1280) {
-		if (today_of_week == SUN) {
+		if (today_of_week == FRI) {
 			today_of_week = MON;
 		}
 		else {
