@@ -60,9 +60,20 @@ int scene_4_update() {
 		printf("%f\n", timebar_width);
 		Stack.objs[1].rect.width = timebar_width + 5;
 	}
+	
 	if (Stack.objs[1].rect.width > 1280) {
-		//load_scene(Scenes.scenes[5]);
-		printf("scene loading \n");
+		if (today_of_week == SUN) {
+			today_of_week = MON;
+		}
+		else {
+			today_of_week++;
+		}
+		timebar_width = 0;
+		Stack.objs[1].rect.width = 0;
+		maingame_timer_set = 0;
+
+		al_stop_timer(maingame_timer);
+		al_start_timer(maingame_timer);
 	}
 
 	re_draw();
