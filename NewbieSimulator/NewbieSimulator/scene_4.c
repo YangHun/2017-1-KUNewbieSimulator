@@ -18,6 +18,7 @@ void selected2();
 bool ongoing1 = false, ongoing2 = false;
 bool isSet = false;
 int moving = 0;
+int count = 0;
 
 struct pos {
 	int x, y;
@@ -84,7 +85,7 @@ int scene_4_init() {
 	return 0;
 }
 
-static double FPS = 40.0;
+static double FPS = 50.0;
 void setting()
 {
 	nowx = start_point.x;
@@ -140,14 +141,18 @@ int scene_4_update() {
 		setting();
 	}
 
-	if (Stack.objs[CHARACTER].pos.x == (double)end_point.x && Stack.objs[CHARACTER].pos.y == (double)end_point.y) {
+	if (count==FPS) {
 		printf("reach the destination\n");
 		ongoing1 = false;
 		ongoing2 = false;
+		Stack.objs[CHARACTER].pos.x = end_point.x;
+		Stack.objs[CHARACTER].pos.y = end_point.y;
+		count = 0;
 	}
 
 	Stack.objs[CHARACTER].pos.x += x_velocity;
 	Stack.objs[CHARACTER].pos.y += y_velocity;
+	count++;
 
 	re_draw();
 
