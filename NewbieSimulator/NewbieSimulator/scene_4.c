@@ -19,6 +19,7 @@ bool ongoing1 = false, ongoing2 = false;
 bool isSet = false;
 int moving = 0;
 int count = 0;
+int current_state;
 
 struct pos {
 	int x, y;
@@ -28,13 +29,15 @@ double nowx, nowy;
 double x_velocity, y_velocity;
 
 ALLEGRO_TIMER *timer;
+int chr_timer_set = 0;
 ALLEGRO_EVENT_QUEUE *event_queue;
 
-object_t player;
+object_t player[4];
 
 int scene_4_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
+	int i;
 
 	printf("Scene 4 start! \n");
 
@@ -61,9 +64,17 @@ int scene_4_init() {
 	today_of_week = MON;
 	test_custom_schedule();
 
-	player = create_object("Resources\\UI\\routegame\\character.png", 100, 150);
-	Stack.push(&Stack, player);
+	player[0] = create_object("Resources\\UI\\routegame\\move.png", 100, 150);
+	player[1] = create_object("Resources\\UI\\routegame\\1.png", 100, 150);
+	player[2] = create_object("Resources\\UI\\routegame\\2.png", 100, 150);
+	player[3] = create_object("Resources\\UI\\routegame\\3.png", 100, 150);
+	for (i = 0; i < 4; i++) {
+		player[i].enable = false;
+		Stack.push(&Stack, player[i]);
+	}
 #define CHARACTER 2
+	current_state = CHARACTER + 1;
+	Stack.objs[current_state].enable = true;
 
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
@@ -85,9 +96,12 @@ int scene_4_init() {
 	return 0;
 }
 
-static double FPS = 50.0;
+static double FPS = 100.0;
 void setting()
 {
+	Stack.objs[current_state].enable = false;
+	current_state = CHARACTER;
+	Stack.objs[current_state].enable = true;
 	nowx = start_point.x;
 	nowy = start_point.y;
 	if (ongoing1) {
@@ -106,6 +120,7 @@ void setting()
 
 int scene_4_update() {
 
+	int i;
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 
@@ -135,24 +150,38 @@ int scene_4_update() {
 		al_start_timer(maingame_timer);
 	}
 
-	if (!ongoing1 && !ongoing2) return 0;
-	if (!isSet) {
-		isSet = true;
-		setting();
+	if (!ongoing1 && !ongoing2) {
+		if (al_get_timer_count(timer) - chr_timer_set>500) {
+			chr_timer_set = al_get_timer_count(timer);
+			Stack.objs[current_state].enable = false;
+			current_state = CHARACTER + rand() % 3 + 1;
+			Stack.objs[current_state].enable = true;
+		}
 	}
+	else {
+		if (!isSet) {
+			isSet = true;
+			setting();
+		}
 
-	if (count==FPS) {
-		printf("reach the destination\n");
-		ongoing1 = false;
-		ongoing2 = false;
-		Stack.objs[CHARACTER].pos.x = end_point.x;
-		Stack.objs[CHARACTER].pos.y = end_point.y;
-		count = 0;
+		if (count == FPS) {
+			printf("reach the destination\n");
+			ongoing1 = false;
+			ongoing2 = false;
+			for (i = 0; i < 4; i++) {
+				Stack.objs[CHARACTER + i].pos.x = end_point.x;
+				Stack.objs[CHARACTER + i].pos.y = end_point.y;
+			}
+			count = 0;
+			isSet = false;
+		}
+
+		for (i = 0; i < 4; i++) {
+			Stack.objs[CHARACTER + i].pos.x += x_velocity;
+			Stack.objs[CHARACTER + i].pos.y += y_velocity;
+		}
+		count++;
 	}
-
-	Stack.objs[CHARACTER].pos.x += x_velocity;
-	Stack.objs[CHARACTER].pos.y += y_velocity;
-	count++;
 
 	re_draw();
 
