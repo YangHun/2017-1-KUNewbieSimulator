@@ -232,7 +232,6 @@ int scene_2_init() {
 		listTextArray[p][3] = create_object(NULL, 449, 56 + (p * 33));
 		listTextArray[p][4] = create_object(NULL, 520, 56 + (p * 33));
 
-
 		Stack.push(&Stack, listTextArray[p][0]);
 		Stack.push(&Stack, listTextArray[p][1]);
 		Stack.push(&Stack, listTextArray[p][2]);
@@ -387,7 +386,9 @@ int scene_2_update() {
 		timeline_location += 1280 / (SUGANG_TIME * 100);
 		timeline.rect.width = timeline_location + 5;
 	}
-
+	if (timeline.rect.width > 1280) {
+		load_scene(Scenes.scenes[3]);
+	}
 	sprintf(gradepoint_str, "%d", mySchedule.credit);
 	re_draw();
 	return 0;
@@ -922,72 +923,6 @@ void toggle_button(ActiveButton active) {
 	isActive = active;
 
 }
-
-//---------------------------
-//requires A LOT OF revision!
-//---------------------------
-
-/*
-
-void printLecture(int index) {
-lectureInfo lecture = lectureTable[index];
-
-//y좌표 강의명460 | 시간/강의실 495 | 학수번호 530 | 이수구분 565 | 수업 방법 600 | 평가방법 670 (간격 35)
-//lecture_name : 강의명
-
-object_t lecture_name = create_object(NULL, 191, 460);
-ui_set_text(&lecture_name, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "name", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_name);
-
-//lecture_time : 시간/강의실
-object_t lecture_time = create_object(NULL, 191, 495);
-ui_set_text(&lecture_time, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "time", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_time);
-
-//lecture_number : 학수번호
-object_t lecture_number = create_object(NULL, 191, 530);
-ui_set_text(&lecture_number, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "number", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_number);
-
-//lecture_credit : 이수구분.학점
-object_t lecture_credit = create_object(NULL, 191, 565);
-ui_set_text(&lecture_credit, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "credit", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_credit);
-
-//lecture_class : 수업 방법
-object_t lecture_class = create_object(NULL, 191, 600);
-ui_set_text(&lecture_class, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "class", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_class);
-
-//lecture_eval : 평가 방법
-object_t lecture_eval = create_object(NULL, 191, 670);
-ui_set_text(&lecture_eval, al_map_rgb(255, 255, 255), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "eval", lecture.identifyNumber), 36);
-Stack.push(&Stack, lecture_eval);
-
-
-}
-
-void printLecture_test(void) {
-lectureInfo lecture = lectureTable[0];
-
-if (conf == NULL)
-printf("NULL!!\n");
-else
-printf("%x\n", conf);
-
-object_t aa = create_object(NULL, 191, 460);
-ui_set_text(&aa, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, lecture.identifyNumber, 30);
-Stack.push(&Stack, aa);
-
-object_t lecture_name = create_object(NULL, 191, 495);
-ui_set_text(&lecture_name, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "COSE101"), 30);
-Stack.push(&Stack, lecture_name);
-printf("%s", al_get_config_value(conf, "korean", lecture.identifyNumber));
-
-
-}
-
-*/
 
 static void on_click_lectureList_0() {
 	if (protectOverlapClick == 0) {
