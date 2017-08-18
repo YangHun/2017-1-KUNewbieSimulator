@@ -3,15 +3,17 @@
 #include "engine.h"
 #include "manageTimetable.h"
 #include "xmlParser.h"
+#include "data.h"
+
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
 #define LIST_SIZE 11
-#define MAX_DEFAULT_STACK 175
 //Global Variable
 lectureInfo lectureTable[LECTURE_SIZE];
 int input = 0;
 int analyzeMessage = MESSAGE_DEFAULT;
 int protectOverlapClick = 0;
+int protectOverlapClick_Map = 0;
 char gradepoint_str[3];
 
 schedule mySchedule;
@@ -43,6 +45,7 @@ static void on_click_reset();
 static void on_click_finish();
 static void on_click_add_lecture();
 static void on_click_campus_map();
+static void on_click_map_screen();
 
 static void on_click_lectureList_0();
 static void on_click_lectureList_1();
@@ -81,8 +84,8 @@ int scene_2_init() {
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	system("chcp 65001");
 	printf("Scene 2 start!");
-
-	canUseKlue = 1; // true
+	//canUseKlue = 1;
+	canUseKlue = (social_point >= 2) ? 1 : 0;
 	selectedLectureIndex = -1;
 	for (int i = 0; i < 7; i++) {
 		colorArray[i] = -1;
@@ -343,9 +346,9 @@ int scene_2_init() {
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); //173
 
-							 //------------------------------------------------
-							 // KLUE Text
-							 //------------------------------------------------
+	 //------------------------------------------------
+	 // KLUE Text
+	 //------------------------------------------------
 
 	object_t lecture_review = create_object(NULL, 908, 600);
 	ui_set_text(&lecture_review, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
@@ -359,6 +362,15 @@ int scene_2_init() {
 	ui_set_text(&lecture_Distance, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
 	Stack.push(&Stack, lecture_Distance); //176
 
+	//------------------------------------------------
+	// CampusMap
+	//------------------------------------------------
+
+	object_t campus_map_screen = create_object("Resources\\UI\\enroll\\campus_map.jpg", 0, 0);
+	ui_set_button(&campus_map_screen);
+	ui_set_on_click_listener(&campus_map_screen, on_click_map_screen);
+	Stack.push(&Stack, campus_map_screen); //177
+	Stack.objs[177].enable = false;
 	return 0;
 }
 
@@ -366,7 +378,9 @@ int scene_2_update() {
 
 	//Scene 2의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
-
+	if (protectOverlapClick_Map == 1) {
+		protectOverlapClick_Map = 0;
+	}
 #define SUGANG_TIME 120.0
 	if (al_get_timer_count(sugang_timer) - sugang_timer_set > 10) {
 		sugang_timer_set = al_get_timer_count(sugang_timer);
@@ -396,42 +410,66 @@ int scene_2_fin() {
 void on_click_add_lecture(void) {
 
 	int input;
+	int inputChange = 0;
 	for (int k = 0; k < LIST_SIZE; k++) {
 		if (Stack.objs[21 + k * 4].enable == true) {
 			input = onListLecture[k];
+			inputChange = 1;
 		}
 	}
-	printf("%d input \n", input);
-	analyzeMessage = analyzeSchedule(lectureTable, mySchedule, input);
-	switch (analyzeMessage)
-	{
-	case EXCEED_POINT:
-		printf("point Exceeded. delete other Lecture\n");
-		break;
+	if (inputChange == 1) {
+		printf("%d input \n", input);
+		analyzeMessage = analyzeSchedule(lectureTable, mySchedule, input);
+		switch (analyzeMessage)
+		{
+		case EXCEED_POINT:
+			printf("point Exceeded. delete other Lecture\n");
+			break;
 
-	case NO_OVERLAP:
-		selectedLectureIndex = -1;
-		addLectureToSchedule(lectureTable, mySchedulePtr, input);
-		addTimeblockImage(input, 1);
-		break;
+		case NO_OVERLAP:
+			selectedLectureIndex = -1;
+			addLectureToSchedule(lectureTable, mySchedulePtr, input);
+			addTimeblockImage(input, 1);
+			break;
 
-	case TIME_OVERLAP:
-		printf("time overlapped. try again\n");
-		break;
+		case TIME_OVERLAP:
+			printf("time overlapped. try again\n");
+			break;
 
-	case ALREADY_EXIST:
-		selectedLectureIndex = -1;
-		deleteLectureFromSchedule(lectureTable, mySchedulePtr, input);
-		deleteTimeblockImage(input);
-		break;
+		case ALREADY_EXIST:
+			selectedLectureIndex = -1;
+			deleteLectureFromSchedule(lectureTable, mySchedulePtr, input);
+			deleteTimeblockImage(input);
+			break;
 
-	default:
-		break;
+		default:
+			break;
+		}
 	}
 }
 
 void on_click_campus_map(void) {
+	if (protectOverlapClick_Map == 0) {
+		printf("on green \n");
+		protectOverlapClick_Map = 1;
+		Stack.objs[177].enable = true;
+		CAMPUS_MAP.enable = false;
+	}
+	else {
+		protectOverlapClick_Map = 0;
+	}
+}
 
+void on_click_map_screen(void) {
+	if (protectOverlapClick_Map == 0) {
+		printf("on red \n");
+		protectOverlapClick_Map = 1;
+		CAMPUS_MAP.enable = true;
+		Stack.objs[177].enable = false;
+	}
+	else {
+		protectOverlapClick_Map = 0;
+	}
 }
 
 void on_click_reset(void) {
@@ -456,6 +494,7 @@ void on_click_button_selective() {
 }
 
 void on_click_button_major() {
+
 	if (isActive != B_MAJOR) {
 		toggle_button(B_MAJOR);
 		arrangeLectureList(0);

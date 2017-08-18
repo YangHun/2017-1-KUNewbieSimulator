@@ -1,5 +1,5 @@
 #include "engine.h"
-
+#include "data.h"
 
 static void scene_1_on_click_button_0();
 float brightness, transparency;
@@ -31,7 +31,7 @@ int explain_stat = 0;
 int spritex = 640, spritey = 360; 
 
 int health_point = 0;
-int social_point = 0;
+	int social_point = 0;
 char hpstr[10], spstr[10];
 
 int dir = 0, img = 0;

@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="fsm.c" />
     <ClCompile Include="game.c" />
+    <ClCompile Include="manageTImetable.c" />
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
     <ClCompile Include="scene_2.c" />
@@ -182,6 +183,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data.h" />
     <ClInclude Include="fsms.h" />
     <ClInclude Include="manageTimetable.h" />
     <ClInclude Include="scenes.h" />
