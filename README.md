@@ -53,6 +53,7 @@ Add-on을 활성화/비활성화시킬 때에는 모든 구성 (Debug/Release), 
 * Primitives
 * Truetype Font
 * Font
+* Audio Codec
 
 NewbieSimulator.vcxproj 프로젝트는 NewbieSimulatorEngine.vcxproj 프로젝트에 다음과 같이 의존한다.
 
