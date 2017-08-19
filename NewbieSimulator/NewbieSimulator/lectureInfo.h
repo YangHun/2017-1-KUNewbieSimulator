@@ -1,7 +1,7 @@
 #pragma once
 #define TUITION_SIZE 6
 #define EVALUATION_SIZE 7
-#define LECTURE_SIZE 12
+#define LECTURE_SIZE 59
 typedef enum _messageNumber {
 	MESSAGE_DEFAULT,
 	NO_OVERLAP,
@@ -24,11 +24,17 @@ typedef enum _roomNumber {
 	INFORMATICS, // 정통관
 	SCI_LIBRARY, // 과도관
 	SCIENCE_HALL, // 이학관
+	HANA_SCIENCE, // 과학관
 	NEW_LAW_HALL, // 법학관신관
+	OLD_LAW_HALL, // 법학관구관
 	LP_HALL, // L-P관
 	WEST_HALL, // 서관
-	POLITIC // 정경관
-
+	POLITIC, // 정경관
+	CREATIVE, // 창의관
+	FUSION, // 미래융합관
+	BIO_HALL, // 생명관
+	GYM_HALL, // 화정체육관
+	GLOBAL_HALL // 국제관
 } roomNumber;
 
 typedef enum _ratingNumber {
@@ -107,8 +113,8 @@ typedef enum _attendance {
 
 typedef struct _lectureInfo {
 	int credit; //학점
-	unsigned char identifyNumber[8]; //학술번호
-	unsigned char name[75]; // 강의명
+	char identifyNumber[8]; //학술번호
+	char name[75]; // 강의명
 	enum classifyNumber classify; // 전공관련/핵심/선택 교양 분류
 	enum roomNumber room; // 강의실
 	enum Rating klueRating; // klue평가

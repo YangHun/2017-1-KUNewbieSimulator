@@ -162,7 +162,7 @@ void xmlParse(lectureInfo lectureTable[]) {
 	int i;
 	int keyLength = 0;
 
-	doc = xmlParseFile("Resources\\xml\\dummy-custom.xml");
+	doc = xmlParseFile("Resources\\xml\\lecture.xml");
 	if (doc == NULL) {
 		printf("Document not parsed successfully. \n");
 		return;
@@ -322,6 +322,24 @@ void xmlParse(lectureInfo lectureTable[]) {
 			break;
 		case POLITIC:
 			printf("%s \n", u8"정경관");
+			break;
+		case CREATIVE:
+			printf("%s \n", u8"창의관");
+			break;
+		case OLD_LAW_HALL:
+			printf("%s \n", u8"법학관구관");
+			break;
+		case GYM_HALL:
+			printf("%s \n", u8"화정체육관");
+			break;
+		case GLOBAL_HALL:
+			printf("%s \n", u8"국제관");
+			break;
+		case FUSION:
+			printf("%s \n", u8"미래융합관");
+			break;
+		case HANA_SCIENCE:
+			printf("%s \n", u8"과학관");
 			break;
 		default:
 			break;

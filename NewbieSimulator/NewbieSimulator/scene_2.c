@@ -95,7 +95,7 @@ int scene_2_init() {
 	Background = bg;
 
 	font = al_load_font("Resources\\font\\BMDOHYEON.ttf", 36, 0);
-	conf = al_load_config_file("Resources\\korean\\lecture_info_custom.ini");
+	conf = al_load_config_file("Resources\\korean\\lecture_info.ini");
 
 	//------------------------------------------------
 	// Buttons
@@ -455,6 +455,9 @@ void on_click_campus_map(void) {
 		protectOverlapClick_Map = 1;
 		Stack.objs[177].enable = true;
 		CAMPUS_MAP.enable = false;
+		for (int i = 0; i < grayblockNumber; i++) {
+			Stack.objs[Stack.counter - 1 - i].enable = false;
+		}
 	}
 	else {
 		protectOverlapClick_Map = 0;
@@ -467,6 +470,9 @@ void on_click_map_screen(void) {
 		protectOverlapClick_Map = 1;
 		CAMPUS_MAP.enable = true;
 		Stack.objs[177].enable = false;
+		for (int i = 0; i < grayblockNumber; i++) {
+			Stack.objs[Stack.counter - 1 - i].enable = true;
+		}
 	}
 	else {
 		protectOverlapClick_Map = 0;
@@ -757,10 +763,12 @@ void printLecture(int index) { //좌측 하단 출력
 
 	Stack.objs[117].modifier.value.font_value.text = al_get_config_value(conf, "name", lecture.identifyNumber);
 	Stack.objs[118].modifier.value.font_value.text = al_get_config_value(conf, "time_room", lecture.identifyNumber);
-	Stack.objs[119].modifier.value.font_value.text = lecture.identifyNumber;
+	Stack.objs[119].modifier.value.font_value.text = lectureTable[onListLecture[index]].identifyNumber;
 	Stack.objs[120].modifier.value.font_value.text = al_get_config_value(conf, "classify_credit", lecture.identifyNumber);
 	Stack.objs[121].modifier.value.font_value.text = al_get_config_value(conf, "tuition_method", lecture.identifyNumber);
 	Stack.objs[122].modifier.value.font_value.text = al_get_config_value(conf, "evaluation_method", lecture.identifyNumber);
+
+	printf("%s \n", al_get_config_value(conf, "time", lecture.identifyNumber));
 }
 
 void resetLectureList() { // List 색 초기화, 눌러보고 생긴 회색 블록 제거
