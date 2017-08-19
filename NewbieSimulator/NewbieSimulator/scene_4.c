@@ -21,6 +21,35 @@ int moving = 0;
 int count = 0;
 int current_state;
 
+
+ALLEGRO_MOUSE_STATE state;
+
+typedef struct point {
+	int x;
+	int y;
+} point;
+
+typedef struct map_button_ptr {
+	object_t* button;
+} map_button_ptr;
+
+bool** map_edge;
+point* vertex;
+int vertex_count = 0;
+int edge_count = 0;
+map_button_ptr* map_button;
+object_t* map = NULL;
+bool clicked_mouse = false;
+bool move_map = false;
+int pre_x = 0, pre_y = 0;
+int pre_mouse_x = 0, pre_mouse_y = 0;
+int map_button_startnum = 0;
+
+typedef void(*_button)();
+
+_button* map_button_on_click_listener;
+void map_button_on_click_listener_func();
+
 struct pos {
 	int x, y;
 }start_point, end_point;
@@ -41,8 +70,11 @@ int scene_4_init() {
 
 	printf("Scene 4 start! \n");
 
-	object_t map = create_object("Resources\\UI\\routegame\\campus_map.jpg", 0, 0);
-	Background = map;
+	object_t bg = create_object("Resources\\UI\\routegame\\bg.png", 0, 0);
+	Background = bg;
+
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\map.jpg", 0, 0));
+	map = &Stack.objs[Stack.counter - 1];
 
 
 	// ------------------------------------
@@ -72,7 +104,7 @@ int scene_4_init() {
 		player[i].enable = false;
 		Stack.push(&Stack, player[i]);
 	}
-#define CHARACTER 2
+#define CHARACTER 3
 	current_state = CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
 
@@ -92,6 +124,49 @@ int scene_4_init() {
 
 	start_point.x = 100;
 	start_point.y = 150;
+
+	//----------------------------------//
+	//Button, map moving setting By hasu//
+	//----------------------------------//
+
+	FILE* map_location;
+	if ((map_location = fopen("Resources\\UI\\routegame\\map_location.txt", "r")) == NULL)
+	{
+		printf("map_location.txt file read error\n");
+		return -1;
+	}
+
+	fscanf(map_location, "%d", &vertex_count);
+	vertex = (point*)malloc(sizeof(point)*vertex_count);
+	map_button = (map_button_ptr*)malloc(sizeof(map_button_ptr)*vertex_count);
+	map_button_on_click_listener = (_button*)malloc(sizeof(_button)*vertex_count);
+
+	map_button_startnum = Stack.counter;
+	for (int i = 0; i < vertex_count; i++)
+	{
+		fscanf(map_location, "%d %d", &vertex[i].x, &vertex[i].y);
+		object_t temp = create_colored_object(al_map_rgb(255, 255, 255), 10, 10, vertex[i].x, vertex[i].y);
+		map_button_on_click_listener[i] = map_button_on_click_listener_func;
+		ui_set_on_click_listener(&temp, map_button_on_click_listener[i]);
+		Stack.push(&Stack, temp);
+		map_button[i].button = &Stack.objs[Stack.counter - 1];
+	}
+
+	fscanf(map_location, "%d", &edge_count);
+	map_edge = (bool**)malloc(sizeof(bool*)*vertex_count);
+	for (int i = 0; i < vertex_count; i++)
+		map_edge[i] = (bool*)malloc(sizeof(bool)*vertex_count);
+
+	for (int i = 0; i < vertex_count; i++)
+		for (int j = 0; j < vertex_count; j++)
+			map_edge[i][j] = false;
+
+	for (int i = 0; i < edge_count; i++)
+	{
+		int x = 0, y = 0;
+		fscanf(map_location, "%d %d", &x, &y);
+		map_edge[x][y] = map_edge[y][x] = true;
+	}
 
 	return 0;
 }
@@ -183,6 +258,37 @@ int scene_4_update() {
 		count++;
 	}
 
+	//--------------------------//
+	//map moving setting By hasu//
+	//--------------------------//
+
+	al_get_mouse_state(&state);
+	if (al_mouse_button_down(&state, 1)) // if mouse is pushed !! 
+	{
+		al_get_mouse_state(&state);
+		int x = state.x;
+		int y = state.y;
+
+		(*map).pos.x += (x - pre_mouse_x);
+		(*map).pos.y += (y - pre_mouse_y);
+
+		pre_mouse_x = x;
+		pre_mouse_y = y;
+
+		for (int i = 0; i < vertex_count; i++)
+		{
+			object_t* btn = map_button[i].button;
+			(*btn).pos.x += (x - pre_mouse_x);
+			(*btn).pos.y += (y - pre_mouse_y);
+		}
+	}
+	else
+	{
+		pre_mouse_x = state.x;
+		pre_mouse_y = state.y;
+	}
+
+
 	re_draw();
 
 	return 0;
@@ -191,6 +297,10 @@ int scene_4_update() {
 int scene_4_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
+	free(vertex);
+	for (int i = 0; i < edge_count; i++)
+		free(map_edge[i]);
+
 	Stack.clear(&Stack);
 	al_destroy_timer(timer);
 
@@ -259,4 +369,8 @@ void selected1()
 void selected2()
 {
 	ongoing2 = true;
+}
+
+void map_button_on_click_listener_func()
+{
 }
