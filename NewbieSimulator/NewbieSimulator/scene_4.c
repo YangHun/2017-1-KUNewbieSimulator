@@ -1,6 +1,7 @@
 #pragma once
 #include "engine.h"
 #include "data.h"
+#include "graph_manage.h"
 // ------------------------------------
 // Timer variable declaration
 // ------------------------------------
@@ -20,39 +21,21 @@ bool isSet = false;
 int moving = 0;
 int count = 0;
 int current_state;
-
+Graph_structure* myGraph;
 
 ALLEGRO_MOUSE_STATE state;
 
-typedef struct point {
-	int x;
-	int y;
-} point;
-
-typedef struct map_button_ptr {
-	object_t* button;
-} map_button_ptr;
-
-bool** map_edge;
-point* vertex;
-int vertex_count = 0;
-int edge_count = 0;
 map_button_ptr* map_button;
 object_t* map = NULL;
 bool clicked_mouse = false;
 bool move_map = false;
 int pre_x = 0, pre_y = 0;
 int pre_mouse_x = 0, pre_mouse_y = 0;
-int map_button_startnum = 0;
-
-typedef void(*_button)();
+//int map_button_startnum = 0;
 
 _button* map_button_on_click_listener;
-void map_button_on_click_listener_func();
 
-struct pos {
-	int x, y;
-}start_point, end_point;
+Coord_2D start_point, end_point;
 
 double nowx, nowy;
 double x_velocity, y_velocity;
@@ -85,10 +68,10 @@ int scene_4_init() {
 	al_start_timer(maingame_timer);
 
 	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
-	Stack.push(&Stack, bar_bg); //0
+	Stack.push(&Stack, bar_bg); //1
 
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
-	Stack.push(&Stack, red); //1
+	Stack.push(&Stack, red); //2
 
 	// ------------------------------------
 	// initial setting
@@ -103,7 +86,19 @@ int scene_4_init() {
 	for (i = 0; i < 4; i++) {
 		player[i].enable = false;
 		Stack.push(&Stack, player[i]);
-	}
+	} // 3 4 5 6
+
+	// ------------------------------------
+	// graph structure setting
+	// ------------------------------------
+	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
+	parse_graph(myGraph);
+	register_button_to_vertex(myGraph, map_button, map_button_on_click_listener);
+	// ------------------------------------
+	// graph test
+	// ------------------------------------
+	print_graph(myGraph);
+
 #define CHARACTER 3
 	current_state = CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
@@ -111,11 +106,11 @@ int scene_4_init() {
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
 	ui_set_on_click_listener(&route1, selected1);
-	Stack.push(&Stack, route1);
+	Stack.push(&Stack, route1); // 7
 	object_t route2 = create_object("Resources\\UI\\routegame\\route2.png", 100, 200);
 	ui_set_button(&route2);
 	ui_set_on_click_listener(&route2, selected2);
-	Stack.push(&Stack, route2);
+	Stack.push(&Stack, route2); // 8
 
 	timer = al_create_timer(1.0 / 1000);
 	event_queue = al_create_event_queue();
@@ -124,49 +119,6 @@ int scene_4_init() {
 
 	start_point.x = 100;
 	start_point.y = 150;
-
-	//----------------------------------//
-	//Button, map moving setting By hasu//
-	//----------------------------------//
-
-	FILE* map_location;
-	if ((map_location = fopen("Resources\\UI\\routegame\\map_location.txt", "r")) == NULL)
-	{
-		printf("map_location.txt file read error\n");
-		return -1;
-	}
-
-	fscanf(map_location, "%d", &vertex_count);
-	vertex = (point*)malloc(sizeof(point)*vertex_count);
-	map_button = (map_button_ptr*)malloc(sizeof(map_button_ptr)*vertex_count);
-	map_button_on_click_listener = (_button*)malloc(sizeof(_button)*vertex_count);
-
-	map_button_startnum = Stack.counter;
-	for (int i = 0; i < vertex_count; i++)
-	{
-		fscanf(map_location, "%d %d", &vertex[i].x, &vertex[i].y);
-		object_t temp = create_colored_object(al_map_rgb(255, 255, 255), 10, 10, vertex[i].x, vertex[i].y);
-		map_button_on_click_listener[i] = map_button_on_click_listener_func;
-		ui_set_on_click_listener(&temp, map_button_on_click_listener[i]);
-		Stack.push(&Stack, temp);
-		map_button[i].button = &Stack.objs[Stack.counter - 1];
-	}
-
-	fscanf(map_location, "%d", &edge_count);
-	map_edge = (bool**)malloc(sizeof(bool*)*vertex_count);
-	for (int i = 0; i < vertex_count; i++)
-		map_edge[i] = (bool*)malloc(sizeof(bool)*vertex_count);
-
-	for (int i = 0; i < vertex_count; i++)
-		for (int j = 0; j < vertex_count; j++)
-			map_edge[i][j] = false;
-
-	for (int i = 0; i < edge_count; i++)
-	{
-		int x = 0, y = 0;
-		fscanf(map_location, "%d %d", &x, &y);
-		map_edge[x][y] = map_edge[y][x] = true;
-	}
 
 	return 0;
 }
@@ -206,11 +158,10 @@ int scene_4_update() {
 	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
 		timebar_width += 1280 / (second_per_day[today_of_week] * 100.0);
-		printf("%f\n", timebar_width);
-		Stack.objs[1].rect.width = timebar_width + 5;
+		Stack.objs[2].rect.width = timebar_width + 5;
 	}
 	
-	if (Stack.objs[1].rect.width > 1280) {
+	if (Stack.objs[2].rect.width > 1280) {
 		if (today_of_week == FRI) {
 			today_of_week = MON;
 		}
@@ -218,7 +169,7 @@ int scene_4_update() {
 			today_of_week++;
 		}
 		timebar_width = 0;
-		Stack.objs[1].rect.width = 0;
+		Stack.objs[2].rect.width = 0;
 		maingame_timer_set = 0;
 
 		al_stop_timer(maingame_timer);
@@ -237,7 +188,7 @@ int scene_4_update() {
 		if (!isSet) {
 			isSet = true;
 			setting();
-		}
+		} 
 
 		if (count == FPS) {
 			printf("reach the destination\n");
@@ -261,7 +212,7 @@ int scene_4_update() {
 	//--------------------------//
 	//map moving setting By hasu//
 	//--------------------------//
-
+	
 	al_get_mouse_state(&state);
 	if (al_mouse_button_down(&state, 1)) // if mouse is pushed !! 
 	{
@@ -275,7 +226,7 @@ int scene_4_update() {
 		pre_mouse_x = x;
 		pre_mouse_y = y;
 
-		for (int i = 0; i < vertex_count; i++)
+		for (int i = 0; i < myGraph->Num_of_Vertex; i++)
 		{
 			object_t* btn = map_button[i].button;
 			(*btn).pos.x += (x - pre_mouse_x);
@@ -287,7 +238,7 @@ int scene_4_update() {
 		pre_mouse_x = state.x;
 		pre_mouse_y = state.y;
 	}
-
+	
 
 	re_draw();
 
@@ -297,10 +248,8 @@ int scene_4_update() {
 int scene_4_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
-	free(vertex);
-	for (int i = 0; i < edge_count; i++)
-		free(map_edge[i]);
-
+	free_graph_structure(myGraph);
+	free(myGraph);
 	Stack.clear(&Stack);
 	al_destroy_timer(timer);
 
@@ -369,8 +318,4 @@ void selected1()
 void selected2()
 {
 	ongoing2 = true;
-}
-
-void map_button_on_click_listener_func()
-{
 }
