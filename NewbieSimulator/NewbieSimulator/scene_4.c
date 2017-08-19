@@ -25,15 +25,14 @@ Graph_structure* myGraph;
 
 ALLEGRO_MOUSE_STATE state;
 
-map_button_ptr* map_button;
+object_t* map_button;
+object_t** map_button_ptr = &map_button;
 object_t* map = NULL;
 bool clicked_mouse = false;
 bool move_map = false;
 int pre_x = 0, pre_y = 0;
 int pre_mouse_x = 0, pre_mouse_y = 0;
 //int map_button_startnum = 0;
-
-_button* map_button_on_click_listener;
 
 Coord_2D start_point, end_point;
 
@@ -88,17 +87,6 @@ int scene_4_init() {
 		Stack.push(&Stack, player[i]);
 	} // 3 4 5 6
 
-	// ------------------------------------
-	// graph structure setting
-	// ------------------------------------
-	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
-	parse_graph(myGraph);
-	register_button_to_vertex(myGraph, map_button, map_button_on_click_listener);
-	// ------------------------------------
-	// graph test
-	// ------------------------------------
-	print_graph(myGraph);
-
 #define CHARACTER 3
 	current_state = CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
@@ -111,6 +99,19 @@ int scene_4_init() {
 	ui_set_button(&route2);
 	ui_set_on_click_listener(&route2, selected2);
 	Stack.push(&Stack, route2); // 8
+
+	// ------------------------------------
+	// graph structure setting
+	// ------------------------------------
+
+	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
+	parse_graph(myGraph);
+	register_button_to_vertex(myGraph, map_button_ptr); // 9 ~ vertex캣수만큼 오름
+
+	// ------------------------------------
+	// graph test
+	// ------------------------------------
+	print_graph(myGraph);
 
 	timer = al_create_timer(1.0 / 1000);
 	event_queue = al_create_event_queue();
@@ -228,9 +229,8 @@ int scene_4_update() {
 
 		for (int i = 0; i < myGraph->Num_of_Vertex; i++)
 		{
-			object_t* btn = map_button[i].button;
-			(*btn).pos.x += (x - pre_mouse_x);
-			(*btn).pos.y += (y - pre_mouse_y);
+			map_button[i].pos.x += (x - pre_mouse_x);
+			map_button[i].pos.y += (y - pre_mouse_y);
 		}
 	}
 	else

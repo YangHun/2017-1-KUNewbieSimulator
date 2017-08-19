@@ -20,9 +20,3 @@ typedef struct Graph_structure {
 	int Num_of_Vertex;
 	int Num_of_Edge;
 } Graph_structure;
-
-typedef struct map_button_ptr {
-	object_t* button;
-} map_button_ptr;
-
-typedef void(*_button)();

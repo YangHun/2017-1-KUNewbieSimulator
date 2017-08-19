@@ -46,16 +46,14 @@ void free_graph_structure(Graph_structure* target) {
 	free(target->vertexArray);
 }
 
-void register_button_to_vertex(Graph_structure* target, map_button_ptr* map_button, _button* map_button_on_click_listener) {
-	map_button = (map_button_ptr*)malloc(sizeof(map_button_ptr) * target->Num_of_Vertex);
-	map_button_on_click_listener = (_button*)malloc(sizeof(_button) * target->Num_of_Vertex);
+void register_button_to_vertex(Graph_structure* target, object_t** map_button_ptr) { // vertex 갯수만큼 stack 오름
+	*map_button_ptr = (object_t*)malloc(sizeof(object_t) * target->Num_of_Vertex);
 	for (int i = 0; i < target->Num_of_Vertex; i++)
 	{
 		object_t temp = create_colored_object(al_map_rgb(255, 255, 255), 10, 10, target->vertexArray[i].loc.x, target->vertexArray[i].loc.y);
-		map_button_on_click_listener[i] = map_button_on_click_listener_func;
-		ui_set_on_click_listener(&temp, map_button_on_click_listener[i]);
+		ui_set_on_click_listener(&temp, map_button_on_click_listener_func);
 		Stack.push(&Stack, temp);
-		map_button[i].button = &Stack.objs[Stack.counter - 1];
+		map_button_ptr[0][i] = Stack.objs[Stack.counter - 1];
 	}
 }
 
