@@ -90,7 +90,7 @@ int scene_4_init() {
 #define CHARACTER 3
 	current_state = CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
-
+	/*
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
 	ui_set_on_click_listener(&route1, selected1);
@@ -99,7 +99,7 @@ int scene_4_init() {
 	ui_set_button(&route2);
 	ui_set_on_click_listener(&route2, selected2);
 	Stack.push(&Stack, route2); // 8
-
+	*/
 	// ------------------------------------
 	// graph structure setting
 	// ------------------------------------
@@ -309,7 +309,7 @@ void test_custom_schedule() { // to test
 
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
 }
-
+/*
 void selected1(object_t *o)
 {
 	ongoing1 = true;
@@ -319,3 +319,4 @@ void selected2(object_t *o)
 {
 	ongoing2 = true;
 }
+*/
