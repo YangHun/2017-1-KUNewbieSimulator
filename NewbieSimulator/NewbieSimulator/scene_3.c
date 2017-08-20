@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "data.h"
 #include "manageTimetable.h"
+#include "audio.h"
 
 ALLEGRO_CONFIG *conf;
 ALLEGRO_CONFIG *conf2;
@@ -37,6 +38,8 @@ double std_dist(int t, int d);
 bool probability_judge(double p);
 void display_timer(void);
 void displayresult(void);
+
+void play_clock_sound_if_not_playing();
 
 int pressed_time[6];
 
@@ -154,7 +157,6 @@ int scene_3_update() {
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 	int i;
-	printf("Scene 3 act! \n");
 	
 	if (counting_start) {
 		if (!timer_started) {	//타이머 작동
@@ -173,6 +175,10 @@ int scene_3_update() {
 			if(is_result)
 				result();
 		}
+	}
+
+	if (!game_start && al_get_timer_count(click_timer) > (865)) {
+		play_clock_sound_if_not_playing();
 	}
 
 	display_timer();
@@ -377,6 +383,14 @@ void displayresult(void) {
 		//	Stack.objs[2 + i] = create_object("Resources\\UI\\enroll_2\\fail.png", 741, 235 + 74 * i);
 	}
 
+}
+
+void play_clock_sound_if_not_playing() {
+	static bool playing = false;
+	if (!playing) {
+		playing = true;
+		play_audiosample(1, false);
+	}
 }
 
 int scene_3_fin() {
