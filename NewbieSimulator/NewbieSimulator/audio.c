@@ -13,11 +13,11 @@ void init_audiosamples() {
 		AudioSamples[0] = al_load_sample("Resources\\sound\\click.ogg");
 		AudioSamples_Gain[0] = 5.0;
 		AudioSamples[1] = al_load_sample("Resources\\sound\\clock.ogg");
-		AudioSamples_Gain[1] = 1.0;
+		AudioSamples_Gain[1] = 2.0;
 		AudioSamples[2] = al_load_sample("Resources\\sound\\theme1.ogg");
 		AudioSamples_Gain[2] = 1.0;
 		AudioSamples[3] = al_load_sample("Resources\\sound\\theme2.ogg");
-		AudioSamples_Gain[3] = 1.0;
+		AudioSamples_Gain[3] = 3.0;
 	}
 }
 

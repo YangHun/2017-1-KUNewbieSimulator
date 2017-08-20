@@ -170,6 +170,8 @@ int scene_3_update() {
 #define GAMESTART_COUNT 10
 		if (!game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1000)) { //10초지나면 수강신청 열림
 			game_start = true;
+
+			stop_audiosample(3);
 		}
 		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1500)) {
 			if(is_result)
@@ -397,8 +399,6 @@ int scene_3_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
-
-	stop_audiosample(3);
 
 	printf("counter : %d \n", Stack.counter);
 
