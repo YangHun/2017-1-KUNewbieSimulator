@@ -41,7 +41,7 @@ void displayresult(void);
 int pressed_time[6];
 
 int scene_3_init() {
-	srand(time(NULL));
+
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	int i, j, x;
 	int k = 0;
@@ -172,9 +172,6 @@ int scene_3_update() {
 			if(is_result)
 				result();
 		}
-		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 2000)) {
-			load_scene(Scenes.scenes[4]);
-		}
 	}
 
 	display_timer();
@@ -234,7 +231,6 @@ void pressed6(object_t *o) {
 
 void result() {
 	int i;
-	printSchedule(mySchedule);
 	for (i = 0; i < 6; i++) {
 		if (!pressed[i]) {
 			continue;
@@ -258,33 +254,40 @@ void result() {
 			lectureindex[i] = -1;
 		}
 	}
-	printSchedule(mySchedule);
+//Sleep(1000);
 	displayresult();
+//	Sleep(1000);
 	reSchedule();
-	Sleep(10000);
+	//Sleep(1000);
+	printSchedule(mySchedule);
+//	Sleep(50000);
 
 	is_result = false;
 }
 
 void reSchedule() {
 	int i, j;
-	int newindex = 0;
+	int newindex;
 	bool repeat = true;
+
+	newindex = rand() % LECTURE_SIZE;
 
 	for (i = 0; i < 6; i++) {
 		if (lectureindex[i] == -1) {
-			for (j = 0; j < LECTURE_SIZE && lectureTable[newindex].klueRating != RATING_VBAD; j++) {
-				newindex = j;
+			while (repeat) {
+				for (j = 0; j < LECTURE_SIZE && lectureTable[newindex].klueRating != RATING_VBAD; j++) {
+					newindex = j;
+				}
 				if (analyzeSchedule(lectureTable, mySchedule, newindex) == NO_OVERLAP) {
 					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
-					break;
+					repeat = false;
 				}
 			}
 		}
-		
 	}
 
 	printSchedule(mySchedule);
+	//Sleep(50000);
 }
 
 double std_dist(int t, int d) { //standard_distribution
