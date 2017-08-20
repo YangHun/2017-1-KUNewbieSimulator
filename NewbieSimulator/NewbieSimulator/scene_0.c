@@ -1,6 +1,6 @@
 #include "engine.h"
 
-static void on_click_button_0();
+static void on_click_button_0(object_t *o);
 
 int scene_0_init() {
 
@@ -50,7 +50,7 @@ int scene_0_fin() {
 	return 0;
 }
 
-void on_click_button_0() {
+void on_click_button_0(object_t *o) {
 
 	load_scene(Scenes.scenes[1]);
 

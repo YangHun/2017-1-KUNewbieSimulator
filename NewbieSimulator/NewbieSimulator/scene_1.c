@@ -51,8 +51,8 @@ object_t character[8];
 bool clicked = false;
 
 int event_num = 0;
-void clicked_yes();
-void clicked_no();
+void clicked_yes(object_t *o);
+void clicked_no(object_t *o);
 
 #define HP_TEXT Stack.objs[5]
 #define SP_TEXT Stack.objs[6]
@@ -514,7 +514,7 @@ void scene_1_finish() {
 	load_scene(Scenes.scenes[2]);
 }
 
-void clicked_yes()
+void clicked_yes(object_t *o)
 {
 	switch (event_num)
 	{
@@ -555,7 +555,7 @@ void clicked_yes()
 	}
 }
 
-void clicked_no()
+void clicked_no(object_t *o)
 {
 	switch (event_num)
 	{

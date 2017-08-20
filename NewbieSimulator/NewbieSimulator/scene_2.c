@@ -35,29 +35,28 @@ void printLecture(int index);
 void initList();
 static void toggle_button(ActiveButton active);
 
-static void on_click_button_0();
-static void on_click_button_selective();
-static void on_click_button_major();
-static void on_click_button_core();
-static void on_click_button_scroll_up();
-static void on_click_button_scroll_down();
-static void on_click_reset();
-static void on_click_finish();
-static void on_click_add_lecture();
-static void on_click_campus_map();
-static void on_click_map_screen();
+static void on_click_button_selective(object_t *o);
+static void on_click_button_major(object_t *o);
+static void on_click_button_core(object_t *o);
+static void on_click_button_scroll_up(object_t *o);
+static void on_click_button_scroll_down(object_t *o);
+static void on_click_reset(object_t *o);
+static void on_click_finish(object_t *o);
+static void on_click_add_lecture(object_t *o);
+static void on_click_campus_map(object_t *o);
+static void on_click_map_screen(object_t *o);
 
-static void on_click_lectureList_0();
-static void on_click_lectureList_1();
-static void on_click_lectureList_2();
-static void on_click_lectureList_3();
-static void on_click_lectureList_4();
-static void on_click_lectureList_5();
-static void on_click_lectureList_6();
-static void on_click_lectureList_7();
-static void on_click_lectureList_8();
-static void on_click_lectureList_9();
-static void on_click_lectureList_10();
+static void on_click_lectureList_0(object_t *o);
+static void on_click_lectureList_1(object_t *o);
+static void on_click_lectureList_2(object_t *o);
+static void on_click_lectureList_3(object_t *o);
+static void on_click_lectureList_4(object_t *o);
+static void on_click_lectureList_5(object_t *o);
+static void on_click_lectureList_6(object_t *o);
+static void on_click_lectureList_7(object_t *o);
+static void on_click_lectureList_8(object_t *o);
+static void on_click_lectureList_9(object_t *o);
+static void on_click_lectureList_10(object_t *o);
 
 char* getBlockImageAddr(int key);
 int onListLecture[LIST_SIZE];
@@ -408,7 +407,7 @@ int scene_2_fin() {
 	return 0;
 }
 
-void on_click_add_lecture(void) {
+void on_click_add_lecture(object_t *o) {
 
 	int input;
 	int inputChange = 0;
@@ -449,7 +448,7 @@ void on_click_add_lecture(void) {
 	}
 }
 
-void on_click_campus_map(void) {
+void on_click_campus_map(object_t *o) {
 	if (protectOverlapClick_Map == 0) {
 		printf("on green \n");
 		protectOverlapClick_Map = 1;
@@ -464,7 +463,7 @@ void on_click_campus_map(void) {
 	}
 }
 
-void on_click_map_screen(void) {
+void on_click_map_screen(object_t *o) {
 	if (protectOverlapClick_Map == 0) {
 		printf("on red \n");
 		protectOverlapClick_Map = 1;
@@ -479,7 +478,7 @@ void on_click_map_screen(void) {
 	}
 }
 
-void on_click_reset(void) {
+void on_click_reset(object_t *o) {
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] != -1) {
 			selectedLectureIndex = -1;
@@ -489,18 +488,18 @@ void on_click_reset(void) {
 	}
 }
 
-void on_click_finish(void) {
+void on_click_finish(object_t *o) {
 	load_scene(Scenes.scenes[3]);
 }
 
-void on_click_button_selective() {
+void on_click_button_selective(object_t *o) {
 	if (isActive != B_SELECTIVE) {
 		toggle_button(B_SELECTIVE);
 		arrangeLectureList(0);
 	}
 }
 
-void on_click_button_major() {
+void on_click_button_major(object_t *o) {
 
 	if (isActive != B_MAJOR) {
 		toggle_button(B_MAJOR);
@@ -508,14 +507,14 @@ void on_click_button_major() {
 	}
 }
 
-void on_click_button_core() {
+void on_click_button_core(object_t *o) {
 	if (isActive != B_CORE) {
 		toggle_button(B_CORE);
 		arrangeLectureList(0);
 	}
 }
 
-void on_click_button_scroll_up() {
+void on_click_button_scroll_up(object_t *o) {
 	int i = 0;
 	int j = 0;
 	int sw;
@@ -585,7 +584,7 @@ void on_click_button_scroll_up() {
 	}
 }
 
-void on_click_button_scroll_down() {
+void on_click_button_scroll_down(object_t *o) {
 	int i = 0;
 	int j = 0;
 	int sw;
@@ -844,7 +843,7 @@ void arrangeLectureList(int selectedScroll) { // 좌측 버튼을 만질 경우 재정렬
 }
 
 void initList() { //강의 리스트 부분 초기화 // 18 ~ 61
-	void(*fp)(void) = NULL;
+	void(*fp)(object_t *o) = NULL;
 	int i = 0;
 	object_t lectureButton[LIST_SIZE * 4];
 	for (i = 0; i < LIST_SIZE * 4; i += 4) {
@@ -932,7 +931,7 @@ void toggle_button(ActiveButton active) {
 
 }
 
-static void on_click_lectureList_0() {
+static void on_click_lectureList_0(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[0] != -1) { // 만약 이 칸에 강의가 채워져 있다면
 			resetLectureList();
@@ -974,7 +973,7 @@ static void on_click_lectureList_0() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_1() {
+static void on_click_lectureList_1(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[1] != -1) {
 			resetLectureList();
@@ -1016,7 +1015,7 @@ static void on_click_lectureList_1() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_2() {
+static void on_click_lectureList_2(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[2] != -1) {
 			resetLectureList();
@@ -1058,7 +1057,7 @@ static void on_click_lectureList_2() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_3() {
+static void on_click_lectureList_3(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[3] != -1) {
 			resetLectureList();
@@ -1101,7 +1100,7 @@ static void on_click_lectureList_3() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_4() {
+static void on_click_lectureList_4(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[4] != -1) {
 			resetLectureList();
@@ -1143,7 +1142,7 @@ static void on_click_lectureList_4() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_5() {
+static void on_click_lectureList_5(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[5] != -1) {
 			resetLectureList();
@@ -1185,7 +1184,7 @@ static void on_click_lectureList_5() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_6() {
+static void on_click_lectureList_6(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[6] != -1) {
 			resetLectureList();
@@ -1227,7 +1226,7 @@ static void on_click_lectureList_6() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_7() {
+static void on_click_lectureList_7(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[7] != -1) {
 			resetLectureList();
@@ -1269,7 +1268,7 @@ static void on_click_lectureList_7() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_8() {
+static void on_click_lectureList_8(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[8] != -1) {
 			resetLectureList();
@@ -1311,7 +1310,7 @@ static void on_click_lectureList_8() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_9() {
+static void on_click_lectureList_9(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[9] != -1) {
 			resetLectureList();
@@ -1353,7 +1352,7 @@ static void on_click_lectureList_9() {
 		protectOverlapClick = 0;
 	}
 }
-static void on_click_lectureList_10() {
+static void on_click_lectureList_10(object_t *o) {
 	if (protectOverlapClick == 0) {
 		if (onListLecture[10] != -1) {
 			resetLectureList();

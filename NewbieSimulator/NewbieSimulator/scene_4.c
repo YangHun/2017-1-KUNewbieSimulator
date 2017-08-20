@@ -14,8 +14,8 @@ void calculate_second_per_day();
 void test_custom_schedule();
 schedule customSchedule; // to test
 
-void selected1();
-void selected2();
+void selected1(object_t *o);
+void selected2(object_t *o);
 bool ongoing1 = false, ongoing2 = false;
 bool isSet = false;
 int moving = 0;
@@ -310,12 +310,12 @@ void test_custom_schedule() { // to test
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
 }
 
-void selected1()
+void selected1(object_t *o)
 {
 	ongoing1 = true;
 }
 
-void selected2()
+void selected2(object_t *o)
 {
 	ongoing2 = true;
 }

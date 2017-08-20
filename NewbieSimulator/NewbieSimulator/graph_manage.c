@@ -4,7 +4,7 @@
 //Button, map moving setting By hasu & minkyu//
 //----------------------------------         //
 
-void map_button_on_click_listener_func();
+void map_button_on_click_listener_func(object_t *o);
 
 void parse_graph(Graph_structure* result) {
 	int vertex_count;
@@ -68,6 +68,6 @@ void print_graph(Graph_structure* target) {
 	printf("\n");
 }
 
-void map_button_on_click_listener_func()
+void map_button_on_click_listener_func(object_t *o)
 {
 }
