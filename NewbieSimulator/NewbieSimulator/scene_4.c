@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "data.h"
 #include "graph_manage.h"
+#include "event_semester.h"
 // ------------------------------------
 // Timer variable declaration
 // ------------------------------------
@@ -13,6 +14,12 @@ whatDay today_of_week; // ø¿¥√¿« ø‰¿œ
 void calculate_second_per_day();
 void test_custom_schedule();
 schedule customSchedule; // to test
+
+// ------------------------------------
+// event variable declaration
+// ------------------------------------
+event_function stochastic_event_func[STO_EVENTCOUNT];
+event_function sequencial_event_func[SEQ_EVENTCOUNT];
 
 void selected1(object_t *o);
 void selected2(object_t *o);
@@ -111,7 +118,7 @@ int scene_4_init() {
 	// ------------------------------------
 	// graph test
 	// ------------------------------------
-	print_graph(myGraph);
+	//print_graph(myGraph);
 
 	timer = al_create_timer(1.0 / 1000);
 	event_queue = al_create_event_queue();
@@ -121,6 +128,10 @@ int scene_4_init() {
 	start_point.x = 100;
 	start_point.y = 150;
 
+	// ------------------------------------
+	// event setting
+	// ------------------------------------
+	init_event(stochastic_event_func, sequencial_event_func);
 	return 0;
 }
 
