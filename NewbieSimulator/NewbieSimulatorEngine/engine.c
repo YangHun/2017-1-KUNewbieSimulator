@@ -168,7 +168,7 @@ void event_manage() {
 				if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
 					if (rect_contains_point(o->rect, last_mouse_down_coord) && rect_contains_point(o->rect, cur_mouse_up_coord)) {
 						if (positionf_transparancy(o, last_mouse_down_coord) == true) {
-							o->modifier.value.button_value.on_click();
+							o->modifier.value.button_value.on_click_listener(o);
 						}
 					}
 				}
