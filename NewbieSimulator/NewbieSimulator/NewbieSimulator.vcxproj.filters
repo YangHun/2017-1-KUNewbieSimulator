@@ -39,6 +39,9 @@
     <ClCompile Include="scene_4.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="graph_manage.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -66,6 +69,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="data.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="graph_structure.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="graph_manage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

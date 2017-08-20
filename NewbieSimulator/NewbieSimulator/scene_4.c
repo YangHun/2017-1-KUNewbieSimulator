@@ -1,6 +1,7 @@
 #pragma once
 #include "engine.h"
 #include "data.h"
+#include "graph_manage.h"
 // ------------------------------------
 // Timer variable declaration
 // ------------------------------------
@@ -20,10 +21,20 @@ bool isSet = false;
 int moving = 0;
 int count = 0;
 int current_state;
+Graph_structure* myGraph;
 
-struct pos {
-	int x, y;
-}start_point, end_point;
+ALLEGRO_MOUSE_STATE state;
+
+object_t* map_button;
+object_t** map_button_ptr = &map_button;
+object_t* map = NULL;
+bool clicked_mouse = false;
+bool move_map = false;
+int pre_x = 0, pre_y = 0;
+int pre_mouse_x = 0, pre_mouse_y = 0;
+//int map_button_startnum = 0;
+
+Coord_2D start_point, end_point;
 
 double nowx, nowy;
 double x_velocity, y_velocity;
@@ -41,8 +52,11 @@ int scene_4_init() {
 
 	printf("Scene 4 start! \n");
 
-	object_t map = create_object("Resources\\UI\\routegame\\campus_map.jpg", 0, 0);
-	Background = map;
+	object_t bg = create_object("Resources\\UI\\routegame\\bg.png", 0, 0);
+	Background = bg;
+
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\map.jpg", 0, 0));
+	map = &Stack.objs[Stack.counter - 1];
 
 
 	// ------------------------------------
@@ -53,10 +67,10 @@ int scene_4_init() {
 	al_start_timer(maingame_timer);
 
 	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
-	Stack.push(&Stack, bar_bg); //0
+	Stack.push(&Stack, bar_bg); //1
 
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
-	Stack.push(&Stack, red); //1
+	Stack.push(&Stack, red); //2
 
 	// ------------------------------------
 	// initial setting
@@ -71,19 +85,33 @@ int scene_4_init() {
 	for (i = 0; i < 4; i++) {
 		player[i].enable = false;
 		Stack.push(&Stack, player[i]);
-	}
-#define CHARACTER 2
+	} // 3 4 5 6
+
+#define CHARACTER 3
 	current_state = CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
 
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
 	ui_set_on_click_listener(&route1, selected1);
-	Stack.push(&Stack, route1);
+	Stack.push(&Stack, route1); // 7
 	object_t route2 = create_object("Resources\\UI\\routegame\\route2.png", 100, 200);
 	ui_set_button(&route2);
 	ui_set_on_click_listener(&route2, selected2);
-	Stack.push(&Stack, route2);
+	Stack.push(&Stack, route2); // 8
+
+	// ------------------------------------
+	// graph structure setting
+	// ------------------------------------
+
+	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
+	parse_graph(myGraph);
+	register_button_to_vertex(myGraph, map_button_ptr); // 9 ~ vertex캣수만큼 오름
+
+	// ------------------------------------
+	// graph test
+	// ------------------------------------
+	print_graph(myGraph);
 
 	timer = al_create_timer(1.0 / 1000);
 	event_queue = al_create_event_queue();
@@ -131,11 +159,10 @@ int scene_4_update() {
 	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
 		timebar_width += 1280 / (second_per_day[today_of_week] * 100.0);
-		printf("%f\n", timebar_width);
-		Stack.objs[1].rect.width = timebar_width + 5;
+		Stack.objs[2].rect.width = timebar_width + 5;
 	}
 	
-	if (Stack.objs[1].rect.width > 1280) {
+	if (Stack.objs[2].rect.width > 1280) {
 		if (today_of_week == FRI) {
 			today_of_week = MON;
 		}
@@ -143,7 +170,7 @@ int scene_4_update() {
 			today_of_week++;
 		}
 		timebar_width = 0;
-		Stack.objs[1].rect.width = 0;
+		Stack.objs[2].rect.width = 0;
 		maingame_timer_set = 0;
 
 		al_stop_timer(maingame_timer);
@@ -162,7 +189,7 @@ int scene_4_update() {
 		if (!isSet) {
 			isSet = true;
 			setting();
-		}
+		} 
 
 		if (count == FPS) {
 			printf("reach the destination\n");
@@ -183,6 +210,36 @@ int scene_4_update() {
 		count++;
 	}
 
+	//--------------------------//
+	//map moving setting By hasu//
+	//--------------------------//
+	
+	al_get_mouse_state(&state);
+	if (al_mouse_button_down(&state, 1)) // if mouse is pushed !! 
+	{
+		al_get_mouse_state(&state);
+		int x = state.x;
+		int y = state.y;
+
+		(*map).pos.x += (x - pre_mouse_x);
+		(*map).pos.y += (y - pre_mouse_y);
+
+		pre_mouse_x = x;
+		pre_mouse_y = y;
+
+		for (int i = 0; i < myGraph->Num_of_Vertex; i++)
+		{
+			map_button[i].pos.x += (x - pre_mouse_x);
+			map_button[i].pos.y += (y - pre_mouse_y);
+		}
+	}
+	else
+	{
+		pre_mouse_x = state.x;
+		pre_mouse_y = state.y;
+	}
+	
+
 	re_draw();
 
 	return 0;
@@ -191,6 +248,8 @@ int scene_4_update() {
 int scene_4_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
+	free_graph_structure(myGraph);
+	free(myGraph);
 	Stack.clear(&Stack);
 	al_destroy_timer(timer);
 

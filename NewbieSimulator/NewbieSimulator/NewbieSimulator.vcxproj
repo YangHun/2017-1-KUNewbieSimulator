@@ -177,6 +177,7 @@
   <ItemGroup>
     <ClCompile Include="fsm.c" />
     <ClCompile Include="game.c" />
+    <ClCompile Include="graph_manage.c" />
     <ClCompile Include="manageTImetable.c" />
     <ClCompile Include="scene_0.c" />
     <ClCompile Include="scene_1.c" />
@@ -190,6 +191,8 @@
   <ItemGroup>
     <ClInclude Include="data.h" />
     <ClInclude Include="fsms.h" />
+    <ClInclude Include="graph_manage.h" />
+    <ClInclude Include="graph_structure.h" />
     <ClInclude Include="manageTimetable.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="lectureInfo.h" />
