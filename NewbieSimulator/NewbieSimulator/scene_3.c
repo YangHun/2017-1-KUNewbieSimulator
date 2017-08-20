@@ -22,13 +22,13 @@ bool is_result = true;
 int timer_text_count;
 int lectureindex[6];
 
-void on_click_startbt();
-void pressed1();
-void pressed2();
-void pressed3();
-void pressed4();
-void pressed5();
-void pressed6();
+void on_click_startbt(object_t *o);
+void pressed1(object_t *o);
+void pressed2(object_t *o);
+void pressed3(object_t *o);
+void pressed4(object_t *o);
+void pressed5(object_t *o);
+void pressed6(object_t *o);
 void result();
 
 void reSchedule(void);
@@ -181,7 +181,7 @@ int scene_3_update() {
 	return 0;
 }
 
-void on_click_startbt() {
+void on_click_startbt(object_t *o) {
 	if (counting_start)
 		return;
 	
@@ -191,7 +191,7 @@ void on_click_startbt() {
 	counting_start = true;
 }
 
-void pressed1() {
+void pressed1(object_t *o) {
 	if (!game_start || pressed[0]) return; //수강신청 안열렸으면 의미없음
 	printf("pressed!");
 	//Sleep(1000);
@@ -199,31 +199,31 @@ void pressed1() {
 	pressed_time[0] = al_get_timer_count(click_timer);
 }
 
-void pressed2() {
+void pressed2(object_t *o) {
 	if (!game_start || pressed[1]) return;
 	pressed[1] = true;
 	pressed_time[1] = al_get_timer_count(click_timer);
 }
 
-void pressed3() {
+void pressed3(object_t *o) {
 	if (!game_start || pressed[2]) return;
 	pressed[2] = true;
 	pressed_time[2] = al_get_timer_count(click_timer);
 }
 
-void pressed4() {
+void pressed4(object_t *o) {
 	if (!game_start || pressed[3]) return;
 	pressed[3] = true;
 	pressed_time[3] = al_get_timer_count(click_timer);
 }
 
-void pressed5() {
+void pressed5(object_t *o) {
 	if (!game_start || pressed[4]) return;
 	pressed[4] = true;
 	pressed_time[4] = al_get_timer_count(click_timer);
 }
 
-void pressed6() {
+void pressed6(object_t *o) {
 	if (!game_start || pressed[5]) return;
 	pressed[5] = true;
 	pressed_time[5] = al_get_timer_count(click_timer);
