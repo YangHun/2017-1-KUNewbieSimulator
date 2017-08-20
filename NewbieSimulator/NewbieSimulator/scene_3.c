@@ -145,7 +145,8 @@ int scene_3_init() {
 	Stack.push(&Stack, start_bt);
 #define START_BT Stack.objs[17]
 
-	
+	play_audiosample(3, true);
+
 	return 0;
 }
 
@@ -368,6 +369,8 @@ int scene_3_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
+
+	stop_audiosample(3);
 
 	printf("counter : %d \n", Stack.counter);
 

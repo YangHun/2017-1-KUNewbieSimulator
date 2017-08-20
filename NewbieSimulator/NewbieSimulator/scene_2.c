@@ -4,6 +4,7 @@
 #include "manageTimetable.h"
 #include "xmlParser.h"
 #include "data.h"
+#include "audio.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
@@ -369,6 +370,10 @@ int scene_2_init() {
 	ui_set_on_click_listener(&campus_map_screen, on_click_map_screen);
 	Stack.push(&Stack, campus_map_screen); //177
 	Stack.objs[177].enable = false;
+
+	// audio
+	play_audiosample(2, true);
+
 	return 0;
 }
 
@@ -397,6 +402,9 @@ int scene_2_update() {
 int scene_2_fin() {
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
+
+	// audio
+	stop_audiosample(2);
 
 	printf("counter : %d \n", Stack.counter);
 
