@@ -5,8 +5,8 @@ void ui_set_button(object_t *o) {
 	o->modifier.type = OBJECT_MODIFIER_BUTTON;
 }
 
-void ui_set_on_click_listener(object_t *o, void(*on_click)()) {
-	o->modifier.value.button_value.on_click = on_click;
+void ui_set_on_click_listener(object_t *o, on_click_listener_t listener) {
+	o->modifier.value.button_value.on_click_listener = listener;
 }
 
 void ui_set_text(object_t *o, ALLEGRO_COLOR color, char* path, int align, char* text, int font_size) {

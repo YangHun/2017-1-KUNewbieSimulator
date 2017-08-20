@@ -17,17 +17,18 @@ bool pressed[6];
 bool success[6];
 bool renew_timer_text = false;
 bool lecturerepeat;
+bool is_result = true;
 
 int timer_text_count;
 int lectureindex[6];
 
-void on_click_startbt();
-void pressed1();
-void pressed2();
-void pressed3();
-void pressed4();
-void pressed5();
-void pressed6();
+void on_click_startbt(object_t *o);
+void pressed1(object_t *o);
+void pressed2(object_t *o);
+void pressed3(object_t *o);
+void pressed4(object_t *o);
+void pressed5(object_t *o);
+void pressed6(object_t *o);
 void result();
 
 void reSchedule(void);
@@ -35,6 +36,7 @@ void reSchedule(void);
 double std_dist(int t, int d);
 bool probability_judge(double p);
 void display_timer(void);
+void displayresult(void);
 
 int pressed_time[6];
 
@@ -65,15 +67,19 @@ int scene_3_init() {
 	Stack.push(&Stack, navy_red);
 #define NAVY_RED Stack.objs[0]
 
+	object_t navy_white = create_colored_object(al_map_rgb(255, 255, 255), 465, 75, 335, 0);
+	Stack.push(&Stack, navy_white);
 	
 	object_t bt[6];	//신청버튼 출력
-	bt[0] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 225);
+	for (i = 0; i < 6; i++)
+		bt[i] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 235 + 74 * i);
+	/*
 	bt[1] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 299);
 	bt[2] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 376);
 	bt[3] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 451);
 	bt[4] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 531);
 	bt[5] = create_object("Resources\\UI\\enroll_2\\b_apply.png", 741, 611);
-
+	*/
 
 	for (i = 0; i < 6; i++) {
 		ui_set_button(&bt[i]);
@@ -109,12 +115,15 @@ int scene_3_init() {
 	//과목이름 출력
 	object_t lecture[6];
 	for (i = 0; i < 6; i++) {
-		lecture[i] = create_object(NULL, 850, 235 + i * 74);
+		lecture[i] = create_object(NULL, 850, 240 + i * 75);
 		if (lectureindex[i] == -1)
 			ui_set_text(&lecture[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 36);
 		else
 			ui_set_text(&lecture[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf2, "name", lectureTable[lectureindex[i]].identifyNumber), 36);
 		Stack.push(&Stack, bt[i]);
+	}
+
+	for (i = 0; i < 6; i++) {
 		Stack.push(&Stack, lecture[i]);
 	}
 
@@ -122,19 +131,19 @@ int scene_3_init() {
 	Stack.push(&Stack, navyism);
 
 	object_t first_text = create_object(NULL, 0, 327);
-	ui_set_text(&first_text, al_map_rgb(0, 150, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "time_0"), 50);
+	ui_set_text(&first_text, al_map_rgb(255, 104, 27), "Resources\\font\\malgun.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "time_0"), 64);
 	Stack.push(&Stack, first_text);
-#define TEXT_FIRST Stack.objs[14]
+#define TEXT_FIRST Stack.objs[15]
 	
 	object_t before_start = create_object("Resources\\UI\\enroll_2\\before_start.png", 0, 0);
 	Stack.push(&Stack, before_start);
-#define BEFORE_START Stack.objs[15]
+#define BEFORE_START Stack.objs[16]
 
 	object_t start_bt = create_object("Resources\\UI\\enroll_2\\b_start.png", 500, 500);
 	ui_set_button(&start_bt);
 	ui_set_on_click_listener(&start_bt, on_click_startbt);
 	Stack.push(&Stack, start_bt);
-#define START_BT Stack.objs[16]
+#define START_BT Stack.objs[17]
 
 	
 	return 0;
@@ -160,7 +169,8 @@ int scene_3_update() {
 			game_start = true;
 		}
 		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1500)) {
-			result();
+			if(is_result)
+				result();
 		}
 	}
 
@@ -171,7 +181,7 @@ int scene_3_update() {
 	return 0;
 }
 
-void on_click_startbt() {
+void on_click_startbt(object_t *o) {
 	if (counting_start)
 		return;
 	
@@ -181,7 +191,7 @@ void on_click_startbt() {
 	counting_start = true;
 }
 
-void pressed1() {
+void pressed1(object_t *o) {
 	if (!game_start || pressed[0]) return; //수강신청 안열렸으면 의미없음
 	printf("pressed!");
 	//Sleep(1000);
@@ -189,31 +199,31 @@ void pressed1() {
 	pressed_time[0] = al_get_timer_count(click_timer);
 }
 
-void pressed2() {
+void pressed2(object_t *o) {
 	if (!game_start || pressed[1]) return;
 	pressed[1] = true;
 	pressed_time[1] = al_get_timer_count(click_timer);
 }
 
-void pressed3() {
+void pressed3(object_t *o) {
 	if (!game_start || pressed[2]) return;
 	pressed[2] = true;
 	pressed_time[2] = al_get_timer_count(click_timer);
 }
 
-void pressed4() {
+void pressed4(object_t *o) {
 	if (!game_start || pressed[3]) return;
 	pressed[3] = true;
 	pressed_time[3] = al_get_timer_count(click_timer);
 }
 
-void pressed5() {
+void pressed5(object_t *o) {
 	if (!game_start || pressed[4]) return;
 	pressed[4] = true;
 	pressed_time[4] = al_get_timer_count(click_timer);
 }
 
-void pressed6() {
+void pressed6(object_t *o) {
 	if (!game_start || pressed[5]) return;
 	pressed[5] = true;
 	pressed_time[5] = al_get_timer_count(click_timer);
@@ -235,6 +245,7 @@ void result() {
 			printf("[%d]time: %d\n", i, pressed_time[i]);
 			printf("prob: %lf\n", std_dist(pressed_time[i], 2));
 			printf("[%d]fail!!\n", i);
+			success[i] = false;
 		}
 	}
 	for (i = 0; i < 6; i++) {
@@ -243,13 +254,19 @@ void result() {
 			lectureindex[i] = -1;
 		}
 	}
-	//reSchedule();
+//Sleep(1000);
+	displayresult();
+//	Sleep(1000);
+	reSchedule();
+	//Sleep(1000);
 	printSchedule(mySchedule);
-	Sleep(50000);
+//	Sleep(50000);
+
+	is_result = false;
 }
 
 void reSchedule() {
-	int i;
+	int i, j;
 	int newindex;
 	bool repeat = true;
 
@@ -258,8 +275,8 @@ void reSchedule() {
 	for (i = 0; i < 6; i++) {
 		if (lectureindex[i] == -1) {
 			while (repeat) {
-				while (lectureTable[newindex].klueRating == RATING_VGOOD || lectureTable[newindex].klueRating == RATING_GOOD) {
-					newindex = rand() % LECTURE_SIZE;
+				for (j = 0; j < LECTURE_SIZE && lectureTable[newindex].klueRating != RATING_VBAD; j++) {
+					newindex = j;
 				}
 				if (analyzeSchedule(lectureTable, mySchedule, newindex) == NO_OVERLAP) {
 					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
@@ -270,7 +287,7 @@ void reSchedule() {
 	}
 
 	printSchedule(mySchedule);
-	Sleep(50000);
+	//Sleep(50000);
 }
 
 double std_dist(int t, int d) { //standard_distribution
@@ -281,7 +298,8 @@ double std_dist(int t, int d) { //standard_distribution
 	double sigma = 0.5 * d;// 몇초를 1sigma의 기준으로?
 	double z = ((double)t - 10000) / 1000 / sigma;
 
-	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z) + ((double)1 / 384 * z*z*z*z*z*z*z*z); //taylor series
+	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z) + 
+		((double)1 / 384 * z*z*z*z*z*z*z*z) - ((double)1 / 3840 * z*z*z*z*z*z*z*z*z*z); //taylor series
 
 	return p;
 }
@@ -306,10 +324,10 @@ void display_timer(void) {
 	if (count == 1 && renew_timer_text) {
 		TEXT_FIRST.enable = false;
 		object_t text = create_object(NULL, 0, 327);
-		ui_set_text(&text, al_map_rgb(0, 150, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "time_1"), 60);
+		ui_set_text(&text, al_map_rgb(255, 104, 27), "Resources\\font\\malgun.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "time_1"), 64);
 		Stack.push(&Stack, text);
 	}
-	if (count > 1 && renew_timer_text) {
+	if (count > 1 && count < 16 && renew_timer_text) {
 		char string[8];
 		sprintf(string, "time_%d", count);
 		printf(">%s<\n", string);
@@ -317,7 +335,7 @@ void display_timer(void) {
 	//	Sleep(1000);
 		Stack.pull(&Stack);
 		object_t text = create_object(NULL, 0, 327);
-		ui_set_text(&text, al_map_rgb(0, 150, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", string), 60);
+		ui_set_text(&text, al_map_rgb(255, 104, 27), "Resources\\font\\malgun.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", string), 64);
 		Stack.push(&Stack, text);
 	}
 	if (renew_timer_text) {
@@ -332,7 +350,18 @@ void display_timer(void) {
 }
 
 void displayresult(void) {
-	
+	int i = 0;
+	object_t fin[6];
+	//225(74) 299(77) 376 451(75) 531(80) 611(80)
+	for (i = 0; i < 6; i++) {
+		if (success[i] == true)
+			Stack.objs[2 + i].image = al_load_bitmap("Resources\\UI\\enroll_2\\pass.jpg");
+		//			create_object("Resources\\UI\\enroll_2\\pass.png", 741, 235 + 74 * i);
+		else
+			Stack.objs[2 + i].image = al_load_bitmap("Resources\\UI\\enroll_2\\fail.jpg");
+		//	Stack.objs[2 + i] = create_object("Resources\\UI\\enroll_2\\fail.png", 741, 235 + 74 * i);
+	}
+
 }
 
 int scene_3_fin() {

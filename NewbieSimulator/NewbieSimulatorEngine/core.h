@@ -54,11 +54,14 @@ typedef struct object_modifier_t object_modifier_t;
 struct object_t;
 typedef struct object_t object_t;
 
+
+typedef void(*on_click_listener_t)(object_t *);
+
 struct object_modifier_t {
 	object_modifier_type_t type;
 	union {
 		struct {
-			void(*on_click)();
+			on_click_listener_t on_click_listener;
 		} button_value;
 		struct {
 			ALLEGRO_FONT *font;
