@@ -77,19 +77,6 @@ int scene_4_init() {
 	// ------------------------------------
 	today_of_week = MON;
 	test_custom_schedule();
-
-	player[0] = create_object("Resources\\UI\\routegame\\move.png", 100, 150);
-	player[1] = create_object("Resources\\UI\\routegame\\1.png", 100, 150);
-	player[2] = create_object("Resources\\UI\\routegame\\2.png", 100, 150);
-	player[3] = create_object("Resources\\UI\\routegame\\3.png", 100, 150);
-	for (i = 0; i < 4; i++) {
-		player[i].enable = false;
-		Stack.push(&Stack, player[i]);
-	} // 3 4 5 6
-
-#define CHARACTER 3
-	current_state = CHARACTER + 1;
-	Stack.objs[current_state].enable = true;
 	/*
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
@@ -106,7 +93,7 @@ int scene_4_init() {
 
 	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
 	parse_graph(myGraph);
-	register_button_to_vertex(myGraph, map_button_ptr); // 9 ~ vertex캣수만큼 오름
+	register_button_to_vertex(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
 
 	// ------------------------------------
 	// graph test
@@ -118,8 +105,30 @@ int scene_4_init() {
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_start_timer(timer);
 
-	start_point.x = 100;
-	start_point.y = 150;
+
+
+
+	player[0] = create_object("Resources\\UI\\routegame\\move.png", 100, 150);
+	player[1] = create_object("Resources\\UI\\routegame\\1.png", 100, 150);
+	player[2] = create_object("Resources\\UI\\routegame\\2.png", 100, 150);
+	player[3] = create_object("Resources\\UI\\routegame\\3.png", 100, 150);
+	for (i = 0; i < 4; i++) {
+		player[i].enable = false;
+		Stack.push(&Stack, player[i]);
+	} // 171 + (# of edges) +  0, 1, 2, 3
+
+
+#define VERTICE myGraph->Num_of_Vertex
+#define EDGES 2*myGraph->Num_of_Edge
+#define CHARACTER 3
+	current_state = VERTICE + EDGES + CHARACTER + 1;
+	Stack.objs[current_state].enable = true;
+
+	start_point.x = 1155;
+	start_point.y = 1385;
+
+
+
 
 	return 0;
 }
@@ -128,7 +137,7 @@ static double FPS = 100.0;
 void setting()
 {
 	Stack.objs[current_state].enable = false;
-	current_state = CHARACTER;
+	current_state = VERTICE + EDGES + CHARACTER;
 	Stack.objs[current_state].enable = true;
 	nowx = start_point.x;
 	nowy = start_point.y;
@@ -181,7 +190,7 @@ int scene_4_update() {
 		if (al_get_timer_count(timer) - chr_timer_set>500) {
 			chr_timer_set = al_get_timer_count(timer);
 			Stack.objs[current_state].enable = false;
-			current_state = CHARACTER + rand() % 3 + 1;
+			current_state = VERTICE + EDGES + CHARACTER + rand() % 3 + 1;
 			Stack.objs[current_state].enable = true;
 		}
 	}
@@ -224,14 +233,21 @@ int scene_4_update() {
 		(*map).pos.x += (x - pre_mouse_x);
 		(*map).pos.y += (y - pre_mouse_y);
 
-		pre_mouse_x = x;
-		pre_mouse_y = y;
-
 		for (int i = 0; i < myGraph->Num_of_Vertex; i++)
 		{
-			map_button[i].pos.x += (x - pre_mouse_x);
-			map_button[i].pos.y += (y - pre_mouse_y);
+			(map_button_ptr[i])->pos.x += (x - pre_mouse_x);
+			(map_button_ptr[i])->pos.y += (y - pre_mouse_y);
+
 		}
+
+		for (int i = 0; i < CHARACTER + 1; i++)
+		{
+			Stack.objs[VERTICE + EDGES + CHARACTER + i].pos.x += (x - pre_mouse_x);
+			Stack.objs[VERTICE + EDGES + CHARACTER + i].pos.y += (y - pre_mouse_y);
+		}
+		
+		pre_mouse_x = x;
+		pre_mouse_y = y;
 	}
 	else
 	{

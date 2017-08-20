@@ -26,11 +26,13 @@ void parse_graph(Graph_structure* result) {
 	for (int i = 0; i < vertex_count; i++)
 	{
 		fscanf(map_location, "%d %d", &result->vertexArray[i].loc.x, &result->vertexArray[i].loc.y);
+		result->vertexArray[i].id = 0;
 	}
+
 
 	fscanf(map_location, "%d", &edge_count);
 	result->Num_of_Edge = edge_count;
-	result->edgeArray = (edge*)malloc(sizeof(edge) * edge_count);
+	result->edgeArray = (edge*)malloc(sizeof(edge) * edge_count * 2);
 	
 	for (int i = 0; i < edge_count; i++)
 	{
@@ -38,7 +40,25 @@ void parse_graph(Graph_structure* result) {
 		result->edgeArray[i].vertexindex_1 = ver1;
 		result->edgeArray[i].vertexindex_2 = ver2;
 		result->edgeArray[i].length = 1.0;
+		result->edgeArray[i + edge_count].vertexindex_1 = ver2;
+		result->edgeArray[i + edge_count].vertexindex_2 = ver1;
+		result->edgeArray[i + edge_count].length = 1.0;
 	}
+	//qsort()
+}
+
+int compare(const void *a, const void *b)    // 오름차순 비교 함수 구현
+{
+	edge num1 = *(edge *)a;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
+	edge num2 = *(edge *)b;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
+
+	if (num1.vertexindex_1 != num2.vertexindex_1) {
+		return num1.vertexindex_1 - num2.vertexindex_1;
+	}
+	else {
+		return num1.vertexindex_2 - num2.vertexindex_2;
+	}
+	return 0;    // a와 b가 같을 때는 0 반환
 }
 
 void free_graph_structure(Graph_structure* target) {
@@ -46,14 +66,14 @@ void free_graph_structure(Graph_structure* target) {
 	free(target->vertexArray);
 }
 
-void register_button_to_vertex(Graph_structure* target, object_t** map_button_ptr) { // vertex 갯수만큼 stack 오름
-	*map_button_ptr = (object_t*)malloc(sizeof(object_t) * target->Num_of_Vertex);
+void register_button_to_vertex(Graph_structure* target, object_t*** map_button_ptr) { // vertex 갯수만큼 stack 오름
+	*map_button_ptr = (object_t**)malloc(sizeof(object_t *) * target->Num_of_Vertex);
 	for (int i = 0; i < target->Num_of_Vertex; i++)
 	{
-		object_t temp = create_colored_object(al_map_rgb(255, 255, 255), 10, 10, target->vertexArray[i].loc.x, target->vertexArray[i].loc.y);
+		object_t temp = create_object("Resources\\UI\\routegame\\v_building.png",target->vertexArray[i].loc.x - 15, target->vertexArray[i].loc.y - 15);
 		ui_set_on_click_listener(&temp, map_button_on_click_listener_func);
 		Stack.push(&Stack, temp);
-		map_button_ptr[0][i] = Stack.objs[Stack.counter - 1];
+		(*map_button_ptr)[i] = &Stack.objs[Stack.counter - 1];
 	}
 }
 
