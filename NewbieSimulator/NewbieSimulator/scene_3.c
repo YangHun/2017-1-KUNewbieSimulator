@@ -49,6 +49,8 @@ int scene_3_init() {
 
 	printf("Scene 3 start! \n");
 
+	srand(time(NULL));
+
 	object_t bg = create_object("Resources\\UI\\enroll_2\\background.jpg", 0, 0);
 	Background = bg;
 	for (i = 0; i < 6; i++) {
@@ -172,6 +174,9 @@ int scene_3_update() {
 			if(is_result)
 				result();
 		}
+		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 2000)) {
+			load_scene(Scenes.scenes[4]);
+		}
 	}
 
 	display_timer();
@@ -267,22 +272,20 @@ void result() {
 
 void reSchedule() {
 	int i, j;
-	int newindex;
-	bool repeat = true;
-
-	newindex = rand() % LECTURE_SIZE;
+	int newindex = 0;
 
 	for (i = 0; i < 6; i++) {
 		if (lectureindex[i] == -1) {
-			while (repeat) {
-				for (j = 0; j < LECTURE_SIZE && lectureTable[newindex].klueRating != RATING_VBAD; j++) {
-					newindex = j;
+			for (j = 0; j < LECTURE_SIZE; j++) {
+				newindex = j;
+				if (lectureTable[newindex].klueRating != RATING_VBAD) {
+					continue;
 				}
 				if (analyzeSchedule(lectureTable, mySchedule, newindex) == NO_OVERLAP) {
 					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
-					repeat = false;
+					break;
 				}
-			}
+			}			
 		}
 	}
 
@@ -295,7 +298,7 @@ double std_dist(int t, int d) { //standard_distribution
 //수강신청 난이도: 1:어려움 2:보통 3:쉬움
 //#include <math.h> : 하면 터짐
 	double p;
-	double sigma = 0.5 * d;// 몇초를 1sigma의 기준으로?
+	double sigma = 1 * d;// 몇초를 1sigma의 기준으로?
 	double z = ((double)t - 10000) / 1000 / sigma;
 
 	p = 1 - ((double)1 / 2 * z*z) + ((double)1 / 8 * z*z*z*z) - ((double)1 / 48 * z*z*z*z*z*z) + 
