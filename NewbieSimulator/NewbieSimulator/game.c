@@ -2,6 +2,8 @@
 #include "scenes.h"
 #include "fsms.h"
 
+#include "audio.h"
+
 static int register_scene_obj(scene_t *s, int((*init)()), int((*act)()), int((*transit)()));
 static int register_fsm_obj(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()), int((*transition)()));
 static int register_fsm_obj_no_transit(fsm_t *f, int statenum, int((*firstframe)()), int((*action)()), int((*lateupdate)()));
@@ -68,7 +70,7 @@ void start () {
 	register_fsm_obj_no_transit(&FSMs.states[1], 1, first_frame_1, action_1, late_update_1);
 	register_fsm_obj_no_transit(&FSMs.states[2], 100, first_frame_100, action_100, late_update_100);
 
-
+	init_audiosamples();
 }
 
 
@@ -77,7 +79,7 @@ void end () {
 	//free memory and destroy elements
 	//called once
 
-
+	fin_audiosamples();
 }
 
 //------------------------------------------------------------------

@@ -4,6 +4,7 @@
 #include "manageTimetable.h"
 #include "xmlParser.h"
 #include "data.h"
+#include "audio.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #define MAX_CREDIT 19
@@ -369,6 +370,10 @@ int scene_2_init() {
 	ui_set_on_click_listener(&campus_map_screen, on_click_map_screen);
 	Stack.push(&Stack, campus_map_screen); //177
 	Stack.objs[177].enable = false;
+
+	// audio
+	play_audiosample(2, true);
+
 	return 0;
 }
 
@@ -398,6 +403,9 @@ int scene_2_fin() {
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
 	Stack.clear(&Stack);
 
+	// audio
+	stop_audiosample(2);
+
 	printf("counter : %d \n", Stack.counter);
 
 	//clearing font related memory
@@ -408,6 +416,8 @@ int scene_2_fin() {
 }
 
 void on_click_add_lecture(object_t *o) {
+
+	play_audiosample(0, false);
 
 	int input;
 	int inputChange = 0;
@@ -449,6 +459,8 @@ void on_click_add_lecture(object_t *o) {
 }
 
 void on_click_campus_map(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick_Map == 0) {
 		printf("on green \n");
 		protectOverlapClick_Map = 1;
@@ -464,6 +476,8 @@ void on_click_campus_map(object_t *o) {
 }
 
 void on_click_map_screen(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick_Map == 0) {
 		printf("on red \n");
 		protectOverlapClick_Map = 1;
@@ -479,6 +493,8 @@ void on_click_map_screen(object_t *o) {
 }
 
 void on_click_reset(object_t *o) {
+	play_audiosample(0, false);
+
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] != -1) {
 			selectedLectureIndex = -1;
@@ -489,10 +505,14 @@ void on_click_reset(object_t *o) {
 }
 
 void on_click_finish(object_t *o) {
+	play_audiosample(0, false);
+
 	load_scene(Scenes.scenes[3]);
 }
 
 void on_click_button_selective(object_t *o) {
+	play_audiosample(0, false);
+
 	if (isActive != B_SELECTIVE) {
 		toggle_button(B_SELECTIVE);
 		arrangeLectureList(0);
@@ -500,6 +520,7 @@ void on_click_button_selective(object_t *o) {
 }
 
 void on_click_button_major(object_t *o) {
+	play_audiosample(0, false);
 
 	if (isActive != B_MAJOR) {
 		toggle_button(B_MAJOR);
@@ -508,6 +529,8 @@ void on_click_button_major(object_t *o) {
 }
 
 void on_click_button_core(object_t *o) {
+	play_audiosample(0, false);
+
 	if (isActive != B_CORE) {
 		toggle_button(B_CORE);
 		arrangeLectureList(0);
@@ -515,6 +538,8 @@ void on_click_button_core(object_t *o) {
 }
 
 void on_click_button_scroll_up(object_t *o) {
+	play_audiosample(0, false);
+
 	int i = 0;
 	int j = 0;
 	int sw;
@@ -585,6 +610,8 @@ void on_click_button_scroll_up(object_t *o) {
 }
 
 void on_click_button_scroll_down(object_t *o) {
+	play_audiosample(0, false);
+
 	int i = 0;
 	int j = 0;
 	int sw;
@@ -932,6 +959,8 @@ void toggle_button(ActiveButton active) {
 }
 
 static void on_click_lectureList_0(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[0] != -1) { // 만약 이 칸에 강의가 채워져 있다면
 			resetLectureList();
@@ -974,6 +1003,8 @@ static void on_click_lectureList_0(object_t *o) {
 	}
 }
 static void on_click_lectureList_1(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[1] != -1) {
 			resetLectureList();
@@ -1016,6 +1047,8 @@ static void on_click_lectureList_1(object_t *o) {
 	}
 }
 static void on_click_lectureList_2(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[2] != -1) {
 			resetLectureList();
@@ -1058,6 +1091,8 @@ static void on_click_lectureList_2(object_t *o) {
 	}
 }
 static void on_click_lectureList_3(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[3] != -1) {
 			resetLectureList();
@@ -1101,6 +1136,8 @@ static void on_click_lectureList_3(object_t *o) {
 	}
 }
 static void on_click_lectureList_4(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[4] != -1) {
 			resetLectureList();
@@ -1143,6 +1180,8 @@ static void on_click_lectureList_4(object_t *o) {
 	}
 }
 static void on_click_lectureList_5(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[5] != -1) {
 			resetLectureList();
@@ -1185,6 +1224,8 @@ static void on_click_lectureList_5(object_t *o) {
 	}
 }
 static void on_click_lectureList_6(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[6] != -1) {
 			resetLectureList();
@@ -1227,6 +1268,8 @@ static void on_click_lectureList_6(object_t *o) {
 	}
 }
 static void on_click_lectureList_7(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[7] != -1) {
 			resetLectureList();
@@ -1269,6 +1312,8 @@ static void on_click_lectureList_7(object_t *o) {
 	}
 }
 static void on_click_lectureList_8(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[8] != -1) {
 			resetLectureList();
@@ -1311,6 +1356,8 @@ static void on_click_lectureList_8(object_t *o) {
 	}
 }
 static void on_click_lectureList_9(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[9] != -1) {
 			resetLectureList();
@@ -1353,6 +1400,8 @@ static void on_click_lectureList_9(object_t *o) {
 	}
 }
 static void on_click_lectureList_10(object_t *o) {
+	play_audiosample(0, false);
+
 	if (protectOverlapClick == 0) {
 		if (onListLecture[10] != -1) {
 			resetLectureList();

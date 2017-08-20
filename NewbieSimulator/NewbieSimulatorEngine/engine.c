@@ -57,6 +57,14 @@ static int engine() {
 		fprintf(stderr, "failed to initialize the primitives addon!\n");
 		return -1;
 	}
+	if (!al_install_audio()) {
+		printf("failed to initialize audio!\n");
+		return -1;
+	}
+	if (!al_init_acodec_addon()) {
+		printf("failed to initialize audio codecs!\n");
+		return -1;
+	}
 
 
 	timer = al_create_timer(1.0 / FPS);

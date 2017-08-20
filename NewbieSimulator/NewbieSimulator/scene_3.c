@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "data.h"
 #include "manageTimetable.h"
+#include "audio.h"
 
 ALLEGRO_CONFIG *conf;
 ALLEGRO_CONFIG *conf2;
@@ -37,6 +38,8 @@ double std_dist(int t, int d);
 bool probability_judge(double p);
 void display_timer(void);
 void displayresult(void);
+
+void play_clock_sound_if_not_playing();
 
 int pressed_time[6];
 
@@ -145,7 +148,8 @@ int scene_3_init() {
 	Stack.push(&Stack, start_bt);
 #define START_BT Stack.objs[17]
 
-	
+	play_audiosample(3, true);
+
 	return 0;
 }
 
@@ -153,7 +157,6 @@ int scene_3_update() {
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
 	int i;
-	printf("Scene 3 act! \n");
 	
 	if (counting_start) {
 		if (!timer_started) {	//타이머 작동
@@ -167,11 +170,17 @@ int scene_3_update() {
 #define GAMESTART_COUNT 10
 		if (!game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1000)) { //10초지나면 수강신청 열림
 			game_start = true;
+
+			stop_audiosample(3);
 		}
 		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1500)) {
 			if(is_result)
 				result();
 		}
+	}
+
+	if (!game_start && al_get_timer_count(click_timer) > (865)) {
+		play_clock_sound_if_not_playing();
 	}
 
 	display_timer();
@@ -182,6 +191,8 @@ int scene_3_update() {
 }
 
 void on_click_startbt(object_t *o) {
+	play_audiosample(0, false);
+
 	if (counting_start)
 		return;
 	
@@ -192,6 +203,8 @@ void on_click_startbt(object_t *o) {
 }
 
 void pressed1(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[0]) return; //수강신청 안열렸으면 의미없음
 	printf("pressed!");
 	//Sleep(1000);
@@ -200,30 +213,40 @@ void pressed1(object_t *o) {
 }
 
 void pressed2(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[1]) return;
 	pressed[1] = true;
 	pressed_time[1] = al_get_timer_count(click_timer);
 }
 
 void pressed3(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[2]) return;
 	pressed[2] = true;
 	pressed_time[2] = al_get_timer_count(click_timer);
 }
 
 void pressed4(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[3]) return;
 	pressed[3] = true;
 	pressed_time[3] = al_get_timer_count(click_timer);
 }
 
 void pressed5(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[4]) return;
 	pressed[4] = true;
 	pressed_time[4] = al_get_timer_count(click_timer);
 }
 
 void pressed6(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[5]) return;
 	pressed[5] = true;
 	pressed_time[5] = al_get_timer_count(click_timer);
@@ -362,6 +385,14 @@ void displayresult(void) {
 		//	Stack.objs[2 + i] = create_object("Resources\\UI\\enroll_2\\fail.png", 741, 235 + 74 * i);
 	}
 
+}
+
+void play_clock_sound_if_not_playing() {
+	static bool playing = false;
+	if (!playing) {
+		playing = true;
+		play_audiosample(1, false);
+	}
 }
 
 int scene_3_fin() {
