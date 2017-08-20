@@ -6,7 +6,7 @@ typedef struct Coord_2D {
 
 typedef struct vertex {
 	Coord_2D loc;
-	int id;
+	char name[10];
 } vertex;
 
 typedef struct edge {

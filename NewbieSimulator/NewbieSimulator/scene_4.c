@@ -12,6 +12,8 @@ int second_per_day[5] = { 0, };
 whatDay today_of_week; // 오늘의 요일
 void calculate_second_per_day();
 void test_custom_schedule();
+void map_button_on_click_listener_func(object_t *o);
+
 schedule customSchedule; // to test
 
 void selected1(object_t *o);
@@ -43,7 +45,28 @@ ALLEGRO_TIMER *timer;
 int chr_timer_set = 0;
 ALLEGRO_EVENT_QUEUE *event_queue;
 
-object_t player[4];
+//object_t player[4];
+
+typedef struct character {
+
+	position_t pos;
+
+	int curr_point;
+	int next_point;
+
+	object_t* image[4];
+	int current_image;
+	
+	bool is_moving_now;
+
+}Character;
+
+Character player;
+
+static int vertex_object_starting;
+
+void set_player_position_to_vertex(Character* chr, int index);
+
 
 int scene_4_init() {
 
@@ -57,7 +80,6 @@ int scene_4_init() {
 
 	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\map.jpg", 0, 0));
 	map = &Stack.objs[Stack.counter - 1];
-
 
 	// ------------------------------------
 	// Timebar UI setting
@@ -93,6 +115,7 @@ int scene_4_init() {
 
 	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
 	parse_graph(myGraph);
+	vertex_object_starting = Stack.counter;
 	register_button_to_vertex(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
 
 	// ------------------------------------
@@ -106,52 +129,81 @@ int scene_4_init() {
 	al_start_timer(timer);
 
 
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\move.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\1.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\2.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\3.png", 100, 150));
 
-
-	player[0] = create_object("Resources\\UI\\routegame\\move.png", 100, 150);
-	player[1] = create_object("Resources\\UI\\routegame\\1.png", 100, 150);
-	player[2] = create_object("Resources\\UI\\routegame\\2.png", 100, 150);
-	player[3] = create_object("Resources\\UI\\routegame\\3.png", 100, 150);
 	for (i = 0; i < 4; i++) {
-		player[i].enable = false;
-		Stack.push(&Stack, player[i]);
+		player.image[i] = &Stack.objs[Stack.counter - 4 + i];
+		player.image[i]->enable = false;
 	} // 171 + (# of edges) +  0, 1, 2, 3
 
-
+	
 #define VERTICE myGraph->Num_of_Vertex
-#define EDGES 2*myGraph->Num_of_Edge
+//#define EDGES 2*myGraph->Num_of_Edge
+#define EDGES 0
 #define CHARACTER 3
+/*
 	current_state = VERTICE + EDGES + CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
-
-	start_point.x = 1155;
-	start_point.y = 1385;
-
-
-
+	*/
+	
+	set_player_position_to_vertex(&player, 1);
 
 	return 0;
 }
 
-static double FPS = 100.0;
+void set_player_position_to_vertex(Character* chr, int index) {
+
+	int image_x, image_y;
+
+	image_x = chr->image[0]->rect.width/2;
+	image_y = chr->image[0]->rect.height - 43;
+
+	player.pos.x = myGraph->vertexArray[index].loc.x - image_x;
+	player.pos.y = myGraph->vertexArray[index].loc.y - image_y;
+
+	for (int i = 0; i < 4; i++) {
+		chr->image[i]->pos.x = myGraph->vertexArray[index].loc.x - image_x;
+		chr->image[i]->pos.y = myGraph->vertexArray[index].loc.y - image_y;
+	}
+	chr->curr_point = index;
+
+}
+void move_player(Character* chr, float x, float y) {
+	player.pos.x += x;
+	player.pos.y += y;
+	for (int i = 0; i < 4; i++) {
+		chr->image[i]->pos.x += x;
+		chr->image[i]->pos.y += y;
+	}
+
+}
+
+static double speed = 1000;
 void setting()
 {
-	Stack.objs[current_state].enable = false;
-	current_state = VERTICE + EDGES + CHARACTER;
-	Stack.objs[current_state].enable = true;
-	nowx = start_point.x;
-	nowy = start_point.y;
-	if (ongoing1) {
-		end_point.x = 190;
-		end_point.y = 100;
-		x_velocity = (double)(end_point.x - start_point.x) / FPS; //FPS조절하여 캐릭터 속도 조절
-		y_velocity = (double)(end_point.y - start_point.y) / FPS;
-	}
-	else {
-		end_point.x = 190;
-		end_point.y = 200;
-		x_velocity = (double)(end_point.x - start_point.x) / FPS;
-		y_velocity = (double)(end_point.y - start_point.y) / FPS;
+	player.image[player.current_image]->enable = false;
+	player.current_image = 0;
+	player.image[player.current_image]->enable = true;
+	nowx = player.pos.x;
+	nowy = player.pos.y;
+	if (player.is_moving_now) {
+		end_point.x = myGraph->vertexArray[player.next_point].loc.x;
+		end_point.y = myGraph->vertexArray[player.next_point].loc.y;
+		start_point.x = myGraph->vertexArray[player.curr_point].loc.x;
+		start_point.y = myGraph->vertexArray[player.curr_point].loc.y;
+
+		float vector_x = end_point.x - start_point.x;
+		float vector_y = end_point.y - start_point.y;
+
+		move_player(&player, vector_x / speed, vector_y / speed);
+		printf("%f %d\n", player.pos.x, myGraph->vertexArray[player.next_point].loc.x - 1);
+		if (player.pos.x == myGraph->vertexArray[player.next_point].loc.x &&
+			player.pos.y == myGraph->vertexArray[player.next_point].loc.y ) {
+			
+		}
 	}
 }
 
@@ -186,37 +238,42 @@ int scene_4_update() {
 		al_start_timer(maingame_timer);
 	}
 
-	if (!ongoing1 && !ongoing2) {
+	if (!player.is_moving_now) {
 		if (al_get_timer_count(timer) - chr_timer_set>500) {
 			chr_timer_set = al_get_timer_count(timer);
-			Stack.objs[current_state].enable = false;
-			current_state = VERTICE + EDGES + CHARACTER + rand() % 3 + 1;
-			Stack.objs[current_state].enable = true;
+			player.image[player.current_image]->enable = false;
+			player.current_image = rand() % 3 + 1;
+			player.image[player.current_image]->enable = true;
 		}
 	}
 	else {
-		if (!isSet) {
-			isSet = true;
-			setting();
-		} 
+		
+		setting();
 
-		if (count == FPS) {
+		
+		if (count >= speed) {
 			printf("reach the destination\n");
-			ongoing1 = false;
-			ongoing2 = false;
+			
+			player.is_moving_now = false;
+
+			int image_x, image_y;
+
+			image_x = player.image[0]->rect.width / 2;
+			image_y = player.image[0]->rect.height - 43;
+
+			player.curr_point = player.next_point;
+			player.next_point = -1;
+			//player.is_moving_now = false;
+
 			for (i = 0; i < 4; i++) {
-				Stack.objs[CHARACTER + i].pos.x = end_point.x;
-				Stack.objs[CHARACTER + i].pos.y = end_point.y;
+				player.image[i]->pos.x = end_point.x - image_x + (*map).pos.x;
+				player.image[i]->pos.y = end_point.y - image_y + (*map).pos.y;
 			}
 			count = 0;
-			isSet = false;
 		}
 
-		for (i = 0; i < 4; i++) {
-			Stack.objs[CHARACTER + i].pos.x += x_velocity;
-			Stack.objs[CHARACTER + i].pos.y += y_velocity;
-		}
 		count++;
+		
 	}
 
 	//--------------------------//
@@ -237,13 +294,17 @@ int scene_4_update() {
 		{
 			(map_button_ptr[i])->pos.x += (x - pre_mouse_x);
 			(map_button_ptr[i])->pos.y += (y - pre_mouse_y);
+			(map_button_ptr[i])->rect.left += (x - pre_mouse_x);
+			(map_button_ptr[i])->rect.top += (y - pre_mouse_y);
 
 		}
 
-		for (int i = 0; i < CHARACTER + 1; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			Stack.objs[VERTICE + EDGES + CHARACTER + i].pos.x += (x - pre_mouse_x);
-			Stack.objs[VERTICE + EDGES + CHARACTER + i].pos.y += (y - pre_mouse_y);
+			player.image[i]->pos.x += (x - pre_mouse_x);
+			player.image[i]->pos.y += (y - pre_mouse_y);
+			player.image[i]->rect.left += (x - pre_mouse_x);
+			player.image[i]->rect.top += (y - pre_mouse_y);
 		}
 		
 		pre_mouse_x = x;
@@ -336,3 +397,11 @@ void selected2(object_t *o)
 	ongoing2 = true;
 }
 */
+
+void map_button_on_click_listener_func(object_t *o)
+{
+	printf("enter!");
+	player.is_moving_now = true;
+	player.next_point = o - &Stack.objs[vertex_object_starting];
+	printf("start: %d, end: %d", player.curr_point, player.next_point);
+}
