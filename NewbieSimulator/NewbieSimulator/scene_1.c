@@ -521,6 +521,7 @@ void scene_1_finish() {
 
 void clicked_yes(object_t *o)
 {
+	play_audiosample(0, false);
 	switch (event_num)
 	{
 	case 0:
@@ -562,6 +563,7 @@ void clicked_yes(object_t *o)
 
 void clicked_no(object_t *o)
 {
+	play_audiosample(0, false);
 	switch (event_num)
 	{
 	case 0:

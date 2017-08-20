@@ -183,6 +183,8 @@ int scene_3_update() {
 }
 
 void on_click_startbt(object_t *o) {
+	play_audiosample(0, false);
+
 	if (counting_start)
 		return;
 	
@@ -193,6 +195,8 @@ void on_click_startbt(object_t *o) {
 }
 
 void pressed1(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[0]) return; //수강신청 안열렸으면 의미없음
 	printf("pressed!");
 	//Sleep(1000);
@@ -201,30 +205,40 @@ void pressed1(object_t *o) {
 }
 
 void pressed2(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[1]) return;
 	pressed[1] = true;
 	pressed_time[1] = al_get_timer_count(click_timer);
 }
 
 void pressed3(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[2]) return;
 	pressed[2] = true;
 	pressed_time[2] = al_get_timer_count(click_timer);
 }
 
 void pressed4(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[3]) return;
 	pressed[3] = true;
 	pressed_time[3] = al_get_timer_count(click_timer);
 }
 
 void pressed5(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[4]) return;
 	pressed[4] = true;
 	pressed_time[4] = al_get_timer_count(click_timer);
 }
 
 void pressed6(object_t *o) {
+	play_audiosample(0, false);
+
 	if (!game_start || pressed[5]) return;
 	pressed[5] = true;
 	pressed_time[5] = al_get_timer_count(click_timer);
