@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "data.h"
+#include "audio.h"
 
 static void scene_1_on_click_button_0();
 float brightness, transparency;
@@ -14,6 +15,7 @@ ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* timer_event_queue;
 ALLEGRO_FONT *font;
 ALLEGRO_CONFIG *conf;
+ALLEGRO_SAMPLE *sample_bgm;
 
 void invitation();
 void first_meeting();
@@ -152,6 +154,8 @@ int scene_1_init(){
 
 	for (i = 0; i < EVENTCOUNT; i++)
 		event_func[i].isStarted = false;
+
+	play_audiosample(2, true);
 
 	return 0;
 }
@@ -303,6 +307,7 @@ int scene_1_fin() {
 	al_destroy_config(conf);
 	al_destroy_font(font);
 	al_destroy_timer(event_timer);
+	al_destroy_sample(sample_bgm);
 
 	return 0;
 }
@@ -513,6 +518,7 @@ void scene_1_finish() {
 
 void clicked_yes(object_t *o)
 {
+	play_audiosample(0, false);
 	switch (event_num)
 	{
 	case 0:
@@ -554,6 +560,7 @@ void clicked_yes(object_t *o)
 
 void clicked_no(object_t *o)
 {
+	play_audiosample(0, false);
 	switch (event_num)
 	{
 	case 0:

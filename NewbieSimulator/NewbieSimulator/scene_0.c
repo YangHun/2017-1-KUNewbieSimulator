@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "audio.h"
 
 static void on_click_button_0(object_t *o);
 
@@ -15,11 +16,11 @@ int scene_0_init() {
 //	Stack.push(&Stack, target);
 //	ui_set_scrollbar(&Stack.objs[1], &Stack.objs[2], "Resources\\dummy\\scroller\\b_top.png", 
 //		"Resources\\dummy\\scroller\\b_bot.png", al_map_rgb(255, 255, 255), al_map_rgb(0, 0, 0));
-	
+
+	play_audiosample(2, true);
+
 	return 0;
 }
-
-#define HOSBUTTON Stack.objs[0]
 
 int scene_0_update() {
 
@@ -29,6 +30,7 @@ int scene_0_update() {
 int scene_0_fin() {
 
 	// 이 씬에서 다른 씬으로 넘어갈 때, 한 번 실행되는 함수.
+
 	Stack.clear(&Stack);
 
 	printf("counter : %d \n", Stack.counter);
@@ -38,6 +40,7 @@ int scene_0_fin() {
 
 void on_click_button_0(object_t *o) {
 
+	play_audiosample(0, false);
 	load_scene(Scenes.scenes[1]);
 
 }
