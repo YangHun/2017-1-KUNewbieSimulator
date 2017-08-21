@@ -88,8 +88,8 @@ Character player;
 
 static int edge_object_starting;
 static int vertex_object_starting;
+static int stat_object_starting;
 int yes_or_no_UI_starting = 0;
-
 void set_player_position_to_vertex(Character* chr, int index);
 
 
@@ -113,10 +113,10 @@ int scene_4_init() {
 	maingame_timer = al_create_timer(1.0 / 1000);
 	al_start_timer(maingame_timer);
 
-	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
+	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 300);
 	Stack.push(&Stack, bar_bg); //1
 
-	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
+	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 300);
 	Stack.push(&Stack, red); //2
 
 	// ------------------------------------
@@ -239,6 +239,7 @@ int scene_4_init() {
 	ui_set_text(&attend, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "attend"), 24);
 	Stack.push(&Stack, attend);
 
+	stat_object_starting = Stack.counter;
 	object_t hp = create_object(NULL, 240, 150);
 	sprintf(hp_str, "%0.1f", health_point / 10.0);
 	ui_set_text(&hp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
@@ -248,9 +249,9 @@ int scene_4_init() {
 	sprintf(sp_str, "%0.1f", social_point / 10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	Stack.push(&Stack, sp);
-
-#define HP_TEXT Stack.objs[14]
-#define SP_TEXT Stack.objs[15]
+	
+#define HP_TEXT Stack.objs[524]
+#define SP_TEXT Stack.objs[525]
 
 	return 0;
 }
@@ -363,7 +364,7 @@ void move(int *pdx, int *pdy) {
 	}
 
 }
-#define TIMEBAR_MAX 1280
+#define TIMEBAR_MAX 980 // 1280 - 300
 int scene_4_update() {
 
 	int i;
@@ -389,7 +390,7 @@ int scene_4_update() {
 	
 	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
-		timebar_width += 128000 / (second_per_day[today_of_week] * 100.0);
+		timebar_width += (980 * 100) / (second_per_day[today_of_week] * 100.0); // n배 빠르게
 		Stack.objs[2].rect.width = timebar_width + 5;
 	}
 	
