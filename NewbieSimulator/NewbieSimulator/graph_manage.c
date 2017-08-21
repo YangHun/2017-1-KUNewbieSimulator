@@ -133,6 +133,17 @@ void free_graph_structure(Graph_structure* target) {
 	free(target->vertexArray);
 }
 
+void make_edge_objects(Graph_structure* target) {
+	for (int i = 0; i < target->Num_of_Edge * 2; i++)
+	{
+		edge e = target->edgeArray[i];
+		if (!e.reversed)
+		{
+			// TODO: create line objects
+		}
+	}
+}
+
 void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { // vertex 갯수만큼 stack 오름
 	*map_button_ptr = (object_t**)malloc(sizeof(object_t *) * target->Num_of_Vertex);
 	for (int i = 0; i < target->Num_of_Vertex; i++)

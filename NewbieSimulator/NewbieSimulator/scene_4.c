@@ -126,6 +126,7 @@ int scene_4_init() {
 
 	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
 	parse_graph(myGraph);
+	make_edge_objects(myGraph);
 	vertex_object_starting = Stack.counter;
 	make_vertex_objects(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
 
