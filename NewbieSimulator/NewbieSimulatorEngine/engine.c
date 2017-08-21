@@ -254,15 +254,7 @@ void engine_draw_objs() {
 
 		if (o->enable == true) {
 
-			if (o->rotated == true) {
-				al_draw_rotated_bitmap(o->image, (o->rect.width / 2.0), (o->rect.height / 2.0),
-					o->pos.x + o->rect.width / 2, o->pos.y + o->rect.height / 2, o->angle, 0);
-				o->rotated = false;
-				if (o->angle >= 360.0) {
-					o->angle -= 360.0f;
-				}
-			}
-			else if (o->modifier.type == OBJECT_MODIFIER_FONT) {
+			if (o->modifier.type == OBJECT_MODIFIER_FONT) {
 				al_draw_text(o->modifier.value.font_value.font, o->modifier.value.font_value.color, o->pos.x, o->pos.y, o->modifier.value.font_value.align, o->modifier.value.font_value.text);
 			}
 			else if (o->modifier.type == OBJECT_MODIFIER_SCROLLBAR) {
@@ -282,9 +274,27 @@ void engine_draw_objs() {
 			else if (o->modifier.type == OBJECT_MODIFIER_SCROLLBAR_CHILD) {
 				// do nothing
 			}
+			else if (o->modifier.type == OBJECT_MODIFIER_LINE) {
+				float x1, x2, y1, y2, t;
+				x1 = o->modifier.value.line.x1;
+				y1 = o->modifier.value.line.y1;
+				x2 = o->modifier.value.line.x2;
+				y2 = o->modifier.value.line.y2;
+				t = o->modifier.value.line.thickness;
+
+				al_draw_line(x1, y1, x2, y2, o->color, t);
+			}
 			else{
 				if (o->image == NULL) {
 					al_draw_filled_rectangle(o->pos.x, o->pos.y, o->pos.x + o->rect.width, o->pos.y + o->rect.height, o->color);
+				}
+				else if (o->rotated) {
+					al_draw_rotated_bitmap(o->image, (o->rect.width / 2.0), (o->rect.height / 2.0),
+						o->pos.x + o->rect.width / 2, o->pos.y + o->rect.height / 2, o->angle, 0);
+					o->rotated = false;
+					if (o->angle >= 360.0) {
+						o->angle -= 360.0f;
+					}
 				}
 				else {
 					al_draw_tinted_bitmap(o->image, al_map_rgba_f(1, 1, 1, o->opacity), o->pos.x, o->pos.y, 0);

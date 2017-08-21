@@ -227,8 +227,28 @@ void rotate_object(object_t* obj, float angle) {
 
 	obj->angle += angle;
 	obj->rotated = true;
+}
 
-	printf("%f %d", obj->angle, obj->rotated);
+object_t create_line_object(ALLEGRO_COLOR c, float x1, float y1, float x2, float y2, float thickness) {
+
+	object_t obj;
+	obj.color = c;
+	obj.image = NULL;
+
+	obj.enable = true;
+	obj.rotated = false;
+	obj.angle = 0.0f;
+	obj.opacity = 1.0f;
+
+	obj.modifier.type = OBJECT_MODIFIER_LINE;
+	obj.modifier.value.line.x1 = x1;
+	obj.modifier.value.line.y1 = y1;
+	obj.modifier.value.line.x2 = x2;
+	obj.modifier.value.line.y2 = y2;
+	obj.modifier.value.line.thickness = thickness;
+
+	return obj;
+
 }
 
 
