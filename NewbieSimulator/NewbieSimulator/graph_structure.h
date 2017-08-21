@@ -6,6 +6,7 @@ typedef enum vertex_type{
 	VERTEX_TYPE_NONE,
 	VERTEX_TYPE_BUILDING,
 	VERTEX_TYPE_BUSROUTE,
+	VERTEX_TYPE_ECOUNT,
 }vertex_type;
 
 typedef struct Coord_2D {

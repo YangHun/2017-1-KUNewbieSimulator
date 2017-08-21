@@ -34,7 +34,9 @@ void parse_graph(Graph_structure* result) {
 
 	for (int i = 0; i < vertex_count; i++)
 	{
-		fscanf(map_location, "%d %d", &result->vertexArray[i].loc.x, &result->vertexArray[i].loc.y);
+		vertex *v = &result->vertexArray[i];
+		fscanf(map_location, "%d %d", &v->loc.x, &v->loc.y);
+		v->type = VERTEX_TYPE_NONE;
 	}
 
 
@@ -43,20 +45,18 @@ void parse_graph(Graph_structure* result) {
 	{
 		int n = 0;
 		char buf[64];
-		vertex *v = &result->vertexArray[i];
 		fscanf(map_location, "%d %s", &n, buf);
+		vertex *v = &result->vertexArray[n];
 
 		if (strncmp(buf, "b/", 2) == 0) {
 			v->type = VERTEX_TYPE_BUILDING;
-			strncpy(v->name, buf + 2, strlen(buf) - 2);
+			strncpy(v->name, buf + 2, strlen(buf + 2) + 1);
 		}
 		else if (strncmp(buf, "br/", 3) == 0) {
 			v->type = VERTEX_TYPE_BUSROUTE;
-			int c = sscanf("%d", &v->value.as_busroute.id);
-			strncpy(v->name, buf + c + 4, strlen(buf) - c - 4);
-		}
-		else {
-			v->type = VERTEX_TYPE_NONE;
+			int c;
+			sscanf(buf + 3, "%d%n", &v->value.as_busroute.id, &c);
+			strncpy(v->name, buf + c + 4, strlen(buf + c + 4) + 1);
 		}
 	}
 
@@ -163,7 +163,13 @@ void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { 
 	*map_button_ptr = (object_t**)malloc(sizeof(object_t *) * target->Num_of_Vertex);
 	for (int i = 0; i < target->Num_of_Vertex; i++)
 	{
-		object_t temp = create_object("Resources\\UI\\routegame\\v_building.png",target->vertexArray[i].loc.x - 15, target->vertexArray[i].loc.y - 15);
+		vertex *v = &target->vertexArray[i];
+		const char *paths[VERTEX_TYPE_ECOUNT] = {
+			"Resources\\UI\\routegame\\v_default.png",
+			"Resources\\UI\\routegame\\v_building.png",
+			"Resources\\UI\\routegame\\v_busroute.png",
+		};
+		object_t temp = create_object(paths[v->type], v->loc.x - 15, v->loc.y - 15);
 		ui_set_button(&temp);
 		ui_set_on_click_listener(&temp, map_button_on_click_listener_func);
 		Stack.push(&Stack, temp);
