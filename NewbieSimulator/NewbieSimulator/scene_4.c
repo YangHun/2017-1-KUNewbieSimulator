@@ -26,7 +26,7 @@ event_function sequencial_event_func[SEQ_EVENTCOUNT];
 event_function special_event_func[SPE_EVENTCOUNT];
 ALLEGRO_TIMER* event_timer;
 int event_timer_clock = 0;
-bool event_waiting = false;
+bool event_choose = false;
 
 void selected1(object_t *o);
 void selected2(object_t *o);
@@ -177,7 +177,6 @@ int scene_4_init() {
 	
 	yes_or_no_UI_starting = Stack.counter;
 
-	Stack.push(&Stack, create_object("Resources\\UI\\tutorial\\allblack.png", 0, 18));
 	Stack.push(&Stack, create_object("Resources\\UI\\tutorial\\kakaotalk.png", 365, 210));
 	object_t yes_button = create_object("Resources\\UI\\tutorial\\yes_button.png", 365, 380); 
 	object_t no_button = create_object("Resources\\UI\\tutorial\\no_button.png", 640, 380);
@@ -186,10 +185,10 @@ int scene_4_init() {
 	ui_set_button(&no_button);
 
 	Stack.push(&Stack, yes_button);
-	Stack.push(&Stack, no_button);  // (current : 178 + 0 1 2 3 = 181)
+	Stack.push(&Stack, no_button);  // (current : 178 + 0 1 2  = 180)
 
-	for (i = 0; i < 4; i++) {
-		Stack.objs[Stack.counter - 4 + i].enable = false;
+	for (i = 0; i < 3; i++) {
+		Stack.objs[Stack.counter - 3 + i].enable = false;
 	}
 
 	return 0;
@@ -355,14 +354,14 @@ int scene_4_update() {
 		}
 	}
 
-	if (event_waiting) {
+	if (event_choose) {
 		al_resume_timer(maingame_timer);
 		al_start_timer(event_timer);
 		event_timer_clock = 0;
-		for (int i = 0; i < 4; i++) {
-			Stack.objs[Stack.counter - 4 + i].enable = false;
+		for (int i = 0; i < 3; i++) {
+			Stack.objs[Stack.counter - 3 + i].enable = false;
 		}
-		event_waiting = false;
+		event_choose = false;
 
 	}
 	

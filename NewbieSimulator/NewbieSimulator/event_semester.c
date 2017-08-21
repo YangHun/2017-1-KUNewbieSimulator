@@ -18,7 +18,7 @@ void init_seq_event(event_function seq_event_func[]);
 void init_spe_event(event_function spe_event_func[]);
 
 extern int yes_or_no_UI_starting;
-extern bool event_waiting;
+extern bool event_choose;
 
 void init_event(event_function sto_event_func[], event_function seq_event_func[], event_function spe_event_func[]) {
 	init_sto_event(sto_event_func);
@@ -52,6 +52,15 @@ void init_spe_event(event_function spe_event_func[]) {
 	}
 }
 
+void standard_event_form() { // 기본적인 형태
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "message of event";
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = "message of event";
+	for (int i = 0; i < 4; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
 
 void sto_event_dummy0() {
 	char copycat[] = "0";
@@ -71,13 +80,13 @@ void sto_event_dummy2() {
 void seq_event_dummy0() {
 	char copycat[] = "0";
 	printf("seq %s is on \n", copycat);
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "seq0";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "seq0";
-	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = "seq0";
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 3; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
-	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_yes);
-	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 3], click_no);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 
 }
 
@@ -116,7 +125,7 @@ void click_yes(object_t* o) {
 	} switchs_end;
 	
 	o->modifier.value.font_value.text = "";
-	event_waiting = true;
+	event_choose = true;
 }
 
 void click_no(object_t* o) {
@@ -128,5 +137,5 @@ void click_no(object_t* o) {
 
 	} switchs_end;
 	o->modifier.value.font_value.text = "";
-	event_waiting = true;
+	event_choose = true;
 }
