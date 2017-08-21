@@ -20,6 +20,9 @@ schedule customSchedule; // to test
 // ------------------------------------
 event_function stochastic_event_func[STO_EVENTCOUNT];
 event_function sequencial_event_func[SEQ_EVENTCOUNT];
+int event_sandclock = 0;
+ALLEGRO_TIMER* event_timer;
+int event_timer_clock = 0;
 
 void selected1(object_t *o);
 void selected2(object_t *o);
@@ -132,6 +135,8 @@ int scene_4_init() {
 	// event setting
 	// ------------------------------------
 	init_event(stochastic_event_func, sequencial_event_func);
+	event_timer = al_create_timer(1.0 / 1000);
+	al_start_timer(event_timer);
 	return 0;
 }
 
@@ -186,6 +191,27 @@ int scene_4_update() {
 
 		al_stop_timer(maingame_timer);
 		al_start_timer(maingame_timer);
+	}
+
+	// ------------------------------------
+	// Event Managing
+	// ------------------------------------
+#define EVENT_TIME_INTERVAL 10
+	if (al_get_timer_count(event_timer) - event_timer_clock > (EVENT_TIME_INTERVAL * 1000)) {
+		event_timer_clock = al_get_timer_count(event_timer);
+		for (int i = 0; i < SEQ_EVENTCOUNT; i++) {
+			if (sequencial_event_func[i].isStarted == false) {
+				al_stop_timer(maingame_timer);
+				al_stop_timer(event_timer);
+				sequencial_event_func[i].func();
+				al_resume_timer(maingame_timer);
+				al_set_timer_count(event_timer, 0);
+				al_start_timer(event_timer);
+				event_timer_clock = 0;
+				sequencial_event_func[i].isStarted = true;
+				break;
+			}
+		}
 	}
 
 	if (!ongoing1 && !ongoing2) {
@@ -263,7 +289,8 @@ int scene_4_fin() {
 	free(myGraph);
 	Stack.clear(&Stack);
 	al_destroy_timer(timer);
-
+	al_destroy_timer(maingame_timer);
+	al_destroy_timer(event_timer);
 	printf("counter : %d \n", Stack.counter);
 
 	return 0;
@@ -304,17 +331,17 @@ void test_custom_schedule() { // to test
 	customSchedule.timeTable[0][1].isEmptyBit = NONEMPTY;
 	customSchedule.timeTable[0][2].index = 2;
 	customSchedule.timeTable[0][2].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][3].index = 3;
+	customSchedule.timeTable[0][3].index = 2;
 	customSchedule.timeTable[0][3].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][4].index = 4;
+	customSchedule.timeTable[0][4].index = 2;
 	customSchedule.timeTable[0][4].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][5].index = 5;
+	customSchedule.timeTable[0][5].index = 2;
 	customSchedule.timeTable[0][5].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][6].index = 6;
+	customSchedule.timeTable[0][6].index = 2;
 	customSchedule.timeTable[0][6].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][7].index = 7;
+	customSchedule.timeTable[0][7].index = 2;
 	customSchedule.timeTable[0][7].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][8].index = 8;
+	customSchedule.timeTable[0][8].index = 2;
 	customSchedule.timeTable[0][8].isEmptyBit = NONEMPTY;
 	calculate_second_per_day();
 
