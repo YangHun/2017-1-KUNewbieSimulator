@@ -13,6 +13,7 @@ whatDay today_of_week; // 오늘의 요일
 void calculate_second_per_day();
 void test_custom_schedule();
 void map_button_on_click_listener_func(object_t *o);
+void move(int *pdx, int *pdy);
 
 schedule customSchedule; // to test
 
@@ -116,7 +117,7 @@ int scene_4_init() {
 	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
 	parse_graph(myGraph);
 	vertex_object_starting = Stack.counter;
-	register_button_to_vertex(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
+	make_vertex_objects(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
 
 	// ------------------------------------
 	// graph test
@@ -149,7 +150,11 @@ int scene_4_init() {
 	Stack.objs[current_state].enable = true;
 	*/
 	
-	set_player_position_to_vertex(&player, 1);
+	set_player_position_to_vertex(&player, 2);
+
+	int dx = -400;
+	int dy = -1200;
+	move(&dx, &dy);
 
 	return 0;
 }
@@ -205,6 +210,52 @@ void setting()
 			
 		}
 	}
+}
+void move(int *pdx, int *pdy) {
+	int prev_map_x = (*map).pos.x;
+	int prev_map_y = (*map).pos.y;
+
+	(*map).pos.x += *pdx;
+	(*map).pos.y += *pdy;
+
+	if ((*map).pos.x > 0) {
+		(*map).pos.x = 0;
+		*pdx = 0 - prev_map_x;
+	}
+	if ((*map).pos.y > 0) {
+		(*map).pos.y = 0;
+		*pdy = 0 - prev_map_y;
+	}
+
+	if ((*map).pos.x < SCREEN_W - map->rect.width) {
+		(*map).pos.x = SCREEN_W - map->rect.width;
+		*pdx = SCREEN_W - map->rect.width - prev_map_x;
+	}
+	if ((*map).pos.y < SCREEN_H - map->rect.height) {
+		(*map).pos.y = SCREEN_H - map->rect.height;
+		*pdy = SCREEN_H - map->rect.height - prev_map_y;
+	}
+
+	int dx = *pdx;
+	int dy = *pdy;
+
+	for (int i = 0; i < myGraph->Num_of_Vertex; i++)
+	{
+		(map_button_ptr[i])->pos.x += dx;
+		(map_button_ptr[i])->pos.y += dy;
+		(map_button_ptr[i])->rect.left += dx;
+		(map_button_ptr[i])->rect.top += dy;
+
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		player.image[i]->pos.x += dx;
+		player.image[i]->pos.y += dy;
+		player.image[i]->rect.left += dx;
+		player.image[i]->rect.top += dy;
+	}
+
 }
 
 int scene_4_update() {
@@ -287,28 +338,14 @@ int scene_4_update() {
 		int x = state.x;
 		int y = state.y;
 
-		(*map).pos.x += (x - pre_mouse_x);
-		(*map).pos.y += (y - pre_mouse_y);
+		int dx = (x - pre_mouse_x);
+		int dy = (y - pre_mouse_y);
 
-		for (int i = 0; i < myGraph->Num_of_Vertex; i++)
-		{
-			(map_button_ptr[i])->pos.x += (x - pre_mouse_x);
-			(map_button_ptr[i])->pos.y += (y - pre_mouse_y);
-			(map_button_ptr[i])->rect.left += (x - pre_mouse_x);
-			(map_button_ptr[i])->rect.top += (y - pre_mouse_y);
+		move(&dx, &dy);
 
-		}
+		pre_mouse_x += dx;
+		pre_mouse_y += dy;
 
-		for (int i = 0; i < 4; i++)
-		{
-			player.image[i]->pos.x += (x - pre_mouse_x);
-			player.image[i]->pos.y += (y - pre_mouse_y);
-			player.image[i]->rect.left += (x - pre_mouse_x);
-			player.image[i]->rect.top += (y - pre_mouse_y);
-		}
-		
-		pre_mouse_x = x;
-		pre_mouse_y = y;
 	}
 	else
 	{
@@ -400,8 +437,18 @@ void selected2(object_t *o)
 
 void map_button_on_click_listener_func(object_t *o)
 {
-	printf("enter!");
-	player.is_moving_now = true;
-	player.next_point = o - &Stack.objs[vertex_object_starting];
-	printf("start: %d, end: %d", player.curr_point, player.next_point);
+	if (player.is_moving_now)
+		return;
+	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
+	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
+	for (int i = 0; i < myGraph->Num_of_Edge * 2; i++)
+	{
+		edge e = myGraph->edgeArray[i];
+		if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == clicked_vertex_idx)
+		{
+			player.is_moving_now = true;
+			player.next_point = clicked_vertex_idx;
+			break;
+		}
+	}
 }

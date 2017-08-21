@@ -1,12 +1,17 @@
 #include"engine.h"
 #include"graph_structure.h"
+#include "graph_manage.h"
 //----------------------------------         //
 //Button, map moving setting By hasu & minkyu//
 //----------------------------------         //
 
 extern void map_button_on_click_listener_func(object_t *o);
-int compare(const void *a, const void *b);
-void print_graph(Graph_structure* target);
+static int graph_edge_argcompare_totalorder(const void *a, const void *b);
+static int graph_edge_argcompare_firstonly(const void *a, const void *b);
+static int graph_edge_refcompare_totalorder(const void *a, const void *b);
+static int graph_edge_refcompare_firstonly(const void *a, const void *b);
+
+static Graph_structure *current_graph;
 
 void parse_graph(Graph_structure* result) {
 	int vertex_count;
@@ -50,18 +55,29 @@ void parse_graph(Graph_structure* result) {
 		result->edgeArray[i].vertexindex_1 = ver1;
 		result->edgeArray[i].vertexindex_2 = ver2;
 		result->edgeArray[i].length = length;
+		result->edgeArray[i].reversed = false;
 		result->edgeArray[i + edge_count].vertexindex_1 = ver2;
 		result->edgeArray[i + edge_count].vertexindex_2 = ver1;
 		result->edgeArray[i + edge_count].length = length;
+		result->edgeArray[i].reversed = true;
 	}
-	qsort((result->edgeArray), 2 * edge_count, sizeof(edge), compare);
-	
+
+	result->edges_sorted_args = malloc(sizeof(int) * edge_count * 2);
+	for (int i = 0; i < edge_count * 2; i++) {
+		result->edges_sorted_args[i] = i;
+	}
+	current_graph = result;
+	qsort(result->edges_sorted_args, 2 * edge_count, sizeof(int), graph_edge_argcompare_totalorder);
+	current_graph = NULL;
 }
 
-int compare(const void *a, const void *b)    // 오름차순 비교 함수 구현
+int graph_edge_argcompare_totalorder(const void *a, const void *b)
 {
-	edge num1 = *(edge *)a;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
-	edge num2 = *(edge *)b;    // void 포인터를 int 포인터로 변환한 뒤 역참조하여 값을 가져옴
+	int i = *(int *)a;
+	int j = *(int *)b;
+
+	edge num1 = current_graph->edgeArray[i];
+	edge num2 = current_graph->edgeArray[j];
 
 	if (num1.vertexindex_1 != num2.vertexindex_1) {
 		return num1.vertexindex_1 - num2.vertexindex_1;
@@ -71,12 +87,53 @@ int compare(const void *a, const void *b)    // 오름차순 비교 함수 구현
 	}
 }
 
+int graph_edge_argcompare_firstonly(const void *a, const void *b)
+{
+	int i = *(int *)a;
+	int j = *(int *)b;
+
+	edge num1 = current_graph->edgeArray[i];
+	edge num2 = current_graph->edgeArray[j];
+
+	return num1.vertexindex_1 - num2.vertexindex_1;
+}
+
+int graph_edge_refcompare_totalorder(const void *a, const void *b)
+{
+	int i = *(int *)a;
+	int j = *(int *)b;
+
+	edge num1 = current_graph->edgeArray[current_graph->edges_sorted_args[i]];
+	edge num2 = current_graph->edgeArray[current_graph->edges_sorted_args[j]];
+
+	printf("num1: %d %d\n", num1.vertexindex_1, num1.vertexindex_2);
+	printf("num2: %d %d\n", num2.vertexindex_1, num2.vertexindex_2);
+
+	if (num1.vertexindex_1 != num2.vertexindex_1) {
+		return num1.vertexindex_1 - num2.vertexindex_1;
+	}
+	else {
+		return num1.vertexindex_2 - num2.vertexindex_2;
+	}
+}
+
+int graph_edge_refcompare_firstonly(const void *a, const void *b)
+{
+	int i = *(int *)a;
+	int j = *(int *)b;
+
+	edge num1 = current_graph->edgeArray[current_graph->edges_sorted_args[i]];
+	edge num2 = current_graph->edgeArray[current_graph->edges_sorted_args[j]];
+
+	return num1.vertexindex_1 - num2.vertexindex_1;
+}
+
 void free_graph_structure(Graph_structure* target) {
 	free(target->edgeArray);
 	free(target->vertexArray);
 }
 
-void register_button_to_vertex(Graph_structure* target, object_t*** map_button_ptr) { // vertex 갯수만큼 stack 오름
+void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { // vertex 갯수만큼 stack 오름
 	*map_button_ptr = (object_t**)malloc(sizeof(object_t *) * target->Num_of_Vertex);
 	for (int i = 0; i < target->Num_of_Vertex; i++)
 	{
@@ -93,9 +150,12 @@ void print_graph(Graph_structure* target) {
 		printf("%d %d \n", target->vertexArray[i].loc.x, target->vertexArray[i].loc.y);
 	}
 	printf("\n");
-	for (int i = 0; i < target->Num_of_Edge; i++) {
-		printf("%d %d %d\n", target->edgeArray[i].vertexindex_1, target->edgeArray[i].vertexindex_2, target->edgeArray[i].length);
+	for (int i = 0; i < target->Num_of_Edge * 2; i++) {
+		if (target->edgeArray[target->edges_sorted_args[i]].vertexindex_1 == 104 && target->edgeArray[target->edges_sorted_args[i]].vertexindex_2 == 103)
+		{
+			printf("*** %d %d %d\n", i, target->edges_sorted_args[i], 254);
+		}
+		printf("%d %d %d\n", target->edgeArray[target->edges_sorted_args[i]].vertexindex_1, target->edgeArray[target->edges_sorted_args[i]].vertexindex_2, target->edgeArray[target->edges_sorted_args[i]].length);
 	}
-	printf("\n");
 }
 
