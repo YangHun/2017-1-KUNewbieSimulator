@@ -23,9 +23,10 @@ schedule customSchedule; // to test
 // ------------------------------------
 event_function stochastic_event_func[STO_EVENTCOUNT];
 event_function sequencial_event_func[SEQ_EVENTCOUNT];
-int event_sandclock = 0;
+event_function special_event_func[SPE_EVENTCOUNT];
 ALLEGRO_TIMER* event_timer;
 int event_timer_clock = 0;
+bool event_waiting = false;
 
 void selected1(object_t *o);
 void selected2(object_t *o);
@@ -45,8 +46,6 @@ bool clicked_mouse = false;
 bool move_map = false;
 int pre_x = 0, pre_y = 0;
 int pre_mouse_x = 0, pre_mouse_y = 0;
-//int map_button_startnum = 0;
-
 Coord_2D start_point, end_point;
 
 double nowx, nowy;
@@ -75,6 +74,7 @@ typedef struct character {
 Character player;
 
 static int vertex_object_starting;
+int yes_or_no_UI_starting = 0;
 
 void set_player_position_to_vertex(Character* chr, int index);
 
@@ -148,7 +148,7 @@ int scene_4_init() {
 	for (i = 0; i < 4; i++) {
 		player.image[i] = &Stack.objs[Stack.counter - 4 + i];
 		player.image[i]->enable = false;
-	} // 171 + (# of edges) +  0, 1, 2, 3
+	} // 171 + (# of edges) +  0, 1, 2, 3 (current : ~177)
 
 	
 #define VERTICE myGraph->Num_of_Vertex
@@ -169,9 +169,28 @@ int scene_4_init() {
 	// ------------------------------------
 	// event setting
 	// ------------------------------------
-	init_event(stochastic_event_func, sequencial_event_func);
+	
+	init_event(stochastic_event_func, sequencial_event_func, special_event_func);
 	event_timer = al_create_timer(1.0 / 1000);
 	al_start_timer(event_timer);
+	
+	yes_or_no_UI_starting = Stack.counter;
+
+	Stack.push(&Stack, create_object("Resources\\UI\\tutorial\\allblack.png", 0, 18));
+	Stack.push(&Stack, create_object("Resources\\UI\\tutorial\\kakaotalk.png", 365, 210));
+	object_t yes_button = create_object("Resources\\UI\\tutorial\\yes_button.png", 365, 380); 
+	object_t no_button = create_object("Resources\\UI\\tutorial\\no_button.png", 640, 380);
+	
+	ui_set_button(&yes_button);
+	ui_set_button(&no_button);
+
+	Stack.push(&Stack, yes_button);
+	Stack.push(&Stack, no_button);  // (current : 178 + 0 1 2 3 = 181)
+
+	for (i = 0; i < 4; i++) {
+		Stack.objs[Stack.counter - 4 + i].enable = false;
+	}
+
 	return 0;
 }
 
@@ -308,24 +327,44 @@ int scene_4_update() {
 	// ------------------------------------
 	// Event Managing
 	// ------------------------------------
-#define EVENT_TIME_INTERVAL 10
+
+	
+#define EVENT_TIME_INTERVAL 5
 	if (al_get_timer_count(event_timer) - event_timer_clock > (EVENT_TIME_INTERVAL * 1000)) {
 		event_timer_clock = al_get_timer_count(event_timer);
+		/*
 		for (int i = 0; i < SEQ_EVENTCOUNT; i++) {
 			if (sequencial_event_func[i].isStarted == false) {
+				al_set_timer_count(event_timer, 0);
 				al_stop_timer(maingame_timer);
 				al_stop_timer(event_timer);
 				sequencial_event_func[i].func();
-				al_resume_timer(maingame_timer);
-				al_set_timer_count(event_timer, 0);
-				al_start_timer(event_timer);
-				event_timer_clock = 0;
 				sequencial_event_func[i].isStarted = true;
+				
 				break;
 			}
 		}
+		*/
+		if (sequencial_event_func[0].isStarted == false) {
+			al_set_timer_count(event_timer, 0);
+			al_stop_timer(maingame_timer);
+			al_stop_timer(event_timer);
+			sequencial_event_func[0].func();
+			sequencial_event_func[0].isStarted = true;
+		}
 	}
 
+	if (event_waiting) {
+		al_resume_timer(maingame_timer);
+		al_start_timer(event_timer);
+		event_timer_clock = 0;
+		for (int i = 0; i < 4; i++) {
+			Stack.objs[Stack.counter - 4 + i].enable = false;
+		}
+		event_waiting = false;
+
+	}
+	
 	if (!player.is_moving_now) {
 		if (al_get_timer_count(timer) - chr_timer_set>500) {
 			chr_timer_set = al_get_timer_count(timer);

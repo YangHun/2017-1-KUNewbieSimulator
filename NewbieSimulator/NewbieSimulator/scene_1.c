@@ -124,9 +124,6 @@ int scene_1_init(){
 	Stack.push(&Stack, sp);
 
 
-	
-
-
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
 
 	character[0] = create_object("Resources\\Sprites\\tuto_0.png", spritex, spritey);
