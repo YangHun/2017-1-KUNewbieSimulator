@@ -450,7 +450,7 @@ int scene_4_update() {
 		al_start_timer(event_timer);
 		event_timer_clock = 0;
 		for (int i = 0; i < 3; i++) {
-			Stack.objs[Stack.counter - 3 + i].enable = false;
+			Stack.objs[yes_or_no_UI_starting + i].enable = false;
 		}
 		event_choose = false;
 
