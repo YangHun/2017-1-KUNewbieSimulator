@@ -63,6 +63,9 @@ double x_velocity, y_velocity;
 ALLEGRO_TIMER *timer;
 int chr_timer_set = 0;
 ALLEGRO_EVENT_QUEUE *event_queue;
+ALLEGRO_CONFIG *conf;
+
+char hp_str[10], sp_str[10];
 
 //object_t player[4];
 
@@ -123,6 +126,8 @@ int scene_4_init() {
 	today_Month = 3;
 	week_count = 1;
 	test_custom_schedule();
+
+	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	/*
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
@@ -169,7 +174,7 @@ int scene_4_init() {
 #define VERTICE myGraph->Num_of_Vertex
 #define EDGES myGraph->Num_of_Edge
 //#define EDGES 0
-#define CHARACTER 3
+//#define CHARACTER 4
 /*
 	current_state = VERTICE + EDGES + CHARACTER + 1;
 	Stack.objs[current_state].enable = true;
@@ -217,6 +222,32 @@ int scene_4_init() {
 			eo->color = al_map_rgb(255, 0, 0);
 		}
 	}
+
+	// ----------------------------------
+	// STAT WINDOW DARWING
+	// ----------------------------------
+	object_t stat_window = create_object("Resources\\UI\\routegame\\stat_window.png", 0, 0);
+	Stack.push(&Stack, stat_window);
+
+	object_t health = create_object(NULL, 60, 150);
+	ui_set_text(&health, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "health"), 24);
+	Stack.push(&Stack, health);
+	object_t sociality = create_object(NULL, 60, 190);
+	ui_set_text(&sociality, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "sociality"), 24);
+	Stack.push(&Stack, sociality);
+	object_t attend = create_object(NULL, 60, 230);
+	ui_set_text(&attend, al_map_rgb(0, 0, 0), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, al_get_config_value(conf, "korean", "attend"), 24);
+	Stack.push(&Stack, attend);
+
+	object_t hp = create_object(NULL, 240, 150);
+	sprintf(hp_str, "%0.1f", health_point / 10.0);
+	ui_set_text(&hp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
+	Stack.push(&Stack, hp);
+
+	object_t sp = create_object(NULL, 240, 190);
+	sprintf(sp_str, "%0.1f", social_point / 10.0);
+	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
+	Stack.push(&Stack, sp);
 
 	return 0;
 }

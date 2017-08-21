@@ -2,18 +2,24 @@
 #include "event_structure.h"
 #include "data.h"
 
-static void click_yes(object_t* o);
-static void click_no(object_t* o);
-
-void init_sto_event(event_function sto_event_func[]);
-void init_seq_event(event_function seq_event_func[]);
-void init_spe_event(event_function spe_event_func[]);
 static void gaechong_0();
 static void shin_ip_daemyun_1();
 static void gohak_daemyun_2();
 static void sabal_3();
 static void ung_ti_4();
 static void hap_ung_5();
+static void Dongbak_6();
+static void running418_7();
+static void Daedongjae_Jujum_8();
+static void Ipselenti_performance_9();
+static void Jongchong_10();
+static void click_yes(object_t* o);
+static void click_no(object_t* o);
+
+void init_sto_event(event_function sto_event_func[]);
+void init_seq_event(event_function seq_event_func[]);
+void init_spe_event(event_function spe_event_func[]);
+
 
 extern int yes_or_no_UI_starting;
 extern bool event_choose;
@@ -60,16 +66,16 @@ int trigger_sequencial_event(int month, whatDay day_of_week, int week, event_fun
 			event_func[7].isStarted = true;
 		break;
 		case 534:
+			event_func[8].func();
+			event_func[8].isStarted = true;
+		break;
+		case 544:
 			event_func[9].func();
 			event_func[9].isStarted = true;
 		break;
-		case 544:
+		case 642:
 			event_func[10].func();
 			event_func[10].isStarted = true;
-		break;
-		case 642:
-			event_func[12].func();
-			event_func[12].isStarted = true;
 		break;
 	default:
 		return 0;
@@ -84,14 +90,18 @@ void init_sto_event(event_function sto_event_func[]) {
 		sto_event_func[i].isStarted = false;
 	}
 }
-void init_seq_event(event_function seq_event_func[]) { // 8과 11은 현재 보류 - 중간 기말
+void init_seq_event(event_function seq_event_func[]) {
 	seq_event_func[0].func = gaechong_0;
 	seq_event_func[1].func = shin_ip_daemyun_1;
 	seq_event_func[2].func = gohak_daemyun_2;
 	seq_event_func[3].func = sabal_3;
 	seq_event_func[4].func = ung_ti_4;
 	seq_event_func[5].func = hap_ung_5;
-
+	seq_event_func[6].func = Dongbak_6;
+	seq_event_func[7].func = running418_7;
+	seq_event_func[8].func = Daedongjae_Jujum_8;
+	seq_event_func[9].func = Ipselenti_performance_9;
+	seq_event_func[10].func = Jongchong_10;
 	for (int i = 0; i < SEQ_EVENTCOUNT; i++) {
 		seq_event_func[i].isStarted = false;
 	}
@@ -124,7 +134,7 @@ void gaechong_0() {
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
-void shin_ip_daemyun_1() { 
+void shin_ip_daemyun_1() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "shinip daemyun";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "shinip daemyun";
 	for (int i = 0; i < 3; i++) {
@@ -134,7 +144,7 @@ void shin_ip_daemyun_1() {
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
-void gohak_daemyun_2() { 
+void gohak_daemyun_2() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "gohak daemyun";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "gohak daemyun";
 	for (int i = 0; i < 3; i++) {
@@ -144,7 +154,7 @@ void gohak_daemyun_2() {
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
-void sabal_3() { 
+void sabal_3() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "sabal";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "sabal";
 	for (int i = 0; i < 3; i++) {
@@ -174,9 +184,59 @@ void hap_ung_5() { // 기본적인 형태
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
+void Dongbak_6() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Dongbak";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Dongbak";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
+void running418_7() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "running";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "running";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
+void Daedongjae_Jujum_8() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Daedongjae_Jujum";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Daedongjae_Jujum";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
+void Ipselenti_performance_9() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Ipselenti_performance";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Ipselenti_performance";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
+void Jongchong_10() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Jongchong";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Jongchong";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
 void click_yes(object_t* o) {
 	event_choose = true;
-	char compareText[20] = "";
+	char compareText[40] = "";
 	strcpy(compareText, o->modifier.value.font_value.text);
 	o->modifier.value.font_value.text = "";
 	
@@ -216,17 +276,43 @@ void click_yes(object_t* o) {
 			health_point -= 2;
 			return;
 		}
+		cases("Dongbak") {
+			printf("Dongbak yes \n");
+			social_point += 0.3;
+			health_point -= 0.3;
+			return;
+		}
+		cases("running") {
+			printf("running yes \n");
+			social_point += 0.8;
+			health_point -= 1;
+			return;
+		}
+		cases("Daedongjae_Jujum") {
+			printf("Daedongjae_Jujum yes \n");
+			social_point += 1.5;
+			health_point -= 0.5;
+			return;
+		}
+		cases("Ipselenti_performance") {
+			printf("Ipselenti_performance yes \n");
+			social_point += 1.5;
+			health_point -= 1;
+			return;
+		}
+		cases("Jongchong") {
+			printf("Jongchong yes \n");
+			social_point += 2;
+			health_point -= 0.5;
+			return;
+		}
 		defaults
-
 	} switchs_end;
-	
-	
 }
 
 void click_no(object_t* o) {
-
 	event_choose = true;
-	char compareText[20] = "";
+	char compareText[40] = "";
 	strcpy(compareText, o->modifier.value.font_value.text);
 	o->modifier.value.font_value.text = "";
 
@@ -258,6 +344,30 @@ void click_no(object_t* o) {
 		cases("hapung") {
 			printf("hapung no \n");
 			social_point -= 2;
+			return;
+		}
+		cases("Dongbak") {
+			printf("Dongbak no \n");
+			social_point -= 0.5;
+			return;
+		}
+		cases("running") {
+			printf("running no \n");
+			return;
+		}
+		cases("Daedongjae_Jujum") {
+			printf("Daedongjae_Jujum no \n");
+			social_point -= 1;
+			return;
+		}
+		cases("Ipselenti_performance") {
+			printf("Ipselenti_performance no \n");
+			social_point -= 2;
+			return;
+		}
+		cases("Jongchong") {
+			printf("Jongchong no \n");
+			social_point -= 0.5;
 			return;
 		}
 		defaults
