@@ -167,9 +167,14 @@ void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { 
 		const char *paths[VERTEX_TYPE_ECOUNT] = {
 			"Resources\\UI\\routegame\\v_default.png",
 			"Resources\\UI\\routegame\\v_building.png",
-			"Resources\\UI\\routegame\\v_busroute.png",
+			"Resources\\UI\\routegame\\v_busstop.png",
 		};
-		object_t temp = create_object(paths[v->type], v->loc.x - 15, v->loc.y - 15);
+		const char *path = paths[v->type];
+		if (v->type == VERTEX_TYPE_BUSROUTE && strcmp(v->name, "", 1) == 0)
+		{
+			path = paths[VERTEX_TYPE_NONE];
+		}
+		object_t temp = create_object(path, v->loc.x - 15, v->loc.y - 15);
 		ui_set_button(&temp);
 		ui_set_on_click_listener(&temp, map_button_on_click_listener_func);
 		Stack.push(&Stack, temp);
