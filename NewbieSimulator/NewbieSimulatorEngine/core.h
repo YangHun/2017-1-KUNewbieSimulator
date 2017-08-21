@@ -49,7 +49,8 @@ enum object_modifier_type_t {
 	OBJECT_MODIFIER_BUTTON,
 	OBJECT_MODIFIER_FONT,
 	OBJECT_MODIFIER_SCROLLBAR,
-	OBJECT_MODIFIER_SCROLLBAR_CHILD
+	OBJECT_MODIFIER_SCROLLBAR_CHILD,
+	OBJECT_MODIFIER_LINE,
 };
 
 struct object_modifier_t;
@@ -80,6 +81,13 @@ struct object_modifier_t {
 			object_t *button_top;
 			object_t *button_bottom;
 		}scrollbar;
+		struct {
+			float x1;
+			float y1;
+			float x2;
+			float y2;
+			float thickness;
+		}line;
 	} value;
 };
 
@@ -214,6 +222,7 @@ extern int state_num;
 
 object_t create_object(char* imgpath, float x, float y);
 object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float top, float left);
+object_t create_line_object(ALLEGRO_COLOR c, float x1, float y1, float x2, float y2, float thickness);
 
 void rotate_object(object_t* obj, float angle);
 void enable_object(object_t*obj, bool b);

@@ -274,6 +274,16 @@ void engine_draw_objs() {
 			else if (o->modifier.type == OBJECT_MODIFIER_SCROLLBAR_CHILD) {
 				// do nothing
 			}
+			else if (o->modifier.type == OBJECT_MODIFIER_LINE) {
+				float x1, x2, y1, y2, t;
+				x1 = o->modifier.value.line.x1;
+				y1 = o->modifier.value.line.y1;
+				x2 = o->modifier.value.line.x2;
+				y2 = o->modifier.value.line.y2;
+				t = o->modifier.value.line.thickness;
+
+				al_draw_line(x1, y1, x2, y2, o->color, t);
+			}
 			else{
 				if (o->image == NULL) {
 					al_draw_filled_rectangle(o->pos.x, o->pos.y, o->pos.x + o->rect.width, o->pos.y + o->rect.height, o->color);
