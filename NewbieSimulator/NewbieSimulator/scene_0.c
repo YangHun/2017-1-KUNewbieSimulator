@@ -9,6 +9,11 @@ int scene_0_init() {
 
 	object_t bg = create_object("Resources\\dummy\\main.jpg", 0, 0);
 	Background = bg;
+
+	object_t button = create_object("Resources\\UI\\splash\\start_button.png", 1117, 567);
+	ui_set_button(&button);
+	ui_set_on_click_listener(&button, on_click_button_0);
+	Stack.push(&Stack, button);
 	
 //	object_t scrollbar = create_object("Resources\\dummy\\scroller\\object.png", 150, 150);
 //	Stack.push(&Stack, scrollbar);
