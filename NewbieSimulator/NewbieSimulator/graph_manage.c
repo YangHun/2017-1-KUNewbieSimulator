@@ -15,7 +15,7 @@ static Graph_structure *current_graph;
 
 void parse_graph(Graph_structure* result) {
 	int vertex_count;
-	int vertex_name;
+	int vertex_name_count;
 	int edge_count;
 	int ver1, ver2;
 	float length;
@@ -38,11 +38,26 @@ void parse_graph(Graph_structure* result) {
 	}
 
 
-	fscanf(map_location, "%d", &vertex_name);
-	for (int i = 0; i < vertex_name; i++)
+	fscanf(map_location, "%d", &vertex_name_count);
+	for (int i = 0; i < vertex_name_count; i++)
 	{
 		int n = 0;
-		fscanf(map_location, "%d %s", &n, &result->vertexArray[n].name);
+		char buf[64];
+		vertex *v = &result->vertexArray[i];
+		fscanf(map_location, "%d %s", &n, buf);
+
+		if (strncmp(buf, "b/", 2) == 0) {
+			v->type = VERTEX_TYPE_BUILDING;
+			strncpy(v->name, buf + 2, strlen(buf) - 2);
+		}
+		else if (strncmp(buf, "br/", 3) == 0) {
+			v->type = VERTEX_TYPE_BUSROUTE;
+			int c = sscanf("%d", &v->value.as_busroute.id);
+			strncpy(v->name, buf + c + 4, strlen(buf) - c - 4);
+		}
+		else {
+			v->type = VERTEX_TYPE_NONE;
+		}
 	}
 
 	fscanf(map_location, "%d", &edge_count);

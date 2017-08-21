@@ -2,6 +2,12 @@
 
 #include <stdbool.h>
 
+typedef enum vertex_type{
+	VERTEX_TYPE_NONE,
+	VERTEX_TYPE_BUILDING,
+	VERTEX_TYPE_BUSROUTE,
+}vertex_type;
+
 typedef struct Coord_2D {
 	int x;
 	int y;
@@ -9,7 +15,13 @@ typedef struct Coord_2D {
 
 typedef struct vertex {
 	Coord_2D loc;
-	char name[10];
+	vertex_type type;
+	union {
+		struct {
+			int id;
+		} as_busroute;
+	} value;
+	char name[32];
 } vertex;
 
 typedef struct edge {
