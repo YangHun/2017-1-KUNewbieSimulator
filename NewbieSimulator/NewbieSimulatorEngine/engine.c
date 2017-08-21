@@ -168,18 +168,27 @@ void event_manage() {
 
 		if (positioni_equals(last_mouse_up_coord, cur_mouse_up_coord))
 			break;
+
+		int last_match_index = -1;
 		
 		for (int i = 0; i < Stack.counter; i++) {
 			object_t *o = &(Stack.objs[i]);
 			
 			if (o->enable == true) {
-				if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
+				if (o->blocks) {
 					if (rect_contains_point(o->rect, last_mouse_down_coord) && rect_contains_point(o->rect, cur_mouse_up_coord)) {
 						if (positionf_transparancy(o, last_mouse_down_coord) == true) {
-							o->modifier.value.button_value.on_click_listener(o);
+							last_match_index = i;
 						}
 					}
 				}
+			}
+		}
+
+		if (last_match_index != -1) {
+			object_t *o = &(Stack.objs[last_match_index]);
+			if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
+			o->modifier.value.button_value.on_click_listener(o);
 			}
 		}
 		

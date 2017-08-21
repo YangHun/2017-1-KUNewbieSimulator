@@ -3,6 +3,7 @@
 
 void ui_set_button(object_t *o) {
 	o->modifier.type = OBJECT_MODIFIER_BUTTON;
+	o->blocks = true;
 }
 
 void ui_set_on_click_listener(object_t *o, on_click_listener_t listener) {
