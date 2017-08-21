@@ -227,8 +227,6 @@ void rotate_object(object_t* obj, float angle) {
 
 	obj->angle += angle;
 	obj->rotated = true;
-
-	printf("%f %d", obj->angle, obj->rotated);
 }
 
 
