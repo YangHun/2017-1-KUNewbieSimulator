@@ -37,7 +37,7 @@ int trigger_sequencial_event(int month, whatDay day_of_week, int week, event_fun
 			event_func[0].func();
 			event_func[0].isStarted = true;
 		break;
-		case 312:
+		case 313:
 			event_func[1].func();
 			event_func[1].isStarted = true;
 		break;

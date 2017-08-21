@@ -31,7 +31,7 @@ event_function special_event_func[SPE_EVENTCOUNT];
 ALLEGRO_TIMER* event_timer;
 int event_timer_clock = 0;
 bool event_choose = false;
-
+bool is_seq_triggered;
 // ------------------------------------
 // stat
 // ------------------------------------
@@ -194,9 +194,8 @@ int scene_4_init() {
 	init_event(stochastic_event_func, sequencial_event_func, special_event_func);
 	event_timer = al_create_timer(1.0 / 1000);
 	al_start_timer(event_timer);
-	
+	is_seq_triggered = false;
 	yes_or_no_UI_starting = Stack.counter;
-
 	Stack.push(&Stack, create_object("Resources\\UI\\tutorial\\kakaotalk.png", 365, 210));
 	object_t yes_button = create_object("Resources\\UI\\tutorial\\yes_button.png", 365, 380); 
 	object_t no_button = create_object("Resources\\UI\\tutorial\\no_button.png", 640, 380);
@@ -249,6 +248,7 @@ int scene_4_init() {
 	sprintf(sp_str, "%0.1f", social_point / 10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	Stack.push(&Stack, sp);
+
 #define HP_TEXT Stack.objs[14]
 #define SP_TEXT Stack.objs[15]
 
@@ -369,6 +369,19 @@ int scene_4_update() {
 	int i;
 	//Scene 0의 Main문
 	//while문 안에 있다 --> 매 frame마다 실행됨
+	// ------------------------------------
+	// trigger sequencial event
+	// ------------------------------------
+	
+	if (!is_seq_triggered) {
+		int p = trigger_sequencial_event(today_Month, today_of_week, week_count, sequencial_event_func);
+		if (p == 1) {
+			al_set_timer_count(event_timer, 0);
+			al_stop_timer(maingame_timer);
+			al_stop_timer(event_timer);
+			is_seq_triggered = true;
+		}
+	}
 
 	// ------------------------------------
 	// Timebar running
@@ -410,18 +423,32 @@ int scene_4_update() {
 			today_day -= 31;
 			week_count = 1;
 		}
+		is_seq_triggered = false;
 		timebar_width = 0;
 		Stack.objs[2].rect.width = 0;
 		maingame_timer_set = 0;
-		printf("%d 월 %d 일 %d주 \n", today_Month, today_day, week_count);
+		printf("%d 월 %d 일 %d주 ", today_Month, today_day, week_count);
+		switch (today_of_week) {
+		case MON:
+			printf("월");
+			break;
+		case TUE:
+			printf("화");
+			break;
+		case WED:
+			printf("수");
+			break;
+		case THU:
+			printf("목");
+			break;
+		case FRI:
+			printf("금");
+			break;
+		}
+		printf("\n");
 		al_stop_timer(maingame_timer);
 		al_start_timer(maingame_timer);
-		int p = trigger_sequencial_event(today_Month, today_day, week_count, sequencial_event_func);
-		if (p == 1) {
-			al_set_timer_count(event_timer, 0);
-			al_stop_timer(maingame_timer);
-			al_stop_timer(event_timer);
-		}
+		
 	}
 
 	// ------------------------------------
@@ -447,7 +474,7 @@ int scene_4_update() {
 		*/
 		
 	}
-
+	
 	if (event_choose) {
 		stat_update();
 		al_resume_timer(maingame_timer);
