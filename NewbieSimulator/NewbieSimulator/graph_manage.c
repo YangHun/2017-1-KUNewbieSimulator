@@ -134,16 +134,13 @@ void free_graph_structure(Graph_structure* target) {
 }
 
 void make_edge_objects(Graph_structure* target) {
-	for (int i = 0; i < target->Num_of_Edge * 2; i++)
+	for (int i = 0; i < target->Num_of_Edge; i++)
 	{
 		edge e = target->edgeArray[i];
-		if (!e.reversed)
-		{
-			vertex *u = &target->vertexArray[e.vertexindex_1];
-			vertex *v = &target->vertexArray[e.vertexindex_2];
-			object_t o = create_line_object(al_map_rgb(0, 0, 0), u->loc.x, u->loc.y, v->loc.x, v->loc.y, 3.0);
-			Stack.push(&Stack, o);
-		}
+		vertex *u = &target->vertexArray[e.vertexindex_1];
+		vertex *v = &target->vertexArray[e.vertexindex_2];
+		object_t o = create_line_object(al_map_rgb(127, 127, 127), u->loc.x, u->loc.y, v->loc.x, v->loc.y, 5.0);
+		Stack.push(&Stack, o);
 	}
 }
 

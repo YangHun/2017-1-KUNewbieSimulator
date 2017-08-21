@@ -193,6 +193,19 @@ int scene_4_init() {
 		Stack.objs[Stack.counter - 3 + i].enable = false;
 	}
 
+	// initial graph edge coloring
+
+	for (int i = 0; i < myGraph->Num_of_Edge; i++)
+	{
+		edge e = myGraph->edgeArray[i];
+
+		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
+		{
+			object_t *eo = &Stack.objs[edge_object_starting + i];
+			eo->color = al_map_rgb(255, 0, 0);
+		}
+	}
+
 	return 0;
 }
 
@@ -391,7 +404,26 @@ int scene_4_update() {
 
 		
 		if (count >= speed) {
-			printf("reach the destination\n");
+
+			// reached destination
+
+			for (int i = 0; i < myGraph->Num_of_Edge; i++)
+			{
+				edge e = myGraph->edgeArray[i];
+
+				if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == player.next_point ||
+					e.vertexindex_2 == player.curr_point && e.vertexindex_1 == player.next_point)
+				{
+					object_t *eo = &Stack.objs[edge_object_starting + i];
+					eo->color = al_map_rgb(127, 127, 127);
+				}
+
+				if (e.vertexindex_1 == player.next_point || e.vertexindex_2 == player.next_point)
+				{
+					object_t *eo = &Stack.objs[edge_object_starting + i];
+					eo->color = al_map_rgb(255, 0, 0);
+				}
+			}
 			
 			player.is_moving_now = false;
 
@@ -530,14 +562,25 @@ void map_button_on_click_listener_func(object_t *o)
 		return;
 	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
 	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
-	for (int i = 0; i < myGraph->Num_of_Edge * 2; i++)
+	for (int i = 0; i < myGraph->Num_of_Edge; i++)
 	{
 		edge e = myGraph->edgeArray[i];
-		if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == clicked_vertex_idx)
+
+		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
+		{
+			object_t *eo = &Stack.objs[edge_object_starting + i];
+			eo->color = al_map_rgb(127, 127, 127);
+		}
+
+		if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == clicked_vertex_idx ||
+			e.vertexindex_2 == player.curr_point && e.vertexindex_1 == clicked_vertex_idx)
 		{
 			player.is_moving_now = true;
 			player.next_point = clicked_vertex_idx;
-			break;
+
+			object_t *eo = &Stack.objs[edge_object_starting + i];
+			eo->color = al_map_rgb(0, 0, 255);
 		}
 	}
+	re_draw();
 }
