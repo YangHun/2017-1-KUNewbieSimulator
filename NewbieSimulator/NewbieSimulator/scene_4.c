@@ -15,6 +15,9 @@ void calculate_second_per_day();
 void test_custom_schedule();
 void map_button_on_click_listener_func(object_t *o);
 void move(int *pdx, int *pdy);
+int today_Month;
+int today_day;
+int week_count;
 
 schedule customSchedule; // to test
 
@@ -27,6 +30,12 @@ event_function special_event_func[SPE_EVENTCOUNT];
 ALLEGRO_TIMER* event_timer;
 int event_timer_clock = 0;
 bool event_choose = false;
+
+// ------------------------------------
+// stat
+// ------------------------------------
+int attendance_rate;
+int grade_point;
 
 void selected1(object_t *o);
 void selected2(object_t *o);
@@ -110,6 +119,9 @@ int scene_4_init() {
 	// initial setting
 	// ------------------------------------
 	today_of_week = MON;
+	today_day = 2;
+	today_Month = 3;
+	week_count = 1;
 	test_custom_schedule();
 	/*
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
@@ -317,7 +329,7 @@ void move(int *pdx, int *pdy) {
 	}
 
 }
-
+#define TIMEBAR_MAX 1280
 int scene_4_update() {
 
 	int i;
@@ -330,23 +342,52 @@ int scene_4_update() {
 	
 	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
-		timebar_width += 1280 / (second_per_day[today_of_week] * 100.0);
+		timebar_width += 128000 / (second_per_day[today_of_week] * 100.0);
 		Stack.objs[2].rect.width = timebar_width + 5;
 	}
 	
-	if (Stack.objs[2].rect.width > 1280) {
+	if (Stack.objs[2].rect.width > TIMEBAR_MAX) {
 		if (today_of_week == FRI) {
 			today_of_week = MON;
+			today_day += 3;
+			week_count++;
 		}
 		else {
 			today_of_week++;
+			today_day++;
+		}
+		if (today_day >= 29 && today_Month == 2) {
+			today_Month++;
+			today_day -= 28;
+			week_count = 1;
+		}
+		if (today_day >= 31 && (today_Month == 4 || today_Month == 6 || today_Month == 9 || today_Month == 11)) {
+			today_Month++;
+			today_day -= 30;
+			week_count = 1;
+		}
+		if (today_day >= 32 && (today_Month == 1 || today_Month == 3 || today_Month == 5 || today_Month == 7 || today_Month == 8 || today_Month == 10 || today_Month == 12)) {
+			if (today_Month == 12) {
+				today_Month = 1;
+			}
+			else {
+				today_Month++;
+			}
+			today_day -= 31;
+			week_count = 1;
 		}
 		timebar_width = 0;
 		Stack.objs[2].rect.width = 0;
 		maingame_timer_set = 0;
-
+		printf("%d ø˘ %d ¿œ %d¡÷ \n", today_Month, today_day, week_count);
 		al_stop_timer(maingame_timer);
 		al_start_timer(maingame_timer);
+		int p = trigger_sequencial_event(today_Month, today_day, week_count, sequencial_event_func);
+		if (p == 1) {
+			al_set_timer_count(event_timer, 0);
+			al_stop_timer(maingame_timer);
+			al_stop_timer(event_timer);
+		}
 	}
 
 	// ------------------------------------
@@ -370,13 +411,7 @@ int scene_4_update() {
 			}
 		}
 		*/
-		if (sequencial_event_func[0].isStarted == false) {
-			al_set_timer_count(event_timer, 0);
-			al_stop_timer(maingame_timer);
-			al_stop_timer(event_timer);
-			sequencial_event_func[0].func();
-			sequencial_event_func[0].isStarted = true;
-		}
+		
 	}
 
 	if (event_choose) {
