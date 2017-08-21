@@ -1,6 +1,6 @@
 #pragma once
 #include "event_structure.h"
-
+#include "data.h"
 static void sto_event_dummy0();
 static void sto_event_dummy1();
 static void sto_event_dummy2();
