@@ -18,6 +18,7 @@ void move(int *pdx, int *pdy);
 int today_Month;
 int today_day;
 int week_count;
+void stat_update();
 
 schedule customSchedule; // to test
 
@@ -248,6 +249,8 @@ int scene_4_init() {
 	sprintf(sp_str, "%0.1f", social_point / 10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	Stack.push(&Stack, sp);
+#define HP_TEXT Stack.objs[14]
+#define SP_TEXT Stack.objs[15]
 
 	return 0;
 }
@@ -446,6 +449,7 @@ int scene_4_update() {
 	}
 
 	if (event_choose) {
+		stat_update();
 		al_resume_timer(maingame_timer);
 		al_start_timer(event_timer);
 		event_timer_clock = 0;
@@ -649,4 +653,12 @@ void map_button_on_click_listener_func(object_t *o)
 		}
 	}
 	re_draw();
+}
+
+void stat_update()
+{
+	sprintf(sp_str, "%0.1f", social_point / 10.0);
+	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
+	sprintf(hp_str, "%0.1f", health_point / 10.0);
+	ui_set_text(&HP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
 }

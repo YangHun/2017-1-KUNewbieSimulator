@@ -373,6 +373,4 @@ void click_no(object_t* o) {
 		defaults
 
 	} switchs_end;
-
-
 }

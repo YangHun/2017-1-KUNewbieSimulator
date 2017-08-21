@@ -32,8 +32,8 @@ int explain_stat = 0;
 
 int spritex = 640, spritey = 360; 
 
-int health_point = 0;
-	int social_point = 0;
+float health_point = 10.0;
+float social_point = 0.0;
 char hpstr[10], spstr[10];
 
 int dir = 0, img = 0;
@@ -56,8 +56,8 @@ int event_num = 0;
 void clicked_yes(object_t *o);
 void clicked_no(object_t *o);
 
-#define HP_TEXT Stack.objs[5]
-#define SP_TEXT Stack.objs[6]
+#define HP_TEXT Stack.objs[7]
+#define SP_TEXT Stack.objs[8]
 
 #define timeline Stack.objs[2]
 #define timebar Stack.objs[3]
@@ -272,8 +272,8 @@ int scene_1_update() {
 	}
 
 
-#define EVENT_TIME 20
-	if (al_get_timer_count(event_timer) - event_timer_set > (EVENT_TIME*1000)) {
+#define EVENT_TIME 2////	FOR TEST!!!!!	2->20
+	if (al_get_timer_count(event_timer) - event_timer_set > (EVENT_TIME*1000)) { 
 		printf("timer : %lld\n", al_get_timer_count(event_timer));
 		event_timer_set = al_get_timer_count(event_timer);
 		for (event_num = 0; event_num < EVENTCOUNT; event_num++) {
