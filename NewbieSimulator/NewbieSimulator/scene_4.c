@@ -73,6 +73,7 @@ typedef struct character {
 
 Character player;
 
+static int edge_object_starting;
 static int vertex_object_starting;
 int yes_or_no_UI_starting = 0;
 
@@ -126,6 +127,7 @@ int scene_4_init() {
 
 	myGraph = (Graph_structure*)malloc(sizeof(Graph_structure));
 	parse_graph(myGraph);
+	edge_object_starting = Stack.counter;
 	make_edge_objects(myGraph);
 	vertex_object_starting = Stack.counter;
 	make_vertex_objects(myGraph, &map_button_ptr); // 9 ~ vertex캣수만큼 오름
@@ -153,8 +155,8 @@ int scene_4_init() {
 
 	
 #define VERTICE myGraph->Num_of_Vertex
-//#define EDGES 2*myGraph->Num_of_Edge
-#define EDGES 0
+#define EDGES myGraph->Num_of_Edge
+//#define EDGES 0
 #define CHARACTER 3
 /*
 	current_state = VERTICE + EDGES + CHARACTER + 1;
@@ -273,6 +275,16 @@ void move(int *pdx, int *pdy) {
 
 	int dx = *pdx;
 	int dy = *pdy;
+
+	for (int i = 0; i < myGraph->Num_of_Edge; i++)
+	{
+		object_t *o = &Stack.objs[edge_object_starting + i];
+		o->modifier.value.line.x1 += dx;
+		o->modifier.value.line.y1 += dy;
+		o->modifier.value.line.x2 += dx;
+		o->modifier.value.line.y2 += dy;
+
+	}
 
 	for (int i = 0; i < myGraph->Num_of_Vertex; i++)
 	{

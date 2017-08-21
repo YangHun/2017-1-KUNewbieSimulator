@@ -59,7 +59,7 @@ void parse_graph(Graph_structure* result) {
 		result->edgeArray[i + edge_count].vertexindex_1 = ver2;
 		result->edgeArray[i + edge_count].vertexindex_2 = ver1;
 		result->edgeArray[i + edge_count].length = length;
-		result->edgeArray[i].reversed = true;
+		result->edgeArray[i + edge_count].reversed = true;
 	}
 
 	result->edges_sorted_args = malloc(sizeof(int) * edge_count * 2);
@@ -139,7 +139,10 @@ void make_edge_objects(Graph_structure* target) {
 		edge e = target->edgeArray[i];
 		if (!e.reversed)
 		{
-			// TODO: create line objects
+			vertex *u = &target->vertexArray[e.vertexindex_1];
+			vertex *v = &target->vertexArray[e.vertexindex_2];
+			object_t o = create_line_object(al_map_rgb(0, 0, 0), u->loc.x, u->loc.y, v->loc.x, v->loc.y, 3.0);
+			Stack.push(&Stack, o);
 		}
 	}
 }
