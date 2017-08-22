@@ -359,7 +359,6 @@ void click_yes(object_t* o) {
 
 			int p = rand() & 1;
 			if (p) {
-				gyulseok
 			}
 			
 			return;
@@ -370,7 +369,6 @@ void click_yes(object_t* o) {
 			
 			int p = rand() & 1;
 			if (p) {
-				gyulseok
 			}
 
 			return;
@@ -382,7 +380,6 @@ void click_yes(object_t* o) {
 
 			int p = rand() & 1;
 			if (p) {
-				gyulseok
 			}
 
 			return;

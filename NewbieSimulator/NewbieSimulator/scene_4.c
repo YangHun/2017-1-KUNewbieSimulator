@@ -300,32 +300,32 @@ int scene_4_init() {
 
 	result_window_starting = Stack.counter;
 	object_t middle_result = create_object("Resources\\UI\\routegame\\middle_result.png", 0, 0);
-	//middle_result.enable = false;
+	middle_result.enable = false;
 	Stack.push(&Stack, middle_result);
 
-	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", 700, 570);
+	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", 740, 600);
 	ui_set_button(&continue_button);
 	ui_set_on_click_listener(&continue_button, letscontinue);
-	//continue_button.enable = false;
+	continue_button.enable = false;
 	Stack.push(&Stack, continue_button);
 	
 	object_t what_week_num = create_object(NULL, 490,140);
 	sprintf(weekstr, "%d     %d", today_Month, today_of_week);
 	ui_set_text(&what_week_num, al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
-	//what_week_num.enable = false;
+	what_week_num.enable = false;
 	Stack.push(&Stack, what_week_num);
 #define WEEKNUM Stack.objs[result_window_starting+2]
 	object_t what_week_hangel = create_object(NULL, 510, 140);
 	ui_set_text(&what_week_hangel, al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "whatweek"), 36);
-	//what_week_hangel.enable = false;
+	what_week_hangel.enable = false;
 	Stack.push(&Stack, what_week_hangel);
 
 	object_t hp_variation = create_object(NULL, 700, 196);
 	ui_set_text(&hp_variation, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, "+5.0", 24);
-	//hp_variation.enable = false;
+	hp_variation.enable = false;
 	Stack.push(&Stack, hp_variation);
 	object_t sp_variation = create_object(NULL, 700, 231);
-	//sp_variation.enable = false;
+	sp_variation.enable = false;
 	Stack.push(&Stack, sp_variation);
 #define HP_VAR Stack.objs[result_window_starting+4]
 #define SP_VAR Stack.objs[result_window_starting+5]
@@ -334,7 +334,7 @@ int scene_4_init() {
 	for (int i = 0; i < 6; i++) {
 		clsname[i] = create_object(NULL, 513, 304 + i * 20);
 		ui_set_text(&clsname[i], al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, "classname", 24);
-		//clsname[i].enable = false;
+		clsname[i].enable = false;
 		Stack.push(&Stack, clsname[i]);
 	}
 
@@ -343,7 +343,7 @@ int scene_4_init() {
 	object_t variation[6];
 	for (i = 0; i < 6; i++) {
 		variation[i] = create_object(NULL, 700, 304 + i * 20);
-		//variation[i].enable = false;
+		variation[i].enable = false;
 		Stack.push(&Stack, variation[i]);
 	}
 	printf("variation : %d\n", Stack.counter);
