@@ -111,6 +111,10 @@ int pre_week = 1;
 char weekstr[20];
 bool continue_clicked = false;
 
+char hpvar_str[10] = "", spvar_str[10] = "";
+char var[10];
+
+
 int scene_4_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -569,7 +573,7 @@ int scene_4_update() {
 			week_count = 1;
 		}
 
-		if (pre_week != week_count && test==false) {
+		if (pre_week != week_count) {
 			if (test==false) {
 				printf("enter\n");
 	//al_stop_timer(maingame_timer);
@@ -578,7 +582,7 @@ int scene_4_update() {
 				sprintf(weekstr, "%d     %d", today_Month, pre_week);
 				ui_set_text(&WEEKNUM, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
 
-				char hpvar_str[10]="", spvar_str[10]="";
+				
 
 				if (health_point - pre.hp > 0) {
 					sprintf(hpvar_str, "+%.1f", health_point - pre.hp);
@@ -605,7 +609,7 @@ int scene_4_update() {
 				ui_set_text(&SP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, spvar_str, 24);
 				
 				for (i = 0; i < 6; i++) {
-					char var[10];
+					
 					if (attendance_rate[i] - pre.atd_rate[i] != 0)
 						sprintf(var, "%.1f", attendance_rate[i] - pre.atd_rate[i]);
 					else strcpy(var, "+-0%");
