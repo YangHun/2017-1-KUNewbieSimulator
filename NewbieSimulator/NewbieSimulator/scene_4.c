@@ -74,6 +74,8 @@ ALLEGRO_CONFIG *conf_lecture;
 
 char hp_str[10], sp_str[10];
 
+bool test = false;
+
 //object_t player[4];
 
 typedef struct character {
@@ -101,11 +103,13 @@ void set_player_position_to_vertex(Character* chr, int index);
 void letscontinue();
 
 struct ability {
-	float pre_hp;
-	float pre_sp;
-};
-int pre_week;
+	float hp;
+	float sp;
+	float atd_rate[6];
+}pre;
+int pre_week = 1;
 char weekstr[20];
+bool continue_clicked = false;
 
 int scene_4_init() {
 
@@ -120,8 +124,6 @@ int scene_4_init() {
 	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\map.jpg", 0, 0));
 	map = &Stack.objs[Stack.counter - 1];
 
-	
-
 	// ------------------------------------
 	// initial setting
 	// ------------------------------------
@@ -135,16 +137,7 @@ int scene_4_init() {
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
-	/*
-	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
-	ui_set_button(&route1);
-	ui_set_on_click_listener(&route1, selected1);
-	Stack.push(&Stack, route1); // 7
-	object_t route2 = create_object("Resources\\UI\\routegame\\route2.png", 100, 200);
-	ui_set_button(&route2);
-	ui_set_on_click_listener(&route2, selected2);
-	Stack.push(&Stack, route2); // 8
-	*/
+
 	// ------------------------------------
 	// graph structure setting
 	// ------------------------------------
@@ -302,20 +295,59 @@ int scene_4_init() {
 	// Result Window
 
 	result_window_starting = Stack.counter;
-	object_t middle_result = create_object("Resources\\UI\\routegmae\\middle_result.png", 0, 0);
-	middle_result.enable = false;
+	object_t middle_result = create_object("Resources\\UI\\routegame\\middle_result.png", 0, 0);
+	//middle_result.enable = false;
 	Stack.push(&Stack, middle_result);
 
-	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", SCREEN_W / 2, 500);
+	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", 700, 570);
 	ui_set_button(&continue_button);
 	ui_set_on_click_listener(&continue_button, letscontinue);
-	continue_button.enable = false;
+	//continue_button.enable = false;
 	Stack.push(&Stack, continue_button);
 	
-	object_t what_week = create_object(NULL, 0, 0);
-	sprintf(weekstr, "%d %d", today_Month, today_of_week);
-	ui_set_text(&what_week, al_map_rgb(255, 255, 255), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 24);
-	Stack.push(&Stack, what_week);
+	object_t what_week_num = create_object(NULL, 490,140);
+	sprintf(weekstr, "%d     %d", today_Month, today_of_week);
+	ui_set_text(&what_week_num, al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
+	//what_week_num.enable = false;
+	Stack.push(&Stack, what_week_num);
+#define WEEKNUM Stack.objs[result_window_starting+2]
+	object_t what_week_hangel = create_object(NULL, 510, 140);
+	ui_set_text(&what_week_hangel, al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf, "korean", "whatweek"), 36);
+	//what_week_hangel.enable = false;
+	Stack.push(&Stack, what_week_hangel);
+
+	object_t hp_variation = create_object(NULL, 700, 196);
+	ui_set_text(&hp_variation, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, "+5.0", 24);
+	//hp_variation.enable = false;
+	Stack.push(&Stack, hp_variation);
+	object_t sp_variation = create_object(NULL, 700, 231);
+	//sp_variation.enable = false;
+	Stack.push(&Stack, sp_variation);
+#define HP_VAR Stack.objs[result_window_starting+4]
+#define SP_VAR Stack.objs[result_window_starting+5]
+
+	object_t clsname[6];
+	for (int i = 0; i < 6; i++) {
+		clsname[i] = create_object(NULL, 513, 304 + i * 20);
+		ui_set_text(&clsname[i], al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, "classname", 24);
+		//clsname[i].enable = false;
+		Stack.push(&Stack, clsname[i]);
+	}
+
+	printf("clsname : %d\n", Stack.counter);
+
+	object_t variation[6];
+	for (i = 0; i < 6; i++) {
+		variation[i] = create_object(NULL, 700, 304 + i * 20);
+		//variation[i].enable = false;
+		Stack.push(&Stack, variation[i]);
+	}
+	printf("variation : %d\n", Stack.counter);
+
+	pre.hp = 0.0;
+	pre.sp = 0.0;
+	for (i = 0; i < 6; i++)
+		pre.atd_rate[i] = 0.0;
 
 
 	// ------------------------------------
@@ -485,7 +517,7 @@ int scene_4_update() {
 	// ------------------------------------
 	// trigger sequencial event
 	// ------------------------------------
-	
+
 	if (!is_seq_triggered) {
 		int p = trigger_sequencial_event(today_Month, today_of_week, week_count, sequencial_event_func);
 		if (p == 1) {
@@ -537,10 +569,63 @@ int scene_4_update() {
 			week_count = 1;
 		}
 
-		if (pre_week != today_of_week) {
-			Stack.objs[result_window_starting].enable = true;
+		if (pre_week != week_count && test==false) {
+			if (test==false) {
+				printf("enter\n");
+	//al_stop_timer(maingame_timer);
+	//al_stop_timer(event_timer);
+
+				sprintf(weekstr, "%d     %d", today_Month, pre_week);
+				ui_set_text(&WEEKNUM, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
+
+				char hpvar_str[10]="", spvar_str[10]="";
+
+				if (health_point - pre.hp > 0) {
+					sprintf(hpvar_str, "+%.1f", health_point - pre.hp);
+					printf("print\n");
+				}
+				else if (health_point - pre.hp < 0)
+					//sprintf(hpvar_str, "%.1f", health_point - pre.hp);
+					strcpy(hpvar_str, "minus");
+				else strcpy(hpvar_str, "+-0%");
+
+				if (strcmp("+6.0", hpvar_str) == 0) printf("true\n");
+				else printf("false hpvar_str : %s", hpvar_str);
+
+				ui_set_text(&HP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, hpvar_str, 24);
+				printf("converted hpvar_str : %s\n",hpvar_str);
+
+				if (social_point - pre.sp != 0)
+					//sprintf(spvar_str, "%.1f", social_point - pre.sp);
+					strcpy(spvar_str, "plus");
+				else if (social_point - pre.sp < 0)
+					//sprintf(spvar_str, "%.1f", social_point - pre.sp);
+					strcpy(spvar_str, "minus");
+				else strcpy(spvar_str, "+-0%");
+				ui_set_text(&SP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, spvar_str, 24);
+				
+				for (i = 0; i < 6; i++) {
+					char var[10];
+					if (attendance_rate[i] - pre.atd_rate[i] != 0)
+						sprintf(var, "%.1f", attendance_rate[i] - pre.atd_rate[i]);
+					else strcpy(var, "+-0%");
+					ui_set_text(&Stack.objs[result_window_starting + 12 + i], al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, var, 24);
+				}
+
+				for (i = 0; i < 18; i++)
+					Stack.objs[result_window_starting + i].enable = true;
+
+				//if(!continue_clicked)
+
+				pre.hp = health_point;
+				pre.sp = social_point;
+				for (i = 0; i < 6; i++)
+					pre.atd_rate[i] = attendance_rate[i];
+
+				test = true;		//NEED TO REMOVE!!!!!!!!!!!!!!!!!!
+			}
 		}
-		pre_week = today_of_week;
+		pre_week = week_count;
 
 		is_seq_triggered = false;
 		block_timebar_early_start = true;
@@ -602,7 +687,7 @@ int scene_4_update() {
 		al_resume_timer(maingame_timer);
 		al_start_timer(event_timer);
 		event_timer_clock = 0;
-		for (int i = 0; i < 3; i++) {
+		for (i = 0; i < 3; i++) {
 			Stack.objs[yes_or_no_UI_starting + i].enable = false;
 		}
 		event_choose = false;
@@ -626,7 +711,7 @@ int scene_4_update() {
 
 			// reached destination
 
-			for (int i = 0; i < myGraph->Num_of_Edge; i++)
+			for (i = 0; i < myGraph->Num_of_Edge; i++)
 			{
 				edge e = myGraph->edgeArray[i];
 
@@ -736,10 +821,16 @@ void calculate_second_per_day() {
 }
 
 void calculate_second_per_period(schedule mySchedule) {
+	//int gonggang = 10;
+	//int su_up = 2;
+	//int shuim = 20;
+	int gonggang = 1;
+	int su_up = 1;
+	int shuim = 1;
 	for (int i = 0; i < 9; i++) {
-		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? 10 : 2;
+		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? gonggang : su_up;
 	}
-	second_per_period[9] = 20;
+	second_per_period[9] = shuim;
 }
 
 void test_custom_schedule() { // to test
@@ -807,15 +898,17 @@ void map_button_on_click_listener_func(object_t *o)
 void stat_update()
 {
 	sprintf(sp_str, "%0.1f", social_point / 10.0);
-	ui_set_text(&Stack.objs[stat_object_starting], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
+	ui_set_text(&Stack.objs[stat_object_starting + 1], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	sprintf(hp_str, "%0.1f", health_point / 10.0);
-	ui_set_text(&Stack.objs[stat_object_starting + 1], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
+	ui_set_text(&Stack.objs[stat_object_starting], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
 }
 
 
 void letscontinue()
 {
+	continue_clicked = true;
 }
+
 void edit_timebar_color(schedule mySchedule) {
 	for (int i = 0; i < 9; i++) {
 		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_of_week][i].index == -1) ? al_map_rgb(0, 238, 0) : al_map_rgb(238, 0, 0);
