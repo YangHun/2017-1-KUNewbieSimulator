@@ -10,8 +10,10 @@ ALLEGRO_TIMER* maingame_timer;
 int maingame_timer_set = 0;
 float timebar_width = 0;
 int second_per_day[5] = { 0, };
+float second_per_period[10] = { 0 };
 whatDay today_of_week; // 오늘의 요일
 void calculate_second_per_day();
+void calculate_second_per_period(schedule mySchedule);
 void test_custom_schedule();
 void init_schedule_data();
 void map_button_on_click_listener_func(object_t *o);
@@ -23,6 +25,9 @@ void stat_update();
 int timebar_object_starting;
 schedule customSchedule; // to test
 //-> use "mySchedule" !!!
+void edit_timebar_color(schedule mySchedule);
+int return_interval();
+bool block_timebar_early_start = false;
 
 // ------------------------------------
 // event variable declaration
@@ -126,6 +131,7 @@ int scene_4_init() {
 	week_count = 1;
 	test_custom_schedule();
 	init_schedule_data();
+	calculate_second_per_period(customSchedule);
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
@@ -291,8 +297,40 @@ int scene_4_init() {
 	al_start_timer(maingame_timer);
 	timebar_object_starting = Stack.counter;
 
-	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
-	Stack.push(&Stack, bar_bg); 
+	object_t bar_bg_yel = create_colored_object(al_map_rgb(238, 238, 0), 1280, 17, 0, 0);
+	Stack.push(&Stack, bar_bg_yel);
+
+	object_t bar_bg0 = create_colored_object(al_map_rgb(8, 238, 238), 100, 17, 0, 0);
+	Stack.push(&Stack, bar_bg0);
+
+	object_t bar_bg1 = create_colored_object(al_map_rgb(238, 238, 238), 100, 17, 0, 142);
+	Stack.push(&Stack, bar_bg1); 
+
+	object_t bar_bg2 = create_colored_object(al_map_rgb(28, 238, 238), 100, 17, 0, 284);
+	Stack.push(&Stack, bar_bg2);
+
+	object_t bar_bg3 = create_colored_object(al_map_rgb(238, 28, 238), 100, 17, 0, 426);
+	Stack.push(&Stack, bar_bg3);
+
+	object_t bar_bg4 = create_colored_object(al_map_rgb(108, 108, 28), 100, 17, 0, 568);
+	Stack.push(&Stack, bar_bg4);
+			
+	object_t bar_bg5 = create_colored_object(al_map_rgb(238, 28, 28), 100, 17, 0, 710);
+	Stack.push(&Stack, bar_bg5);
+
+	object_t bar_bg6 = create_colored_object(al_map_rgb(28, 28, 238), 100, 17, 0, 852);
+	Stack.push(&Stack, bar_bg6);
+
+	object_t bar_bg7 = create_colored_object(al_map_rgb(28, 238, 28), 100, 17, 0, 994);
+	Stack.push(&Stack, bar_bg7);
+
+	object_t bar_bg8 = create_colored_object(al_map_rgb(28, 28, 28), 100, 17, 0, 1136);
+	Stack.push(&Stack, bar_bg8);
+
+	object_t timebar = create_object("Resources\\UI\\routegame\\timebar.png", 0, 0);
+	Stack.push(&Stack, timebar);
+
+	edit_timebar_color(customSchedule);
 
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
@@ -450,13 +488,13 @@ int scene_4_update() {
 	// Timebar running
 	// ------------------------------------
 	
-	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
+	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10 && block_timebar_early_start) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
-		timebar_width += (TIMEBAR_MAX * 100) / (second_per_day[today_of_week] * 100.0); // 분자: (TIMEBAR_MAX * n) == n배 빠르게
-		Stack.objs[timebar_object_starting + 1].rect.width = timebar_width + 5;
+		timebar_width += (TIMEBAR_MAX) / (second_per_period[return_interval()] * 100.0); // 분자: (TIMEBAR_MAX * n) == n배 빠르게
+		Stack.objs[timebar_object_starting + 10].pos.x = timebar_width;
 	}
 	
-	if (Stack.objs[timebar_object_starting + 1].rect.width > TIMEBAR_MAX) {
+	if (Stack.objs[timebar_object_starting + 10].pos.x > TIMEBAR_MAX) {
 		if (today_of_week == FRI) {
 			today_of_week = MON;
 			today_day += 3;
@@ -493,9 +531,12 @@ int scene_4_update() {
 		pre_week = today_of_week;
 
 		is_seq_triggered = false;
+		block_timebar_early_start = true;
 		timebar_width = 0;
-		Stack.objs[timebar_object_starting + 1].rect.width = 0;
+		Stack.objs[timebar_object_starting + 10].pos.x = 0;
 		maingame_timer_set = 0;
+		edit_timebar_color(customSchedule);
+		calculate_second_per_period(customSchedule);
 		printf("%d 월 %d 일 %d주 ", today_Month, today_day, week_count);
 		switch (today_of_week) {
 		case MON:
@@ -553,7 +594,7 @@ int scene_4_update() {
 			Stack.objs[yes_or_no_UI_starting + i].enable = false;
 		}
 		event_choose = false;
-
+		block_timebar_early_start = true;
 	}
 	
 	if (!player.is_moving_now) {
@@ -681,6 +722,14 @@ void calculate_second_per_day() {
 		lecture_cursor = -1;
 	}
 }
+
+void calculate_second_per_period(schedule mySchedule) {
+	for (int i = 0; i < 9; i++) {
+		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? 10 : 2;
+	}
+	second_per_period[9] = 20;
+}
+
 void test_custom_schedule() { // to test
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
@@ -690,24 +739,25 @@ void test_custom_schedule() { // to test
 	}
 	customSchedule.timeTable[0][0].index = 0;
 	customSchedule.timeTable[0][0].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][1].index = 1;
-	customSchedule.timeTable[0][1].isEmptyBit = NONEMPTY;
+	customSchedule.timeTable[0][1].index = -1;
+	customSchedule.timeTable[0][1].isEmptyBit = EMPTY;
 	customSchedule.timeTable[0][2].index = 2;
 	customSchedule.timeTable[0][2].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][3].index = 2;
-	customSchedule.timeTable[0][3].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][4].index = 2;
+	customSchedule.timeTable[0][3].index = -1;
+	customSchedule.timeTable[0][3].isEmptyBit = EMPTY;
+	customSchedule.timeTable[0][4].index = 3;
 	customSchedule.timeTable[0][4].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][5].index = 2;
-	customSchedule.timeTable[0][5].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][6].index = 2;
+	customSchedule.timeTable[0][5].index = -1;
+	customSchedule.timeTable[0][5].isEmptyBit = EMPTY;
+	customSchedule.timeTable[0][6].index = 4;
 	customSchedule.timeTable[0][6].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][7].index = 2;
-	customSchedule.timeTable[0][7].isEmptyBit = NONEMPTY;
-	customSchedule.timeTable[0][8].index = 2;
+	customSchedule.timeTable[0][7].index = -1;
+	customSchedule.timeTable[0][7].isEmptyBit = EMPTY;
+	customSchedule.timeTable[0][8].index = 5;
 	customSchedule.timeTable[0][8].isEmptyBit = NONEMPTY;
+	
 	calculate_second_per_day();
-
+	
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
 }
 void init_schedule_data(void) {
@@ -750,6 +800,44 @@ void stat_update()
 	ui_set_text(&Stack.objs[stat_object_starting + 1], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
 }
 
+
 void letscontinue()
 {
+}
+void edit_timebar_color(schedule mySchedule) {
+	for (int i = 0; i < 9; i++) {
+		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_of_week][i].index == -1) ? al_map_rgb(0, 238, 0) : al_map_rgb(238, 0, 0);
+	}
+}
+
+int return_interval() {
+	float target = Stack.objs[timebar_object_starting + 10].pos.x;
+	if (target >= 0 && target <= 100) {
+		return 0;
+	}
+	if (target >= 142 && target <= 242) {
+		return 1;
+	}
+	if (target >= 284 && target <= 384) {
+		return 2;
+	}
+	if (target >= 426 && target <= 526) {
+		return 3;
+	}
+	if (target >= 568 && target <= 668) {
+		return 4;
+	}
+	if (target >= 710 && target <= 810) {
+		return 5;
+	}
+	if (target >= 852 && target <= 952) {
+		return 6;
+	}
+	if (target >= 994 && target <= 1094) {
+		return 7;
+	}
+	if (target >= 1136 && target <= 1236) {
+		return 8;
+	}
+	return 9;
 }
