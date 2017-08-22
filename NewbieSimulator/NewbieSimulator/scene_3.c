@@ -262,7 +262,10 @@ void result() {
 		if (!pressed[i]) {
 			continue;
 		}
-		if (probability_judge(std_dist(pressed_time[i], 2))) {
+		if (lectureTable[lectureindex[i]].classify == MAJOR) {
+			success[i] = true;
+		}
+		else if (probability_judge(std_dist(pressed_time[i], 2))) {
 			printf("[%d]time: %d\n",i, pressed_time[i]);
 			printf("prob: %lf\n", std_dist(pressed_time[i], 2));
 			printf("[%d]success!!\n", i);
