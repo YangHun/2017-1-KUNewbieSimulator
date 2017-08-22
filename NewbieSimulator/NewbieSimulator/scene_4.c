@@ -3,6 +3,14 @@
 #include "data.h"
 #include "graph_manage.h"
 #include "event_semester.h"
+
+// colors
+
+ALLEGRO_COLOR edge_color_default;
+ALLEGRO_COLOR edge_color_available;
+ALLEGRO_COLOR edge_color_ready;
+ALLEGRO_COLOR edge_color_moving;
+
 // ------------------------------------
 // Timer variable declaration
 // ------------------------------------
@@ -129,6 +137,11 @@ int scene_4_init() {
 
 	printf("Scene 4 start! \n");
 
+	edge_color_default = al_map_rgb(127, 127, 127);
+	edge_color_available = al_map_rgb(0, 255, 0);
+	edge_color_ready = al_map_rgb(255, 0, 0);
+	edge_color_moving = al_map_rgb(0, 0, 255);
+
 	object_t bg = create_object("Resources\\UI\\routegame\\bg.png", 0, 0);
 	Background = bg;
 
@@ -231,7 +244,7 @@ int scene_4_init() {
 		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
 		{
 			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = al_map_rgb(255, 0, 0);
+			eo->color = edge_color_available;
 		}
 	}
 
@@ -731,13 +744,13 @@ int scene_4_update() {
 					e.vertexindex_2 == player.curr_point && e.vertexindex_1 == player.next_point)
 				{
 					object_t *eo = &Stack.objs[edge_object_starting + i];
-					eo->color = al_map_rgb(127, 127, 127);
+					eo->color = edge_color_default;
 				}
 
 				if (e.vertexindex_1 == player.next_point || e.vertexindex_2 == player.next_point)
 				{
 					object_t *eo = &Stack.objs[edge_object_starting + i];
-					eo->color = al_map_rgb(255, 0, 0);
+					eo->color = edge_color_available;
 				}
 			}
 			
@@ -892,7 +905,7 @@ void map_button_on_click_listener_func(object_t *o)
 		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
 		{
 			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = al_map_rgb(127, 127, 127);
+			eo->color = edge_color_default;
 		}
 
 		if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == clicked_vertex_idx ||
@@ -902,7 +915,7 @@ void map_button_on_click_listener_func(object_t *o)
 			player.next_point = clicked_vertex_idx;
 
 			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = al_map_rgb(0, 0, 255);
+			eo->color = edge_color_moving;
 		}
 	}
 	re_draw();
