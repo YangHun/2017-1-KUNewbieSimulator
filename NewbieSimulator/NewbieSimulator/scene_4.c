@@ -95,6 +95,7 @@ bool test = false;
 
 ALLEGRO_TIMER *trafficlit_timer;
 static void update_trafficlit_objects();
+static void update_edge_objects();
 
 typedef struct character {
 
@@ -265,16 +266,7 @@ int scene_4_init() {
 
 	// initial graph edge coloring
 
-	for (int i = 0; i < myGraph->Num_of_Edge; i++)
-	{
-		edge e = myGraph->edgeArray[i];
-
-		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
-		{
-			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = edge_color_available;
-		}
-	}
+	update_edge_objects();
 
 	// ----------------------------------
 	// STAT WINDOW DARWING
@@ -781,23 +773,7 @@ int scene_4_update() {
 
 			// reached destination
 
-			for (i = 0; i < myGraph->Num_of_Edge; i++)
-			{
-				edge e = myGraph->edgeArray[i];
-
-				if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == player.next_point ||
-					e.vertexindex_2 == player.curr_point && e.vertexindex_1 == player.next_point)
-				{
-					object_t *eo = &Stack.objs[edge_object_starting + i];
-					eo->color = edge_color_default;
-				}
-
-				if (e.vertexindex_1 == player.next_point || e.vertexindex_2 == player.next_point)
-				{
-					object_t *eo = &Stack.objs[edge_object_starting + i];
-					eo->color = edge_color_available;
-				}
-			}
+			update_edge_objects();
 			
 			player.is_moving_now = false;
 
@@ -850,18 +826,31 @@ int scene_4_update() {
 	// traffic lights
 
 	int trafficlit_tickcnt = al_get_timer_count(trafficlit_timer);
+	bool changed = false;
 	for (int i = 0; i < trafficlit_count; i++)
 	{
 		if ((trafficlit_tickcnt - trafficlit_offset[i]) % trafficlit_period[i] < trafficlit_ontimecut[i])
 		{
-			trafficlit_go[i] = true;
+			if (trafficlit_go[i] != true)
+			{
+				trafficlit_go[i] = true;
+				changed = true;
+			}
 		}
 		else
 		{
-			trafficlit_go[i] = false;
+			if (trafficlit_go[i] != false)
+			{
+				trafficlit_go[i] = false;
+				changed = true;
+			}
 		}
 	}
-	update_trafficlit_objects();
+	if (changed)
+	{
+		update_trafficlit_objects();
+		update_edge_objects();
+	}
 
 	re_draw();
 
@@ -960,25 +949,29 @@ void map_button_on_click_listener_func(object_t *o)
 	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
 	for (int i = 0; i < myGraph->Num_of_Edge; i++)
 	{
-		edge e = myGraph->edgeArray[i];
-
-		if (e.vertexindex_1 == player.curr_point || e.vertexindex_2 == player.curr_point)
+		edge *e = &myGraph->edgeArray[i];
+		if (e->vertexindex_1 == player.curr_point && e->vertexindex_2 == clicked_vertex_idx ||
+			e->vertexindex_2 == player.curr_point && e->vertexindex_1 == clicked_vertex_idx)
 		{
-			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = edge_color_default;
-		}
-
-		if (e.vertexindex_1 == player.curr_point && e.vertexindex_2 == clicked_vertex_idx ||
-			e.vertexindex_2 == player.curr_point && e.vertexindex_1 == clicked_vertex_idx)
-		{
-			player.is_moving_now = true;
-			player.next_point = clicked_vertex_idx;
-
-			object_t *eo = &Stack.objs[edge_object_starting + i];
-			eo->color = edge_color_moving;
+			if (e->grpid != 0)
+			{
+				int trafficlit_idx = e->grpid - 1;
+				if (trafficlit_go[trafficlit_idx])
+				{
+					player.is_moving_now = true;
+					player.next_point = clicked_vertex_idx;
+				}
+			}
+			else
+			{
+				player.is_moving_now = true;
+				player.next_point = clicked_vertex_idx;
+			}
+			update_edge_objects();
+			re_draw();
+			break;
 		}
 	}
-	re_draw();
 }
 
 void stat_update()
@@ -1048,5 +1041,48 @@ void update_trafficlit_objects()
 		o->enable = trafficlit_go[i];
 		o = &Stack.objs[trafficlit_stop_object_starting + i];
 		o->enable = !trafficlit_go[i];
+	}
+}
+
+void update_edge_objects()
+{
+	if (player.is_moving_now)
+	{
+		for (int i = 0; i < myGraph->Num_of_Edge; i++)
+		{
+			edge *e = &myGraph->edgeArray[i];
+			object_t *eo = &Stack.objs[edge_object_starting + i];
+			
+			eo->color = edge_color_default;
+
+			if (e->vertexindex_1 == player.curr_point && e->vertexindex_2 == player.next_point ||
+				e->vertexindex_2 == player.curr_point && e->vertexindex_1 == player.next_point)
+			{
+				eo->color = edge_color_moving;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < myGraph->Num_of_Edge; i++)
+		{
+			edge *e = &myGraph->edgeArray[i];
+			object_t *eo = &Stack.objs[edge_object_starting + i];
+
+			eo->color = edge_color_default;
+
+			if (e->vertexindex_1 == player.curr_point || e->vertexindex_2 == player.curr_point)
+			{
+				eo->color = edge_color_available;
+				if (e->grpid != 0)
+				{
+					int trafficlit_idx = e->grpid - 1;
+					if (!trafficlit_go[trafficlit_idx])
+					{
+						eo->color = edge_color_ready;
+					}
+				}
+			}
+		}
 	}
 }
