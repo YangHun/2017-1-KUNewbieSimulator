@@ -35,11 +35,9 @@ bool is_seq_triggered;
 // ------------------------------------
 // stat
 // ------------------------------------
-int attendance_rate;
+float attendance_rate[6];
 int grade_point;
 
-void selected1(object_t *o);
-void selected2(object_t *o);
 bool ongoing1 = false, ongoing2 = false;
 bool isSet = false;
 int moving = 0;
@@ -641,17 +639,6 @@ void test_custom_schedule() { // to test
 
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
 }
-/*
-void selected1(object_t *o)
-{
-	ongoing1 = true;
-}
-
-void selected2(object_t *o)
-{
-	ongoing2 = true;
-}
-*/
 
 void map_button_on_click_listener_func(object_t *o)
 {
