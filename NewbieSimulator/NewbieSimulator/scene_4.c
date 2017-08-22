@@ -19,7 +19,7 @@ int today_Month;
 int today_day;
 int week_count;
 void stat_update();
-
+int timebar_object_starting;
 schedule customSchedule; // to test
 
 // ------------------------------------
@@ -106,18 +106,7 @@ int scene_4_init() {
 	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\map.jpg", 0, 0));
 	map = &Stack.objs[Stack.counter - 1];
 
-	// ------------------------------------
-	// Timebar UI setting
-	// ------------------------------------
-
-	maingame_timer = al_create_timer(1.0 / 1000);
-	al_start_timer(maingame_timer);
-
-	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 300);
-	Stack.push(&Stack, bar_bg); //1
-
-	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 300);
-	Stack.push(&Stack, red); //2
+	
 
 	// ------------------------------------
 	// initial setting
@@ -250,9 +239,19 @@ int scene_4_init() {
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	Stack.push(&Stack, sp);
 	
-#define HP_TEXT Stack.objs[524]
-#define SP_TEXT Stack.objs[525]
+	// ------------------------------------
+	// Timebar UI setting
+	// ------------------------------------
 
+	maingame_timer = al_create_timer(1.0 / 1000);
+	al_start_timer(maingame_timer);
+	timebar_object_starting = Stack.counter;
+
+	object_t bar_bg = create_colored_object(al_map_rgb(238, 238, 238), 1280, 17, 0, 0);
+	Stack.push(&Stack, bar_bg); 
+
+	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
+	Stack.push(&Stack, red); 
 	return 0;
 }
 
@@ -364,7 +363,7 @@ void move(int *pdx, int *pdy) {
 	}
 
 }
-#define TIMEBAR_MAX 980 // 1280 - 300
+#define TIMEBAR_MAX 1280 // 1280 - 300
 int scene_4_update() {
 
 	int i;
@@ -390,11 +389,11 @@ int scene_4_update() {
 	
 	if (al_get_timer_count(maingame_timer) - maingame_timer_set > 10) {
 		maingame_timer_set = al_get_timer_count(maingame_timer);
-		timebar_width += (980 * 100) / (second_per_day[today_of_week] * 100.0); // n배 빠르게
-		Stack.objs[2].rect.width = timebar_width + 5;
+		timebar_width += (TIMEBAR_MAX * 100) / (second_per_day[today_of_week] * 100.0); // 분자: (TIMEBAR_MAX * n) == n배 빠르게
+		Stack.objs[timebar_object_starting + 1].rect.width = timebar_width + 5;
 	}
 	
-	if (Stack.objs[2].rect.width > TIMEBAR_MAX) {
+	if (Stack.objs[timebar_object_starting + 1].rect.width > TIMEBAR_MAX) {
 		if (today_of_week == FRI) {
 			today_of_week = MON;
 			today_day += 3;
@@ -426,7 +425,7 @@ int scene_4_update() {
 		}
 		is_seq_triggered = false;
 		timebar_width = 0;
-		Stack.objs[2].rect.width = 0;
+		Stack.objs[timebar_object_starting + 1].rect.width = 0;
 		maingame_timer_set = 0;
 		printf("%d 월 %d 일 %d주 ", today_Month, today_day, week_count);
 		switch (today_of_week) {
@@ -686,7 +685,7 @@ void map_button_on_click_listener_func(object_t *o)
 void stat_update()
 {
 	sprintf(sp_str, "%0.1f", social_point / 10.0);
-	ui_set_text(&SP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
+	ui_set_text(&Stack.objs[stat_object_starting], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	sprintf(hp_str, "%0.1f", health_point / 10.0);
-	ui_set_text(&HP_TEXT, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
+	ui_set_text(&Stack.objs[stat_object_starting + 1], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
 }
