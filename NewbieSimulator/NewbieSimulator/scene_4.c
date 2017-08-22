@@ -262,13 +262,18 @@ int scene_4_init() {
 		}
 	}
 	object_t lecture_name[6];
+	//print lecture name
 	for (i = 0; i < 6; i++) {
-		lecture_name[i] = create_object(NULL, 850, 240 + i * 75);
+		lecture_name[i] = create_object(NULL, 30, 275 + i * 70);
 		if (lectureindex[i] == -1)
-			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 36);
+			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "empty", 24);
 		else
-			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf_lecture, "name", lectureTable[lectureindex[i]].identifyNumber), 36);
+			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf_lecture, "name", lectureTable[lectureindex[i]].identifyNumber), 24);
 		Stack.push(&Stack, lecture_name[i]);
+	}
+	//print attendance rate
+	for (i = 0; i < 6; i++) {
+		//attendance
 	}
 	// ------------------------------------
 	// Timebar UI setting

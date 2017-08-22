@@ -343,7 +343,7 @@ void initialization() {
 	prev = FSMs.states[0];
 	next = NULLFSM;
 
-	current_scene = Scenes.scenes[2];
+	current_scene = Scenes.scenes[4];
 	next_scene = NULLSCENE;
 	
 }
