@@ -13,6 +13,7 @@ int second_per_day[5] = { 0, };
 whatDay today_of_week; // ¿À´ÃÀÇ ¿äÀÏ
 void calculate_second_per_day();
 void test_custom_schedule();
+void init_schedule_data();
 void map_button_on_click_listener_func(object_t *o);
 void move(int *pdx, int *pdy);
 int today_Month;
@@ -21,6 +22,7 @@ int week_count;
 void stat_update();
 int timebar_object_starting;
 schedule customSchedule; // to test
+//-> use "mySchedule" !!!
 
 // ------------------------------------
 // event variable declaration
@@ -63,6 +65,7 @@ ALLEGRO_TIMER *timer;
 int chr_timer_set = 0;
 ALLEGRO_EVENT_QUEUE *event_queue;
 ALLEGRO_CONFIG *conf;
+ALLEGRO_CONFIG *conf_lecture;
 
 char hp_str[10], sp_str[10];
 
@@ -114,8 +117,10 @@ int scene_4_init() {
 	today_Month = 3;
 	week_count = 1;
 	test_custom_schedule();
+	init_schedule_data();
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
+	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
 	/*
 	object_t route1 = create_object("Resources\\UI\\routegame\\route1.png", 100, 100);
 	ui_set_button(&route1);
@@ -237,6 +242,34 @@ int scene_4_init() {
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	Stack.push(&Stack, sp);
 	
+	bool lecturerepeat;
+	int k = 0;
+	for (i = 0; i < 6; i++) {
+		lectureindex[i] = -1;
+	}
+	for (i = 0; i < 5; i++) {
+		for (int j = 0; j < 10; j++) {
+			lecturerepeat = false;
+			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
+				int lectureid = mySchedule.timeTable[i][j].index;
+				for (int x = 0; x < 6; x++) {
+					if (lectureid == lectureindex[x])
+						lecturerepeat = true;
+				}
+				if (lecturerepeat == false)
+					lectureindex[k++] = lectureid;
+			}
+		}
+	}
+	object_t lecture_name[6];
+	for (i = 0; i < 6; i++) {
+		lecture_name[i] = create_object(NULL, 850, 240 + i * 75);
+		if (lectureindex[i] == -1)
+			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 36);
+		else
+			ui_set_text(&lecture_name[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, al_get_config_value(conf_lecture, "name", lectureTable[lectureindex[i]].identifyNumber), 36);
+		Stack.push(&Stack, lecture_name[i]);
+	}
 	// ------------------------------------
 	// Timebar UI setting
 	// ------------------------------------
@@ -639,7 +672,9 @@ void test_custom_schedule() { // to test
 
 	printf("%d %d %d %d %d \n", second_per_day[0], second_per_day[1], second_per_day[2], second_per_day[3], second_per_day[4]);
 }
-
+void init_schedule_data(void) {
+	
+}
 void map_button_on_click_listener_func(object_t *o)
 {
 	if (player.is_moving_now)

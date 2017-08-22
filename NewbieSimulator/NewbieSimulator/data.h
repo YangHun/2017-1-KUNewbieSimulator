@@ -11,6 +11,7 @@ extern int grade_point;
 extern lectureInfo lectureTable[LECTURE_SIZE];
 extern schedule mySchedule;
 extern schedule* mySchedulePtr;
-
+//scene 3
+extern int lectureindex[6];
 //scene 4
 //extern void stat_update();
