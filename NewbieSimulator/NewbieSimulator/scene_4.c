@@ -93,7 +93,8 @@ bool test = false;
 
 //object_t player[4];
 
-static void update_trafficlits();
+ALLEGRO_TIMER *trafficlit_timer;
+static void update_trafficlit_objects();
 
 typedef struct character {
 
@@ -114,6 +115,9 @@ Character player;
 static int trafficlit_count = 5;
 static int trafficlit_coord_x[] = { 650, 880, 980, 960, 1115 };
 static int trafficlit_coord_y[] = { 1190, 1245, 1265, 1380, 1275 };
+static int trafficlit_offset[] = { 0, 500, 1000, 1500, 2000 };
+static int trafficlit_period[] = { 2500, 2500, 2500, 2500, 2500 };
+static int trafficlit_ontimecut[] = { 400, 400, 400, 400, 400 };
 static bool trafficlit_go[] = { false, false, false, false, false };
 
 static int trafficlit_go_object_starting;
@@ -186,7 +190,7 @@ int scene_4_init() {
 	{
 		Stack.push(&Stack, create_object(respath_trafficlit_stop, trafficlit_coord_x[i], trafficlit_coord_y[i]));
 	}
-	update_trafficlits();
+	update_trafficlit_objects();
 
 	// ------------------------------------
 	// graph structure setting
@@ -447,6 +451,10 @@ int scene_4_init() {
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
 
+	// Traffic light timer
+
+	trafficlit_timer = al_create_timer(.001);
+	al_start_timer(trafficlit_timer);
 	
 	return 0;
 }
@@ -839,6 +847,21 @@ int scene_4_update() {
 		pre_mouse_y = state.y;
 	}
 	
+	// traffic lights
+
+	int trafficlit_tickcnt = al_get_timer_count(trafficlit_timer);
+	for (int i = 0; i < trafficlit_count; i++)
+	{
+		if ((trafficlit_tickcnt - trafficlit_offset[i]) % trafficlit_period[i] < trafficlit_ontimecut[i])
+		{
+			trafficlit_go[i] = true;
+		}
+		else
+		{
+			trafficlit_go[i] = false;
+		}
+	}
+	update_trafficlit_objects();
 
 	re_draw();
 
@@ -1016,14 +1039,14 @@ int return_interval() {
 	return 9;
 }
 
-void update_trafficlits()
+void update_trafficlit_objects()
 {
 	for (int i = 0; i < trafficlit_count; i++)
 	{
 		object_t *o;
 		o = &Stack.objs[trafficlit_go_object_starting + i];
-		o->enable = !trafficlit_go;
+		o->enable = trafficlit_go[i];
 		o = &Stack.objs[trafficlit_stop_object_starting + i];
-		o->enable = trafficlit_go;
+		o->enable = !trafficlit_go[i];
 	}
 }
