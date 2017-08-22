@@ -89,9 +89,17 @@ Character player;
 static int edge_object_starting;
 static int vertex_object_starting;
 static int stat_object_starting;
+static int result_window_starting;
 int yes_or_no_UI_starting = 0;
 void set_player_position_to_vertex(Character* chr, int index);
+void letscontinue();
 
+struct ability {
+	float pre_hp;
+	float pre_sp;
+};
+int pre_week;
+char weekstr[20];
 
 int scene_4_init() {
 
@@ -252,6 +260,25 @@ int scene_4_init() {
 
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
+
+	// Result Window
+
+	result_window_starting = Stack.counter;
+	object_t middle_result = create_object("Resources\\UI\\routegmae\\middle_result.png", 0, 0);
+	middle_result.enable = false;
+	Stack.push(&Stack, middle_result);
+	
+	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", SCREEN_W / 2, 500);
+	ui_set_button(&Stack, continue_button);
+	ui_set_on_click_listener(&continue_button, letscontinue);
+	continue_button.enable = false;
+	Stack.push(&Stack, continue_button);
+
+	object_t what_week = create_object(NULL, 0, 0);
+	sprintf(weekstr, "%d¿ù %dÂ° ÁÖ", today_Month, today_of_week);
+	ui_set_text(&what_week, al_map_rgb(255, 255, 255), "Resources\\font\\BMJUA.ttf",ALLEGRO_ALIGN_LEFT,weekstr,24);
+	Stack.push(&Stack, what_week);
+
 	return 0;
 }
 
@@ -423,6 +450,12 @@ int scene_4_update() {
 			today_day -= 31;
 			week_count = 1;
 		}
+
+		if (pre_week != today_of_week) {
+			Stack.objs[result_window_starting].enable = true;
+		}
+		pre_week = today_of_week;
+
 		is_seq_triggered = false;
 		timebar_width = 0;
 		Stack.objs[timebar_object_starting + 1].rect.width = 0;
@@ -688,4 +721,8 @@ void stat_update()
 	ui_set_text(&Stack.objs[stat_object_starting], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, sp_str, 24);
 	sprintf(hp_str, "%0.1f", health_point / 10.0);
 	ui_set_text(&Stack.objs[stat_object_starting + 1], al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, hp_str, 24);
+}
+
+void letscontinue()
+{
 }

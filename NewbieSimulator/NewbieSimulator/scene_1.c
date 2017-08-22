@@ -236,8 +236,6 @@ int scene_1_update() {
 	//	printf("dir change, character_timer = %d\n", al_get_timer_count(character_timer));
 	}
 
-	
-
 	if (!explain_stat) { //stat¼³¸í ÆË¾÷ ¶ç¿ì±â
 		explain_stat=1;
 		popup = create_object("Resources\\dummy\\popup.png", 310, 130);
