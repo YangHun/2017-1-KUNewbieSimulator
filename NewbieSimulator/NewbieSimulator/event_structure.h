@@ -1,5 +1,5 @@
 #pragma once
-#define STO_EVENTCOUNT 3
+#define STO_EVENTCOUNT 2
 #define SEQ_EVENTCOUNT 13
 #define SPE_EVENTCOUNT 3
 #include "engine.h"

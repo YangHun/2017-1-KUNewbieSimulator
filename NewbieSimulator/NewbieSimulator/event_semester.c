@@ -19,6 +19,7 @@ static void Daedongjae_Jujum_8();
 static void Ipselenti_performance_9();
 static void Jongchong_10();
 
+
 //---------------------------------
 // stochastic event function
 //---------------------------------
@@ -27,6 +28,10 @@ static void sool_yak_1();
 static void mom_sal_2();
 static void bam_saem_3();
 
+
+
+static void sto_dummy_1();
+static void sto_dummy_2();
 
 
 static void click_yes(object_t* o);
@@ -100,8 +105,39 @@ int trigger_sequencial_event(int month, whatDay day_of_week, int week, event_fun
 	return 1;
 }
 
+int trigger_stochastic_event(event_function sto_event_func[], float *prob_store) {
+	int size = STO_EVENTCOUNT;
+	int* prob_int_store = (int*)malloc(sizeof(int) * size);
+	int sum = 0;
+	int j = 0;
+	for (int i = 0; i < size; i++) {
+		prob_int_store[i] = (int)(10000 * prob_store[i]);
+		sum += prob_int_store[i];
+	}
+	int prob_table[20000];
+	for (int i = 0; i < 20000; i++) {
+		prob_table[i] = -1;
+	}
+	int cursor = 0;
+	for (int i = 0; i < size; i++) {
+		for (j = cursor; j < cursor + prob_int_store[i]; j++) {
+			prob_table[j] = i;
+		}
+		cursor = j;
+	}
+	int bunmo = (sum <= 10000) ? 10000 : sum;
+	int result = rand() % bunmo; // 0 ~ 9999 or sum
+	free(prob_int_store);
+	if (prob_table[result] != -1) {
+		sto_event_func[prob_table[result]].func();
+		return 1;
+	}
+	return 0;
+}
+
 void init_sto_event(event_function sto_event_func[]) {
-	;
+	sto_event_func[0].func = sto_dummy_1;
+	sto_event_func[1].func = sto_dummy_2;
 	for (int i = 0; i < STO_EVENTCOUNT; i++) {
 		sto_event_func[i].isStarted = false;
 	}
@@ -263,15 +299,26 @@ void sool_yak_1() {
 void mom_sal_2() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Momsal";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Momsal";
+} // have to edit
+void sto_dummy_1() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "stodummy1";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "stodummy1";
 	for (int i = 0; i < 3; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
+
 void bam_saem_3() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Bamsaem";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Bamsaem";
+}
+
+void sto_dummy_2() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "stodummy2";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "stodummy2";
+
 	for (int i = 0; i < 3; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
@@ -381,7 +428,13 @@ void click_yes(object_t* o) {
 			int p = rand() & 1;
 			if (p) {
 			}
-
+		}
+		cases("stodummy1") {
+			printf("dummy1 yes \n");
+			return;
+		}
+		cases("stodummy2") {
+			printf("dummy2 yes \n");
 			return;
 		}
 		defaults
@@ -446,6 +499,14 @@ void click_no(object_t* o) {
 		cases("Jongchong") {
 			printf("Jongchong no \n");
 			social_point -= 0.5;
+			return;
+		}
+		cases("stodummy1") {
+			printf("dummy1 no \n");
+			return;
+		}
+		cases("stodummy2") {
+			printf("dummy2 no \n");
 			return;
 		}
 		defaults

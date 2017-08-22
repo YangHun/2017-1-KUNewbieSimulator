@@ -40,6 +40,13 @@ int event_timer_clock = 0;
 bool event_choose = false;
 bool is_seq_triggered;
 // ------------------------------------
+// stochastic event variable declaration
+// ------------------------------------
+float* prob_store;
+float test_prob1 = 0.2;
+float test_prob2 = 0.3;
+float test_prob3 = 0.1;
+// ------------------------------------
 // stat
 // ------------------------------------
 float attendance_rate[6] = { 0, };
@@ -138,7 +145,9 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
-
+	prob_store = (float*)malloc(sizeof(float) * 2);
+	prob_store[0] = test_prob1;
+	prob_store[1] = test_prob2;
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
 
@@ -602,7 +611,8 @@ int scene_4_update() {
 		printf("\n");
 		al_stop_timer(maingame_timer);
 		al_start_timer(maingame_timer);
-		
+		al_set_timer_count(event_timer, 0);
+		event_timer_clock = 0;
 	}
 
 	// ------------------------------------
@@ -673,20 +683,15 @@ int scene_4_update() {
 #define EVENT_TIME_INTERVAL 5
 	if (al_get_timer_count(event_timer) - event_timer_clock > (EVENT_TIME_INTERVAL * 1000)) {
 		event_timer_clock = al_get_timer_count(event_timer);
-		/*
-		for (int i = 0; i < SEQ_EVENTCOUNT; i++) {
-			if (sequencial_event_func[i].isStarted == false) {
-				al_set_timer_count(event_timer, 0);
-				al_stop_timer(maingame_timer);
-				al_stop_timer(event_timer);
-				sequencial_event_func[i].func();
-				sequencial_event_func[i].isStarted = true;
-				
-				break;
-			}
+
+		int p = trigger_stochastic_event(stochastic_event_func, prob_store);
+		printf("ppap \n");
+		al_set_timer_count(event_timer, 0);
+		event_timer_clock = 0;
+		if (p == 1) {
+			al_stop_timer(maingame_timer);
+			al_stop_timer(event_timer);
 		}
-		*/
-		
 	}
 	
 	if (event_choose) {
@@ -800,7 +805,7 @@ int scene_4_fin() {
 	al_destroy_timer(maingame_timer);
 	al_destroy_timer(event_timer);
 	printf("counter : %d \n", Stack.counter);
-
+	free(prob_store);
 	return 0;
 }
 
@@ -835,6 +840,7 @@ void calculate_second_per_period(schedule mySchedule) {
 	int su_up = 1;
 	int shuim = 1;
 	for (int i = 0; i < 9; i++) {
+
 		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? gonggang : su_up;
 	}
 	second_per_period[9] = shuim;
