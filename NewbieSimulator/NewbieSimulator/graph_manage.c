@@ -72,10 +72,12 @@ void parse_graph(Graph_structure* result) {
 		result->edgeArray[i].vertexindex_2 = ver2;
 		result->edgeArray[i].length = length;
 		result->edgeArray[i].reversed = false;
+		result->edgeArray[i].grpid = 0;
 		result->edgeArray[i + edge_count].vertexindex_1 = ver2;
 		result->edgeArray[i + edge_count].vertexindex_2 = ver1;
 		result->edgeArray[i + edge_count].length = length;
 		result->edgeArray[i + edge_count].reversed = true;
+		result->edgeArray[i].grpid = 0;
 	}
 
 	fscanf(map_location, "%d", &edge_grp_count);
@@ -84,7 +86,7 @@ void parse_graph(Graph_structure* result) {
 		int n = 0;
 		fscanf(map_location, "%d ", &n);
 		edge *e = &result->edgeArray[n];
-		fscanf(map_location, "%s", &e->group);
+		fscanf(map_location, "%d", &e->grpid);
 	}
 
 	result->edges_sorted_args = malloc(sizeof(int) * edge_count * 2);

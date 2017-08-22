@@ -30,7 +30,7 @@ typedef struct edge {
 	int vertexindex_2;
 	float length;
 	bool reversed;
-	char group[32];
+	int grpid;
 } edge;
 
 typedef struct Graph_structure {
