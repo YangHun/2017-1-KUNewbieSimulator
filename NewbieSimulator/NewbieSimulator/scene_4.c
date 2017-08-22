@@ -42,7 +42,7 @@ bool is_seq_triggered;
 // ------------------------------------
 // stat
 // ------------------------------------
-float attendance_rate[6];
+float attendance_rate[6] = { 0, };
 int grade_point;
 
 bool ongoing1 = false, ongoing2 = false;
@@ -275,8 +275,8 @@ int scene_4_init() {
 			}
 		}
 	}
-	object_t lecture_name[6];
 	//print lecture name
+	object_t lecture_name[6];
 	for (i = 0; i < 6; i++) {
 		lecture_name[i] = create_object(NULL, 30, 275 + i * 70);
 		if (lectureindex[i] == -1)
@@ -286,8 +286,18 @@ int scene_4_init() {
 		Stack.push(&Stack, lecture_name[i]);
 	}
 	//print attendance rate
+	object_t lecture_att[6];
 	for (i = 0; i < 6; i++) {
-		//attendance
+		char att_str[10];
+		lecture_att[i] = create_object(NULL, 30, 310 + i * 70);
+		sprintf(att_str, "%0.1f", attendance_rate[i]);
+		
+		if (lectureindex[i] == -1)
+			ui_set_text(&lecture_att[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "empty", 24);
+		else
+			ui_set_text(&lecture_att[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, att_str, 24);
+		Stack.push(&Stack, lecture_att[i]);
+			
 	}
 	// Result Window
 
@@ -303,7 +313,7 @@ int scene_4_init() {
 	Stack.push(&Stack, continue_button);
 	
 	object_t what_week = create_object(NULL, 0, 0);
-	sprintf(weekstr, "%d¿ù %dÂ° ÁÖ", today_Month, today_of_week);
+	sprintf(weekstr, "%d %d", today_Month, today_of_week);
 	ui_set_text(&what_week, al_map_rgb(255, 255, 255), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 24);
 	Stack.push(&Stack, what_week);
 
