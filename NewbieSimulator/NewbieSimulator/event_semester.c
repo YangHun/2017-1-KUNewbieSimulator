@@ -2,6 +2,11 @@
 #include "event_structure.h"
 #include "data.h"
 
+
+
+//---------------------------------
+// sequential event function
+//---------------------------------
 static void gaechong_0();
 static void shin_ip_daemyun_1();
 static void gohak_daemyun_2();
@@ -13,6 +18,17 @@ static void running418_7();
 static void Daedongjae_Jujum_8();
 static void Ipselenti_performance_9();
 static void Jongchong_10();
+
+//---------------------------------
+// stochastic event function
+//---------------------------------
+
+static void sool_yak_1();
+static void mom_sal_2();
+static void bam_saem_3();
+
+
+
 static void click_yes(object_t* o);
 static void click_no(object_t* o);
 
@@ -234,6 +250,35 @@ void Jongchong_10() {
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
+
+void sool_yak_1() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Soolyak";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Soolyak";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+void mom_sal_2() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Momsal";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Momsal";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+void bam_saem_3() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Bamsaem";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Bamsaem";
+	for (int i = 0; i < 3; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
 void click_yes(object_t* o) {
 	event_choose = true;
 	char compareText[40] = "";
@@ -304,6 +349,42 @@ void click_yes(object_t* o) {
 			printf("Jongchong yes \n");
 			social_point += 2;
 			health_point -= 0.5;
+			return;
+		}
+		cases("Soolyak") {
+			printf("Soolyak yes \n");
+
+			social_point += 2;
+			health_point -= 0.5;
+
+			int p = rand() & 1;
+			if (p) {
+				gyulseok
+			}
+			
+			return;
+		}
+		cases("Momsal") {
+			printf("Momsal yes \n");
+			social_point -= 0.5;
+			
+			int p = rand() & 1;
+			if (p) {
+				gyulseok
+			}
+
+			return;
+		}
+		cases("Bamsaem") {
+			printf("Bamsaem yes \n");
+			social_point -= 0.5;
+			health_point -= 0.5;
+
+			int p = rand() & 1;
+			if (p) {
+				gyulseok
+			}
+
 			return;
 		}
 		defaults
