@@ -109,6 +109,13 @@ typedef struct character {
 
 Character player;
 
+static int trafficlit_count = 5;
+static int trafficlit_coord_x[] = { 650, 880, 980, 960, 1115 };
+static int trafficlit_coord_y[] = { 1190, 1245, 1265, 1380, 1275 };
+static bool trafficlit_go[] = { false, false, false, false, false };
+
+static int trafficlit_go_object_starting;
+static int trafficlit_stop_object_starting;
 static int edge_object_starting;
 static int vertex_object_starting;
 static int stat_object_starting;
@@ -163,6 +170,22 @@ int scene_4_init() {
 	prob_store[1] = test_prob2;
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
+
+	// traffic light
+	trafficlit_go_object_starting = Stack.counter;
+	const char *const respath_trafficlit_go = "Resources\\UI\\routegame\\go.PNG";
+	for (int i = 0; i < trafficlit_count; i++)
+	{
+		Stack.push(&Stack, create_object(respath_trafficlit_go, trafficlit_coord_x[i], trafficlit_coord_y[i]));
+		Stack.objs[Stack.counter - 1].enable = !trafficlit_go;
+	}
+	trafficlit_stop_object_starting = Stack.counter;
+	const char *const respath_trafficlit_stop = "Resources\\UI\\routegame\\stop.PNG";
+	for (int i = 0; i < trafficlit_count; i++)
+	{
+		Stack.push(&Stack, create_object(respath_trafficlit_go, trafficlit_coord_x[i], trafficlit_coord_y[i]));
+		Stack.objs[Stack.counter - 1].enable = trafficlit_go;
+	}
 
 	// ------------------------------------
 	// graph structure setting
@@ -506,6 +529,19 @@ void move(int *pdx, int *pdy) {
 
 	int dx = *pdx;
 	int dy = *pdy;
+
+	for (int i = trafficlit_go_object_starting; i < trafficlit_go_object_starting + trafficlit_count; i++)
+	{
+		object_t *o = &Stack.objs[i];
+		o->pos.x += dx;
+		o->pos.y += dy;
+	}
+	for (int i = trafficlit_stop_object_starting; i < trafficlit_stop_object_starting + trafficlit_count; i++)
+	{
+		object_t *o = &Stack.objs[i];
+		o->pos.x += dx;
+		o->pos.y += dy;
+	}
 
 	for (int i = 0; i < myGraph->Num_of_Edge; i++)
 	{
