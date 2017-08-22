@@ -93,6 +93,8 @@ bool test = false;
 
 //object_t player[4];
 
+static void update_trafficlits();
+
 typedef struct character {
 
 	position_t pos;
@@ -177,15 +179,14 @@ int scene_4_init() {
 	for (int i = 0; i < trafficlit_count; i++)
 	{
 		Stack.push(&Stack, create_object(respath_trafficlit_go, trafficlit_coord_x[i], trafficlit_coord_y[i]));
-		Stack.objs[Stack.counter - 1].enable = !trafficlit_go;
 	}
 	trafficlit_stop_object_starting = Stack.counter;
 	const char *const respath_trafficlit_stop = "Resources\\UI\\routegame\\stop.PNG";
 	for (int i = 0; i < trafficlit_count; i++)
 	{
-		Stack.push(&Stack, create_object(respath_trafficlit_go, trafficlit_coord_x[i], trafficlit_coord_y[i]));
-		Stack.objs[Stack.counter - 1].enable = trafficlit_go;
+		Stack.push(&Stack, create_object(respath_trafficlit_stop, trafficlit_coord_x[i], trafficlit_coord_y[i]));
 	}
+	update_trafficlits();
 
 	// ------------------------------------
 	// graph structure setting
@@ -1013,4 +1014,16 @@ int return_interval() {
 		return 8;
 	}
 	return 9;
+}
+
+void update_trafficlits()
+{
+	for (int i = 0; i < trafficlit_count; i++)
+	{
+		object_t *o;
+		o = &Stack.objs[trafficlit_go_object_starting + i];
+		o->enable = !trafficlit_go;
+		o = &Stack.objs[trafficlit_stop_object_starting + i];
+		o->enable = trafficlit_go;
+	}
 }
