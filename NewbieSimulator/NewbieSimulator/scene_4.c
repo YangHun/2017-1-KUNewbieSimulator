@@ -230,6 +230,7 @@ int scene_4_init() {
 	// STAT WINDOW DARWING
 	// ----------------------------------
 	object_t stat_window = create_object("Resources\\UI\\routegame\\stat_window.png", 0, 0);
+	stat_window.blocks = true;
 	Stack.push(&Stack, stat_window);
 
 	object_t health = create_object(NULL, 60, 150);
@@ -573,64 +574,6 @@ int scene_4_update() {
 			week_count = 1;
 		}
 
-		if (pre_week != week_count) {
-			if (test==false) {
-				printf("enter\n");
-	//al_stop_timer(maingame_timer);
-	//al_stop_timer(event_timer);
-
-				sprintf(weekstr, "%d     %d", today_Month, pre_week);
-				ui_set_text(&WEEKNUM, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
-
-				
-
-				if (health_point - pre.hp > 0) {
-					sprintf(hpvar_str, "+%.1f", health_point - pre.hp);
-					printf("print\n");
-				}
-				else if (health_point - pre.hp < 0)
-					//sprintf(hpvar_str, "%.1f", health_point - pre.hp);
-					strcpy(hpvar_str, "minus");
-				else strcpy(hpvar_str, "+-0%");
-
-				if (strcmp("+6.0", hpvar_str) == 0) printf("true\n");
-				else printf("false hpvar_str : %s", hpvar_str);
-
-				ui_set_text(&HP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, hpvar_str, 24);
-				printf("converted hpvar_str : %s\n",hpvar_str);
-
-				if (social_point - pre.sp != 0)
-					//sprintf(spvar_str, "%.1f", social_point - pre.sp);
-					strcpy(spvar_str, "plus");
-				else if (social_point - pre.sp < 0)
-					//sprintf(spvar_str, "%.1f", social_point - pre.sp);
-					strcpy(spvar_str, "minus");
-				else strcpy(spvar_str, "+-0%");
-				ui_set_text(&SP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, spvar_str, 24);
-				
-				for (i = 0; i < 6; i++) {
-					
-					if (attendance_rate[i] - pre.atd_rate[i] != 0)
-						sprintf(var, "%.1f", attendance_rate[i] - pre.atd_rate[i]);
-					else strcpy(var, "+-0%");
-					ui_set_text(&Stack.objs[result_window_starting + 12 + i], al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, var, 24);
-				}
-
-				for (i = 0; i < 18; i++)
-					Stack.objs[result_window_starting + i].enable = true;
-
-				//if(!continue_clicked)
-
-				pre.hp = health_point;
-				pre.sp = social_point;
-				for (i = 0; i < 6; i++)
-					pre.atd_rate[i] = attendance_rate[i];
-
-				test = true;		//NEED TO REMOVE!!!!!!!!!!!!!!!!!!
-			}
-		}
-		pre_week = week_count;
-
 		is_seq_triggered = false;
 		block_timebar_early_start = true;
 		timebar_width = 0;
@@ -661,6 +604,66 @@ int scene_4_update() {
 		al_start_timer(maingame_timer);
 		
 	}
+
+	// ------------------------------------
+	// weekly result
+	// ------------------------------------
+
+	if (pre_week != week_count) {
+		if (test == false) {
+
+			al_stop_timer(maingame_timer);
+			al_stop_timer(event_timer);
+
+			sprintf(weekstr, "%d     %d", today_Month, pre_week);
+			ui_set_text(&WEEKNUM, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
+
+			if (health_point - pre.hp > 0) {
+				sprintf(hpvar_str, "+%.1f", health_point - pre.hp);
+				printf("print\n");
+			}
+			else if (health_point - pre.hp < 0)
+				//sprintf(hpvar_str, "%.1f", health_point - pre.hp);
+				strcpy(hpvar_str, "minus");
+			else strcpy(hpvar_str, "+-0%");
+
+			if (strcmp("+6.0", hpvar_str) == 0) printf("true\n");
+			else printf("false hpvar_str : %s", hpvar_str);
+
+			ui_set_text(&HP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, hpvar_str, 24);
+			printf("converted hpvar_str : %s\n", hpvar_str);
+
+			if (social_point - pre.sp != 0)
+				//sprintf(spvar_str, "%.1f", social_point - pre.sp);
+				strcpy(spvar_str, "plus");
+			else if (social_point - pre.sp < 0)
+				//sprintf(spvar_str, "%.1f", social_point - pre.sp);
+				strcpy(spvar_str, "minus");
+			else strcpy(spvar_str, "+-0%");
+			ui_set_text(&SP_VAR, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, spvar_str, 24);
+
+			for (i = 0; i < 6; i++) {
+
+				if (attendance_rate[i] - pre.atd_rate[i] != 0)
+					sprintf(var, "%.1f", attendance_rate[i] - pre.atd_rate[i]);
+				else strcpy(var, "+-0%");
+				ui_set_text(&Stack.objs[result_window_starting + 12 + i], al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, var, 24);
+			}
+
+			for (i = 0; i < 18; i++)
+				Stack.objs[result_window_starting + i].enable = true;
+
+			//if(!continue_clicked)
+
+			pre.hp = health_point;
+			pre.sp = social_point;
+			for (i = 0; i < 6; i++)
+				pre.atd_rate[i] = attendance_rate[i];
+
+			test = true;		//NEED TO REMOVE!!!!!!!!!!!!!!!!!!
+		}
+	}
+	pre_week = week_count;
 
 	// ------------------------------------
 	// Event Managing
@@ -910,7 +913,13 @@ void stat_update()
 
 void letscontinue()
 {
+	event_choose = true;
 	continue_clicked = true;
+	test = false;
+	for (int i = 0; i < 18; i++) {
+		Stack.objs[result_window_starting+i].enable = false;
+	}
+	
 }
 
 void edit_timebar_color(schedule mySchedule) {
