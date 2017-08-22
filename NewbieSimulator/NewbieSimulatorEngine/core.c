@@ -175,6 +175,7 @@ object_t create_object(char* imgpath, float x, float y) {
 	}
 
 	obj.enable = true;
+	obj.blocks = false;
 	obj.rotated = false;
 	obj.angle = 0.0f;
 	obj.opacity = 1.0f;
@@ -207,6 +208,7 @@ object_t create_colored_object(ALLEGRO_COLOR c, float width, float height, float
 	obj.image = NULL;
 
 	obj.enable = true;
+	obj.blocks = false;
 	obj.rotated = false;
 	obj.angle = 0.0f;
 	obj.opacity = 1.0f;
@@ -236,6 +238,7 @@ object_t create_line_object(ALLEGRO_COLOR c, float x1, float y1, float x2, float
 	obj.image = NULL;
 
 	obj.enable = true;
+	obj.blocks = false;
 	obj.rotated = false;
 	obj.angle = 0.0f;
 	obj.opacity = 1.0f;

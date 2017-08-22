@@ -99,6 +99,7 @@ struct object_t {
 	position_t pos;
 
 	bool enable; // enable이면 draw, disable이면 not draw
+	bool blocks;
 	
 	float opacity; //transparancy
 
