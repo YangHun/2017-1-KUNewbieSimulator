@@ -289,6 +289,25 @@ int scene_4_init() {
 	for (i = 0; i < 6; i++) {
 		//attendance
 	}
+	// Result Window
+
+	result_window_starting = Stack.counter;
+	object_t middle_result = create_object("Resources\\UI\\routegmae\\middle_result.png", 0, 0);
+	middle_result.enable = false;
+	Stack.push(&Stack, middle_result);
+
+	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", SCREEN_W / 2, 500);
+	ui_set_button(&continue_button);
+	ui_set_on_click_listener(&continue_button, letscontinue);
+	continue_button.enable = false;
+	Stack.push(&Stack, continue_button);
+	
+	object_t what_week = create_object(NULL, 0, 0);
+	sprintf(weekstr, "%d월 %d째 주", today_Month, today_of_week);
+	ui_set_text(&what_week, al_map_rgb(255, 255, 255), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 24);
+	Stack.push(&Stack, what_week);
+
+
 	// ------------------------------------
 	// Timebar UI setting
 	// ------------------------------------
@@ -335,24 +354,7 @@ int scene_4_init() {
 	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
 
-	// Result Window
-
-	result_window_starting = Stack.counter;
-	object_t middle_result = create_object("Resources\\UI\\routegmae\\middle_result.png", 0, 0);
-	middle_result.enable = false;
-	Stack.push(&Stack, middle_result);
 	
-	object_t continue_button = create_object("Resources\\UI\\routegame\\continue_button.png", SCREEN_W / 2, 500);
-	ui_set_button(&Stack, continue_button);
-	ui_set_on_click_listener(&continue_button, letscontinue);
-	continue_button.enable = false;
-	Stack.push(&Stack, continue_button);
-
-	object_t what_week = create_object(NULL, 0, 0);
-	sprintf(weekstr, "%d월 %d째 주", today_Month, today_of_week);
-	ui_set_text(&what_week, al_map_rgb(255, 255, 255), "Resources\\font\\BMJUA.ttf",ALLEGRO_ALIGN_LEFT,weekstr,24);
-	Stack.push(&Stack, what_week);
-
 	return 0;
 }
 
