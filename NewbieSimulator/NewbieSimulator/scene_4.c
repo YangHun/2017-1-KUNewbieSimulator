@@ -48,10 +48,8 @@ int event_timer_clock = 0;
 bool event_choose = false;
 bool is_seq_triggered;
 ALLEGRO_CONFIG *conf_for_event;
-// ------------------------------------
-// stochastic event variable declaration
-// ------------------------------------
 
+bool stop_map_moving = false;
 // ------------------------------------
 // stat
 // ------------------------------------
@@ -75,7 +73,7 @@ bool move_map = false;
 int pre_x = 0, pre_y = 0;
 int pre_mouse_x = 0, pre_mouse_y = 0;
 Coord_2D start_point, end_point;
-
+float current_edge_length = 1;
 double nowx, nowy;
 double x_velocity, y_velocity;
 
@@ -170,7 +168,6 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
-	
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
 	conf_for_event = al_load_config_file("Resources\\korean\\routegame.ini");
@@ -486,6 +483,7 @@ void move_player(Character* chr, float x, float y) {
 }
 
 static double speed = 1000;
+
 void setting()
 {
 	player.image[player.current_image]->enable = false;
@@ -493,6 +491,7 @@ void setting()
 	player.image[player.current_image]->enable = true;
 	nowx = player.pos.x;
 	nowy = player.pos.y;
+	
 	if (player.is_moving_now) {
 		end_point.x = myGraph->vertexArray[player.next_point].loc.x;
 		end_point.y = myGraph->vertexArray[player.next_point].loc.y;
@@ -502,7 +501,7 @@ void setting()
 		float vector_x = end_point.x - start_point.x;
 		float vector_y = end_point.y - start_point.y;
 
-		move_player(&player, vector_x / speed, vector_y / speed);
+		move_player(&player, vector_x / (speed * current_edge_length), vector_y / (speed * current_edge_length));
 		printf("%f %d\n", player.pos.x, myGraph->vertexArray[player.next_point].loc.x - 1);
 		if (player.pos.x == myGraph->vertexArray[player.next_point].loc.x &&
 			player.pos.y == myGraph->vertexArray[player.next_point].loc.y ) {
@@ -596,6 +595,7 @@ int scene_4_update() {
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
 			is_seq_triggered = true;
+			stop_map_moving = true;
 		}
 	}
 
@@ -678,7 +678,7 @@ int scene_4_update() {
 
 	if (pre_week != week_count) {
 		if (test == false) {
-
+			stop_map_moving = true;
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
 
@@ -748,6 +748,7 @@ int scene_4_update() {
 		if (p == 1) {
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
+			stop_map_moving = true;
 		}
 	}
 	
@@ -762,6 +763,7 @@ int scene_4_update() {
 		}
 		event_choose = false;
 		block_timebar_early_start = true;
+		stop_map_moving = false;
 	}
 	
 	if (!player.is_moving_now) {
@@ -777,7 +779,7 @@ int scene_4_update() {
 		setting();
 
 		
-		if (count >= speed) {
+		if (count >= (speed * current_edge_length)) {
 
 			// reached destination
 
@@ -808,29 +810,29 @@ int scene_4_update() {
 	//--------------------------//
 	//map moving setting By hasu//
 	//--------------------------//
-	
-	al_get_mouse_state(&state);
-	if (al_mouse_button_down(&state, 1)) // if mouse is pushed !! 
-	{
+	if (!stop_map_moving) {
 		al_get_mouse_state(&state);
-		int x = state.x;
-		int y = state.y;
+		if (al_mouse_button_down(&state, 1)) // if mouse is pushed !! 
+		{
+			al_get_mouse_state(&state);
+			int x = state.x;
+			int y = state.y;
 
-		int dx = (x - pre_mouse_x);
-		int dy = (y - pre_mouse_y);
+			int dx = (x - pre_mouse_x);
+			int dy = (y - pre_mouse_y);
 
-		move(&dx, &dy);
+			move(&dx, &dy);
 
-		pre_mouse_x += dx;
-		pre_mouse_y += dy;
+			pre_mouse_x += dx;
+			pre_mouse_y += dy;
 
+		}
+		else
+		{
+			pre_mouse_x = state.x;
+			pre_mouse_y = state.y;
+		}
 	}
-	else
-	{
-		pre_mouse_x = state.x;
-		pre_mouse_y = state.y;
-	}
-	
 	// traffic lights
 
 	int trafficlit_tickcnt = al_get_timer_count(trafficlit_timer);
@@ -953,13 +955,14 @@ void init_schedule_data(void) {
 }
 void map_button_on_click_listener_func(object_t *o)
 {
-	if (player.is_moving_now)
+	if (player.is_moving_now || stop_map_moving)
 		return;
 	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
 	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
 	for (int i = 0; i < myGraph->Num_of_Edge; i++)
 	{
 		edge *e = &myGraph->edgeArray[i];
+		current_edge_length = e->length;
 		if (e->vertexindex_1 == player.curr_point && e->vertexindex_2 == clicked_vertex_idx ||
 			e->vertexindex_2 == player.curr_point && e->vertexindex_1 == clicked_vertex_idx)
 		{
