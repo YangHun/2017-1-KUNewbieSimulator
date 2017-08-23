@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <stdbool.h>
+#include "lectureInfo.h"
 
 /** Begin a switch for the string x */
 #define switchs(x) \

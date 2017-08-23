@@ -3,6 +3,9 @@
 #include "core.h"
 #include "ui.h"
 
+#define SCREEN_W 1280	
+#define SCREEN_H 720
+
 static int engine();
 
 extern void state_manage(ALLEGRO_EVENT ev);

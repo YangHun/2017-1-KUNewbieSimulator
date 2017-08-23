@@ -54,6 +54,8 @@ int scene_3_init() {
 
 	printf("Scene 3 start! \n");
 
+	srand(time(NULL));
+
 	object_t bg = create_object("Resources\\UI\\enroll_2\\background.jpg", 0, 0);
 	Background = bg;
 	for (i = 0; i < 6; i++) {
@@ -177,7 +179,9 @@ int scene_3_update() {
 				result();
 			}
 		}
+
 		if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 2000)) {
+
 			load_scene(Scenes.scenes[4]);
 		}
 	}
@@ -336,7 +340,6 @@ void result() {
 void reSchedule() {
 	int i, j;
 	int newindex = 0;
-	bool repeat = true;
 
 	for (i = 0; i < 6; i++) {
 		if (lectureindex[i] == -1) {
@@ -346,7 +349,7 @@ void reSchedule() {
 					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
 					break;
 				}
-			}
+			}			
 		}
 	}
 

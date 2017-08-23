@@ -32,8 +32,8 @@ int explain_stat = 0;
 
 int spritex = 640, spritey = 360; 
 
-int health_point = 0;
-	int social_point = 0;
+float health_point = 10.0;
+float social_point = 0.0;
 char hpstr[10], spstr[10];
 
 int dir = 0, img = 0;
@@ -56,8 +56,8 @@ int event_num = 0;
 void clicked_yes(object_t *o);
 void clicked_no(object_t *o);
 
-#define HP_TEXT Stack.objs[5]
-#define SP_TEXT Stack.objs[6]
+#define HP_TEXT Stack.objs[7]
+#define SP_TEXT Stack.objs[8]
 
 #define timeline Stack.objs[2]
 #define timebar Stack.objs[3]
@@ -124,9 +124,6 @@ int scene_1_init(){
 	sprintf(spstr, "%0.1f", social_point/10.0);
 	ui_set_text(&sp, al_map_rgb(0, 0, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_CENTER, spstr, 24);
 	Stack.push(&Stack, sp);
-
-
-	
 
 
 	font = al_load_font("Resources\\font\\NanumGothic.ttf", 36, 0);
@@ -239,8 +236,6 @@ int scene_1_update() {
 	//	printf("dir change, character_timer = %d\n", al_get_timer_count(character_timer));
 	}
 
-	
-
 	if (!explain_stat) { //stat¼³¸í ÆË¾÷ ¶ç¿ì±â
 		explain_stat=1;
 		popup = create_object("Resources\\dummy\\popup.png", 310, 130);
@@ -275,8 +270,8 @@ int scene_1_update() {
 	}
 
 
-#define EVENT_TIME 20
-	if (al_get_timer_count(event_timer) - event_timer_set > (EVENT_TIME*1000)) {
+#define EVENT_TIME 2////	FOR TEST!!!!!	2->20
+	if (al_get_timer_count(event_timer) - event_timer_set > (EVENT_TIME*1000)) { 
 		printf("timer : %lld\n", al_get_timer_count(event_timer));
 		event_timer_set = al_get_timer_count(event_timer);
 		for (event_num = 0; event_num < EVENTCOUNT; event_num++) {

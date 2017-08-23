@@ -175,6 +175,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="event_semester.c" />
     <ClCompile Include="audio.c" />
     <ClCompile Include="fsm.c" />
     <ClCompile Include="game.c" />
@@ -192,6 +193,8 @@
   <ItemGroup>
     <ClInclude Include="audio.h" />
     <ClInclude Include="data.h" />
+    <ClInclude Include="event_semester.h" />
+    <ClInclude Include="event_structure.h" />
     <ClInclude Include="fsms.h" />
     <ClInclude Include="graph_manage.h" />
     <ClInclude Include="graph_structure.h" />

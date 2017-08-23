@@ -4,8 +4,6 @@
 
 
 #define FPS 60
-#define SCREEN_W 1280
-#define SCREEN_H 720
 #define BOUNCER_SIZE 64
 
 object_t Background;
@@ -187,7 +185,7 @@ void event_manage() {
 
 		if (last_match_index != -1) {
 			object_t *o = &(Stack.objs[last_match_index]);
-			if (o->modifier.type == OBJECT_MODIFIER_BUTTON) {
+			if (o->modifier.type == OBJECT_MODIFIER_BUTTON&& o->modifier.value.button_value.on_click_listener != NULL) {
 			o->modifier.value.button_value.on_click_listener(o);
 			}
 		}
