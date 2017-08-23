@@ -257,12 +257,12 @@ int scene_4_init() {
 	Stack.push(&Stack, no_button); 
 
 	object_t event_message_0 = create_object(NULL, 470, 245);
-	object_t event_message_1 = create_object(NULL, 470, 295);
+	object_t event_message_1 = create_object(NULL, 470, 305);
 	object_t event_message_2 = create_object(NULL, 470, 335);
 
 	ui_set_text(&event_message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 40);
-	ui_set_text(&event_message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 32);
-	ui_set_text(&event_message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 32);
+	ui_set_text(&event_message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 24);
+	ui_set_text(&event_message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 24);
 
 	Stack.push(&Stack, event_message_0);
 	Stack.push(&Stack, event_message_1);

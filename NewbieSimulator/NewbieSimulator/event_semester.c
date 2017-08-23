@@ -180,9 +180,12 @@ void init_spe_event(event_function spe_event_func[]) {
 void standard_event_form() { // 기본적인 형태
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "message of event";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "message of event";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "flavor_text_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "flavor_text_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "flavor_text_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -204,9 +207,12 @@ void gaechong_0() {
 void shin_ip_daemyun_1() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "shinip daemyun";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "shinip daemyun";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "shin_ip_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "shin_ip_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "shin_ip_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -214,9 +220,12 @@ void shin_ip_daemyun_1() {
 void gohak_daemyun_2() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "gohak daemyun";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "gohak daemyun";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "go_hak_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "go_hak_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "go_hak_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -224,19 +233,25 @@ void gohak_daemyun_2() {
 void sabal_3() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "sabal";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "sabal";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sabal_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sabal_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sabal_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 
-void ung_ti_4() { // 기본적인 형태
+void ung_ti_4() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "ungti";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "ungti";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "eung_t_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "eung_t_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "eung_t_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -244,9 +259,12 @@ void ung_ti_4() { // 기본적인 형태
 void hap_ung_5() { // 기본적인 형태
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "hapung";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "hapung";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "hap_eung_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "hap_eung_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "hap_eung_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -254,9 +272,12 @@ void hap_ung_5() { // 기본적인 형태
 void Dongbak_6() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Dongbak";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Dongbak";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dong_bak_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dong_bak_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dong_bak_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -264,9 +285,12 @@ void Dongbak_6() {
 void running418_7() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "running";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "running";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sa_il_pal_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sa_il_pal_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "sa_il_pal_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -274,9 +298,12 @@ void running418_7() {
 void Daedongjae_Jujum_8() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Daedongjae_Jujum";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Daedongjae_Jujum";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dae_dong_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dae_dong_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "dae_dong_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -284,9 +311,12 @@ void Daedongjae_Jujum_8() {
 void Ipselenti_performance_9() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Ipselenti_performance";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Ipselenti_performance";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "ipselenti_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "ipselenti_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "ipselenti_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -294,9 +324,12 @@ void Ipselenti_performance_9() {
 void Jongchong_10() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Jongchong";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Jongchong";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "jongchong_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "jongchong_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "jongchong_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -305,16 +338,19 @@ void Jongchong_10() {
 void sool_yak_1() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Soolyak";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Soolyak";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "soolyak_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "soolyak_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = "";
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
 void mom_sal_2() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Momsal";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Momsal";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
@@ -324,9 +360,12 @@ void mom_sal_2() {
 void bam_saem_3() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Bamsaem";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Bamsaem";
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_0");
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_1");
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_2");
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
