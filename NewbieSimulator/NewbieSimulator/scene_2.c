@@ -73,6 +73,7 @@ int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
 int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
 int grayblockNumber;
+int grayblockindex = -1;
 typedef enum _KLUElecture { KLUE_HONEY, KLUE_BOMB, KLUE_NORMAL } KLUElecture;
 ALLEGRO_TIMER* sugang_timer;
 ALLEGRO_EVENT_QUEUE* sugang_timer_event_queue;
@@ -384,6 +385,9 @@ int scene_2_update() {
 	if (protectOverlapClick_Map == 1) {
 		protectOverlapClick_Map = 0;
 	}
+	if (protectOverlapClick == 1) {
+		protectOverlapClick = 0;
+	}
 #define SUGANG_TIME 120.0
 	if (al_get_timer_count(sugang_timer) - sugang_timer_set > 10) {
 		sugang_timer_set = al_get_timer_count(sugang_timer);
@@ -497,9 +501,11 @@ void on_click_reset(object_t *o) {
 
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] != -1) {
+			grayblockindex = selectedLectureIndex;
 			selectedLectureIndex = -1;
 			deleteLectureFromSchedule(lectureTable, mySchedulePtr, colorArray[i]);
 			deleteTimeblockImage(colorArray[i]);
+			selectedLectureIndex = grayblockindex;
 		}
 	}
 }
@@ -767,14 +773,16 @@ void deleteTimeblockImage(int input) {
 		}
 		howManyLoop++;
 	}
+	
+	for (int v = i - (howManyLoop - 1); v < i + 1; v++) {
+		al_destroy_font(Stack.objs[v].modifier.value.font_value.font);
+	}
+
 	for (k = i - (howManyLoop - 1); k + howManyLoop < Stack.counter; k++) {
-		Stack.objs[k].modifier.value.font_value.text = Stack.objs[k + howManyLoop].modifier.value.font_value.text;
-		Stack.objs[k].pos.x = Stack.objs[k + howManyLoop].pos.x;
-		Stack.objs[k].pos.y = Stack.objs[k + howManyLoop].pos.y;
+		Stack.objs[k] = Stack.objs[k + howManyLoop];
 	}
-	for (int i = k; i < Stack.counter; i++) {
-		al_destroy_font(Stack.objs[i].modifier.value.font_value.font);
-	}
+	
+	
 	Stack.counter = k;
 	for (int i = 0; i < 7; i++) {
 		if (colorArray[i] == input) {
@@ -822,7 +830,6 @@ void resetLectureList() { // List 색 초기화, 눌러보고 생긴 회색 블록 제거
 				grayblockNumber--;
 			}
 		}
-
 	}
 }
 

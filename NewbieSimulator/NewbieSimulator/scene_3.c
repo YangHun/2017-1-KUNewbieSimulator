@@ -43,6 +43,8 @@ void play_clock_sound_if_not_playing();
 
 int pressed_time[6];
 
+static int netfunnel_object_index;
+
 int scene_3_init() {
 	srand(time(NULL));
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
@@ -138,6 +140,12 @@ int scene_3_init() {
 	Stack.push(&Stack, start_bt);
 #define START_BT Stack.objs[17]
 
+	netfunnel_object_index = Stack.counter;
+	object_t netfunnel_obj = create_object("Resources\\UI\\enroll_2\\netfunnel.png", 0, 0);
+	netfunnel_obj.blocks = true;
+	netfunnel_obj.enable = false;
+	Stack.push(&Stack, netfunnel_obj);
+
 	play_audiosample(3, true);
 
 	return 0;
@@ -164,8 +172,12 @@ int scene_3_update() {
 			stop_audiosample(3);
 		}
 		else if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 1500)) {
-			if(is_result)
+			if (is_result)
+			{
+				object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+				netfunnel_obj->enable = false;
 				result();
+			}
 		}
 
 		if (game_start && al_get_timer_count(click_timer) > (GAMESTART_COUNT * 2000)) {
@@ -205,6 +217,13 @@ void pressed1(object_t *o) {
 
 	pressed[0] = true;
 	pressed_time[0] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void pressed2(object_t *o) {
@@ -213,6 +232,13 @@ void pressed2(object_t *o) {
 	if (!game_start || pressed[1]) return;
 	pressed[1] = true;
 	pressed_time[1] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void pressed3(object_t *o) {
@@ -221,6 +247,13 @@ void pressed3(object_t *o) {
 	if (!game_start || pressed[2]) return;
 	pressed[2] = true;
 	pressed_time[2] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void pressed4(object_t *o) {
@@ -229,6 +262,13 @@ void pressed4(object_t *o) {
 	if (!game_start || pressed[3]) return;
 	pressed[3] = true;
 	pressed_time[3] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void pressed5(object_t *o) {
@@ -237,6 +277,13 @@ void pressed5(object_t *o) {
 	if (!game_start || pressed[4]) return;
 	pressed[4] = true;
 	pressed_time[4] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void pressed6(object_t *o) {
@@ -245,6 +292,13 @@ void pressed6(object_t *o) {
 	if (!game_start || pressed[5]) return;
 	pressed[5] = true;
 	pressed_time[5] = al_get_timer_count(click_timer);
+
+	if (pressed[0] && pressed[1] && pressed[2] && pressed[3] && pressed[4] && pressed[5])
+	{
+		object_t *netfunnel_obj = &Stack.objs[netfunnel_object_index];
+		netfunnel_obj->enable = true;
+		re_draw();
+	}
 }
 
 void result() {
