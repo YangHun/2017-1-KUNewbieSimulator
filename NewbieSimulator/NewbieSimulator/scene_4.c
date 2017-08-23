@@ -37,6 +37,7 @@ void edit_timebar_color(schedule mySchedule);
 int return_interval();
 bool block_timebar_early_start = false;
 bool isArrived = false;
+bool time_attack_mode = false;
 // ------------------------------------
 // event variable declaration
 // ------------------------------------
@@ -822,8 +823,10 @@ int scene_4_update() {
 		count++;
 		
 	}
-	if (pre_period != return_interval()) { // 구간 지남
-		if (return_interval() == 9) { // 새로 온 구간이 쉬는시간
+	int interval_idx = return_interval();
+	if (pre_period != interval_idx) { // 구간 지남
+		if (interval_idx == 9) { // 새로 온 구간이 쉬는시간
+			stop_char_moving = false;
 			if (pre_period < 8) {
 				if (customSchedule.timeTable[today_of_week][pre_period + 1].index != -1) {
 					destination_room = lectureTable[customSchedule.timeTable[today_of_week][pre_period + 1].index].room;
@@ -833,7 +836,7 @@ int scene_4_update() {
 					destination_room = ROOM_DEFAULT;
 				}
 			}
-			else {
+			else { 
 				if (customSchedule.timeTable[today_of_week][0].index != -1) {
 					destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
 				}
@@ -842,17 +845,17 @@ int scene_4_update() {
 				}
 			}
 		}
-		else { // 8 -> 0 일 수도 있음
-			if (customSchedule.timeTable[today_of_week][0].index != -1) {
-				destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
-			}
-			else {
-				destination_room = ROOM_DEFAULT;
+		else { // 새로 온 구간이 교시 구간
+			if (customSchedule.timeTable[today_of_week][interval_idx].index != -1) { // 수업이 있다면
+				time_attack_mode = true;
 			}
 		}
 		printf("%d \n", destination_room);
 	}
-	if (isArrived) {
+	if (time_attack_mode) { // 이 곳이 지각과 결석을 판별하고 도착했는지 파악합니다
+
+	}
+	if (isArrived) { // 도착하면 캐릭터가 굳어야합니다
 		stop_char_moving = true;
 	}
 	//--------------------------//
