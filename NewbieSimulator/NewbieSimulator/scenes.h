@@ -22,3 +22,7 @@ extern int scene_3_fin();
 extern int scene_4_init();
 extern int scene_4_update();
 extern int scene_4_fin();
+
+extern int scene_5_init();
+extern int scene_5_update();
+extern int scene_5_fin();
