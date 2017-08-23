@@ -19,16 +19,17 @@ int maingame_timer_set = 0;
 float timebar_width = 0;
 int second_per_day[5] = { 0, };
 float second_per_period[10] = { 0 };
-whatDay today_of_week; // 오늘의 요일
+whatDay today_dayOfWeek; // 오늘의 요일
 void calculate_second_per_day();
 void calculate_second_per_period(schedule mySchedule);
 void test_custom_schedule();
 void init_schedule_data();
 void map_button_on_click_listener_func(object_t *o);
 void move(int *pdx, int *pdy);
-int today_Month;
-int today_day;
-int week_count;
+int today_dayCount;
+int today_monthOfYear;
+int today_dayOfMonth;
+int today_weekOfMonth;
 int pre_period = 0;
 void stat_update();
 int timebar_object_starting;
@@ -168,10 +169,11 @@ int scene_4_init() {
 	// ------------------------------------
 	// initial setting
 	// ------------------------------------
-	today_of_week = MON;
-	today_day = 2;
-	today_Month = 3;
-	week_count = 1;
+	today_dayOfWeek = MON;
+	today_dayCount = 0;
+	today_dayOfMonth = 2;
+	today_monthOfYear = 3;
+	today_weekOfMonth = 1;
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
@@ -357,7 +359,7 @@ int scene_4_init() {
 	Stack.push(&Stack, continue_button);
 	
 	object_t what_week_num = create_object(NULL, 490,140);
-	sprintf(weekstr, "%d     %d", today_Month, today_of_week);
+	sprintf(weekstr, "%d     %d", today_monthOfYear, today_dayOfWeek);
 	ui_set_text(&what_week_num, al_map_rgb(0,0,0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
 	what_week_num.enable = false;
 	Stack.push(&Stack, what_week_num);
@@ -589,7 +591,7 @@ int scene_4_update() {
 	// ------------------------------------
 
 	if (!is_seq_triggered) {
-		int p = trigger_sequencial_event(today_Month, today_of_week, week_count, sequencial_event_func);
+		int p = trigger_sequencial_event(today_monthOfYear, today_dayOfWeek, today_weekOfMonth, sequencial_event_func);
 		if (p == 1) {
 			al_set_timer_count(event_timer, 0);
 			al_stop_timer(maingame_timer);
@@ -611,34 +613,40 @@ int scene_4_update() {
 	}
 	
 	if (Stack.objs[timebar_object_starting + 10].pos.x > TIMEBAR_MAX) {
-		if (today_of_week == FRI) {
-			today_of_week = MON;
-			today_day += 3;
-			week_count++;
+		if (today_dayOfWeek == FRI) {
+			today_dayOfWeek = MON;
+			today_dayCount += 3;
+			today_dayOfMonth += 3;
+			today_weekOfMonth++;
 		}
 		else {
-			today_of_week++;
-			today_day++;
+			today_dayCount++;
+			today_dayOfWeek++;
+			today_dayOfMonth++;
 		}
-		if (today_day >= 29 && today_Month == 2) {
-			today_Month++;
-			today_day -= 28;
-			week_count = 1;
+		if (today_dayOfMonth >= 29 && today_monthOfYear == 2) {
+			today_monthOfYear++;
+			today_dayOfMonth -= 28;
+			today_weekOfMonth = 1;
 		}
-		if (today_day >= 31 && (today_Month == 4 || today_Month == 6 || today_Month == 9 || today_Month == 11)) {
-			today_Month++;
-			today_day -= 30;
-			week_count = 1;
+		if (today_dayOfMonth >= 31 && (today_monthOfYear == 4 || today_monthOfYear == 6 || today_monthOfYear == 9 || today_monthOfYear == 11)) {
+			today_monthOfYear++;
+			today_dayOfMonth -= 30;
+			today_weekOfMonth = 1;
 		}
-		if (today_day >= 32 && (today_Month == 1 || today_Month == 3 || today_Month == 5 || today_Month == 7 || today_Month == 8 || today_Month == 10 || today_Month == 12)) {
-			if (today_Month == 12) {
-				today_Month = 1;
+		if (today_dayOfMonth >= 32 && (today_monthOfYear == 1 || today_monthOfYear == 3 || today_monthOfYear == 5 || today_monthOfYear == 7 || today_monthOfYear == 8 || today_monthOfYear == 10 || today_monthOfYear == 12)) {
+			if (today_monthOfYear == 12) {
+				today_monthOfYear = 1;
 			}
 			else {
-				today_Month++;
+				today_monthOfYear++;
 			}
-			today_day -= 31;
-			week_count = 1;
+			today_dayOfMonth -= 31;
+			today_weekOfMonth = 1;
+		}
+		if (today_dayCount >= 79)
+		{
+			load_scene(Scenes.scenes[5]);
 		}
 
 		is_seq_triggered = false;
@@ -648,8 +656,8 @@ int scene_4_update() {
 		maingame_timer_set = 0;
 		edit_timebar_color(customSchedule);
 		calculate_second_per_period(customSchedule);
-		printf("%d 월 %d 일 %d주 ", today_Month, today_day, week_count);
-		switch (today_of_week) {
+		printf("%d 월 %d 일 %d주 ", today_monthOfYear, today_dayOfMonth, today_weekOfMonth);
+		switch (today_dayOfWeek) {
 		case MON:
 			printf("월");
 			break;
@@ -677,14 +685,14 @@ int scene_4_update() {
 	// weekly result
 	// ------------------------------------
 
-	if (pre_week != week_count) {
+	if (pre_week != today_weekOfMonth) {
 		if (test == false) {
 			stop_map_moving = true;
 			stop_char_moving = true;
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
 
-			sprintf(weekstr, "%d     %d", today_Month, pre_week);
+			sprintf(weekstr, "%d     %d", today_monthOfYear, pre_week);
 			ui_set_text(&WEEKNUM, al_map_rgb(0, 0, 0), "Resources\\font\\BMJUA.ttf", ALLEGRO_ALIGN_LEFT, weekstr, 36);
 
 			if (health_point - pre.hp > 0) {
@@ -732,7 +740,7 @@ int scene_4_update() {
 			test = true;		//NEED TO REMOVE!!!!!!!!!!!!!!!!!!
 		}
 	}
-	pre_week = week_count;
+	pre_week = today_weekOfMonth;
 
 	// ------------------------------------
 	// Event Managing
@@ -825,17 +833,17 @@ int scene_4_update() {
 		if (interval_idx == 9) { // 새로 온 구간이 쉬는시간
 			stop_char_moving = false;
 			if (pre_period < 8) {
-				if (customSchedule.timeTable[today_of_week][pre_period + 1].index != -1) {
-					destination_room = lectureTable[customSchedule.timeTable[today_of_week][pre_period + 1].index].room;
-
+				if (customSchedule.timeTable[today_dayOfWeek][pre_period + 1].index != -1) {
+					destination_room = lectureTable[customSchedule.timeTable[today_dayOfWeek][pre_period + 1].index].room;
+					
 				}
 				else {
 					destination_room = ROOM_DEFAULT;
 				}
 			}
-			else {
-				if (customSchedule.timeTable[today_of_week][0].index != -1) {
-					destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
+			else { 
+				if (customSchedule.timeTable[today_dayOfWeek][0].index != -1) {
+					destination_room = lectureTable[customSchedule.timeTable[today_dayOfWeek][0].index].room;
 				}
 				else {
 					destination_room = ROOM_DEFAULT;
@@ -845,7 +853,7 @@ int scene_4_update() {
 		*/
 		if (interval_idx != 9) { // 새로 온 구간이 교시 구간
 			roomNumber dest_room;
-			int now_lecture_idx = customSchedule.timeTable[today_of_week][interval_idx].index;
+			int now_lecture_idx = customSchedule.timeTable[today_dayOfWeek][interval_idx].index;
 
 			if (now_lecture_idx != -1) {
 				dest_room = lectureTable[now_lecture_idx].room;
@@ -978,7 +986,7 @@ void calculate_second_per_period(schedule mySchedule) {
 	int shuim = 1000;
 	for (int i = 0; i < 9; i++) {
 
-		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? gonggang : su_up;
+		second_per_period[i] = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? gonggang : su_up;
 	}
 	second_per_period[9] = shuim;
 }
@@ -1071,7 +1079,7 @@ void letscontinue()
 
 void edit_timebar_color(schedule mySchedule) {
 	for (int i = 0; i < 9; i++) {
-		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_of_week][i].index == -1) ? al_map_rgb(0, 238, 0) : al_map_rgb(238, 0, 0);
+		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? al_map_rgb(0, 238, 0) : al_map_rgb(238, 0, 0);
 	}
 }
 
