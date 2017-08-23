@@ -3,7 +3,6 @@
 #include "data.h"
 #include "graph_manage.h"
 #include "event_semester.h"
-
 // colors
 
 ALLEGRO_COLOR edge_color_default;
@@ -29,6 +28,7 @@ void move(int *pdx, int *pdy);
 int today_Month;
 int today_day;
 int week_count;
+int pre_period = 0;
 void stat_update();
 int timebar_object_starting;
 schedule customSchedule; // to test
@@ -36,7 +36,7 @@ schedule customSchedule; // to test
 void edit_timebar_color(schedule mySchedule);
 int return_interval();
 bool block_timebar_early_start = false;
-
+bool isArrived = false;
 // ------------------------------------
 // event variable declaration
 // ------------------------------------
@@ -50,6 +50,7 @@ bool is_seq_triggered;
 ALLEGRO_CONFIG *conf_for_event;
 
 bool stop_map_moving = false;
+bool stop_char_moving = false;
 // ------------------------------------
 // stat
 // ------------------------------------
@@ -92,6 +93,7 @@ bool test = false;
 ALLEGRO_TIMER *trafficlit_timer;
 static void update_trafficlit_objects();
 static void update_edge_objects();
+roomNumber destination_room;
 
 typedef struct character {
 
@@ -168,6 +170,13 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
+	
+	if (customSchedule.timeTable[MON][0].index != 1) {
+		destination_room = lectureTable[customSchedule.timeTable[MON][0].index].room;
+	}
+	else {
+		destination_room = ROOM_DEFAULT;
+	}
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
 	conf_for_event = al_load_config_file("Resources\\korean\\routegame.ini");
@@ -596,6 +605,7 @@ int scene_4_update() {
 			al_stop_timer(event_timer);
 			is_seq_triggered = true;
 			stop_map_moving = true;
+			stop_char_moving = true;
 		}
 	}
 
@@ -679,6 +689,7 @@ int scene_4_update() {
 	if (pre_week != week_count) {
 		if (test == false) {
 			stop_map_moving = true;
+			stop_char_moving = true;
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
 
@@ -749,6 +760,7 @@ int scene_4_update() {
 			al_stop_timer(maingame_timer);
 			al_stop_timer(event_timer);
 			stop_map_moving = true;
+			stop_char_moving = true;
 		}
 	}
 	
@@ -764,6 +776,7 @@ int scene_4_update() {
 		event_choose = false;
 		block_timebar_early_start = true;
 		stop_map_moving = false;
+		stop_char_moving = false;
 	}
 	
 	if (!player.is_moving_now) {
@@ -786,7 +799,7 @@ int scene_4_update() {
 			update_edge_objects();
 			
 			player.is_moving_now = false;
-
+			
 			int image_x, image_y;
 
 			image_x = player.image[0]->rect.width / 2;
@@ -806,7 +819,39 @@ int scene_4_update() {
 		count++;
 		
 	}
-
+	if (pre_period != return_interval()) { // 구간 지남
+		if (return_interval() == 9) { // 새로 온 구간이 쉬는시간
+			if (pre_period < 8) {
+				if (customSchedule.timeTable[today_of_week][pre_period + 1].index != -1) {
+					destination_room = lectureTable[customSchedule.timeTable[today_of_week][pre_period + 1].index].room;
+					
+				}
+				else {
+					destination_room = ROOM_DEFAULT;
+				}
+			}
+			else {
+				if (customSchedule.timeTable[today_of_week][0].index != -1) {
+					destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
+				}
+				else {
+					destination_room = ROOM_DEFAULT;
+				}
+			}
+		}
+		else { // 8 -> 0 일 수도 있음
+			if (customSchedule.timeTable[today_of_week][0].index != -1) {
+				destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
+			}
+			else {
+				destination_room = ROOM_DEFAULT;
+			}
+		}
+		printf("%d \n", destination_room);
+	}
+	if (isArrived) {
+		stop_char_moving = true;
+	}
 	//--------------------------//
 	//map moving setting By hasu//
 	//--------------------------//
@@ -861,7 +906,7 @@ int scene_4_update() {
 		update_trafficlit_objects();
 		update_edge_objects();
 	}
-
+	pre_period = return_interval();
 	re_draw();
 
 	return 0;
@@ -955,7 +1000,7 @@ void init_schedule_data(void) {
 }
 void map_button_on_click_listener_func(object_t *o)
 {
-	if (player.is_moving_now || stop_map_moving)
+	if (player.is_moving_now || stop_char_moving)
 		return;
 	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
 	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
@@ -1039,7 +1084,7 @@ int return_interval() {
 	if (target >= 994 && target <= 1094) {
 		return 7;
 	}
-	if (target >= 1136 && target <= 1236) {
+	if (target >= 1136) {
 		return 8;
 	}
 	return 9;
