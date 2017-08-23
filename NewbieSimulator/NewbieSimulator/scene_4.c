@@ -47,13 +47,11 @@ ALLEGRO_TIMER* event_timer;
 int event_timer_clock = 0;
 bool event_choose = false;
 bool is_seq_triggered;
+ALLEGRO_CONFIG *conf_for_event;
 // ------------------------------------
 // stochastic event variable declaration
 // ------------------------------------
-float* prob_store;
-float test_prob1 = 0.2;
-float test_prob2 = 0.3;
-float test_prob3 = 0.1;
+
 // ------------------------------------
 // stat
 // ------------------------------------
@@ -172,12 +170,10 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
-	prob_store = (float*)malloc(sizeof(float) * 2);
-	prob_store[0] = test_prob1;
-	prob_store[1] = test_prob2;
+	
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
-
+	conf_for_event = al_load_config_file("Resources\\korean\\routegame.ini");
 	// traffic light
 	trafficlit_go_object_starting = Stack.counter;
 	const char *const respath_trafficlit_go = "Resources\\UI\\routegame\\go.PNG";
@@ -258,10 +254,21 @@ int scene_4_init() {
 	ui_set_button(&no_button);
 
 	Stack.push(&Stack, yes_button);
-	Stack.push(&Stack, no_button);  // (current : 178 + 0 1 2  = 180)
+	Stack.push(&Stack, no_button); 
 
-	for (i = 0; i < 3; i++) {
-		Stack.objs[Stack.counter - 3 + i].enable = false;
+	object_t event_message_0 = create_object(NULL, 470, 245);
+	object_t event_message_1 = create_object(NULL, 470, 295);
+	object_t event_message_2 = create_object(NULL, 470, 335);
+
+	ui_set_text(&event_message_0, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 40);
+	ui_set_text(&event_message_1, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 32);
+	ui_set_text(&event_message_2, al_map_rgb(255, 255, 255), "Resources\\font\\NanumGothic.ttf", ALLEGRO_ALIGN_LEFT, "", 32);
+
+	Stack.push(&Stack, event_message_0);
+	Stack.push(&Stack, event_message_1);
+	Stack.push(&Stack, event_message_2);
+	for (i = 0; i < 6; i++) {
+		Stack.objs[Stack.counter - 6 + i].enable = false;
 	}
 
 	// initial graph edge coloring
@@ -734,7 +741,7 @@ int scene_4_update() {
 	if (al_get_timer_count(event_timer) - event_timer_clock > (EVENT_TIME_INTERVAL * 1000)) {
 		event_timer_clock = al_get_timer_count(event_timer);
 
-		int p = trigger_stochastic_event(stochastic_event_func, prob_store);
+		int p = trigger_stochastic_event(stochastic_event_func);
 		printf("ppap \n");
 		al_set_timer_count(event_timer, 0);
 		event_timer_clock = 0;
@@ -746,10 +753,11 @@ int scene_4_update() {
 	
 	if (event_choose) {
 		stat_update();
+		prob_update(stochastic_event_func);
 		al_resume_timer(maingame_timer);
 		al_start_timer(event_timer);
 		event_timer_clock = 0;
-		for (i = 0; i < 3; i++) {
+		for (i = 0; i < 6; i++) {
 			Stack.objs[yes_or_no_UI_starting + i].enable = false;
 		}
 		event_choose = false;
@@ -867,7 +875,9 @@ int scene_4_fin() {
 	al_destroy_timer(maingame_timer);
 	al_destroy_timer(event_timer);
 	printf("counter : %d \n", Stack.counter);
-	free(prob_store);
+	al_destroy_config(conf);
+	al_destroy_config(conf_lecture);
+	al_destroy_config(conf_for_event);
 	return 0;
 }
 
@@ -898,9 +908,9 @@ void calculate_second_per_period(schedule mySchedule) {
 	//int gonggang = 10;
 	//int su_up = 2;
 	//int shuim = 20;
-	int gonggang = 1;
-	int su_up = 1;
-	int shuim = 1;
+	int gonggang = 10;
+	int su_up = 2;
+	int shuim = 20;
 	for (int i = 0; i < 9; i++) {
 
 		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? gonggang : su_up;

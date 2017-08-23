@@ -1,5 +1,5 @@
 #pragma once
-#define STO_EVENTCOUNT 2
+#define STO_EVENTCOUNT 3
 #define SEQ_EVENTCOUNT 13
 #define SPE_EVENTCOUNT 3
 #include "engine.h"
@@ -30,6 +30,7 @@
 struct event_function {
 	void(*func)();
 	bool isStarted;
+	float prob;
 };
 
 typedef struct event_function event_function;

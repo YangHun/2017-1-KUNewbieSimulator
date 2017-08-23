@@ -14,4 +14,5 @@ extern schedule* mySchedulePtr;
 //scene 3
 extern int lectureindex[6];
 //scene 4
+extern ALLEGRO_CONFIG *conf_for_event;
 //extern void stat_update();
