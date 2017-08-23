@@ -95,6 +95,8 @@ static void update_trafficlit_objects();
 static void update_edge_objects();
 roomNumber destination_room;
 
+#define CHARACTER_IMAGE_COUNT 5
+
 typedef struct character {
 
 	position_t pos;
@@ -102,7 +104,7 @@ typedef struct character {
 	int curr_point;
 	int next_point;
 
-	object_t* image[4];
+	object_t* image[CHARACTER_IMAGE_COUNT];
 	int current_image;
 	
 	bool is_moving_now;
@@ -219,13 +221,14 @@ int scene_4_init() {
 	al_start_timer(timer);
 
 
-	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\move.png", 100, 150));
-	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\1.png", 100, 150));
-	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\2.png", 100, 150));
-	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\3.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\player_moving.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\player_stop0.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\player_stop1.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\player_stop2.png", 100, 150));
+	Stack.push(&Stack, create_object("Resources\\UI\\routegame\\player_road.png", 100, 150));
 
-	for (i = 0; i < 4; i++) {
-		player.image[i] = &Stack.objs[Stack.counter - 4 + i];
+	for (i = 0; i < CHARACTER_IMAGE_COUNT; i++) {
+		player.image[i] = &Stack.objs[Stack.counter - CHARACTER_IMAGE_COUNT + i];
 		player.image[i]->enable = false;
 	} // 171 + (# of edges) +  0, 1, 2, 3 (current : ~177)
 
@@ -466,7 +469,7 @@ void set_player_position_to_vertex(Character* chr, int index) {
 	player.pos.x = myGraph->vertexArray[index].loc.x - image_x;
 	player.pos.y = myGraph->vertexArray[index].loc.y - image_y;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < CHARACTER_IMAGE_COUNT; i++) {
 		chr->image[i]->pos.x = myGraph->vertexArray[index].loc.x - image_x;
 		chr->image[i]->pos.y = myGraph->vertexArray[index].loc.y - image_y;
 	}
@@ -476,7 +479,7 @@ void set_player_position_to_vertex(Character* chr, int index) {
 void move_player(Character* chr, float x, float y) {
 	player.pos.x += x;
 	player.pos.y += y;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < CHARACTER_IMAGE_COUNT; i++) {
 		chr->image[i]->pos.x += x;
 		chr->image[i]->pos.y += y;
 	}
@@ -569,7 +572,7 @@ void move(int *pdx, int *pdy) {
 
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < CHARACTER_IMAGE_COUNT; i++)
 	{
 		player.image[i]->pos.x += dx;
 		player.image[i]->pos.y += dy;
@@ -771,10 +774,19 @@ int scene_4_update() {
 	}
 	
 	if (!player.is_moving_now) {
-		if (al_get_timer_count(timer) - chr_timer_set>500) {
-			chr_timer_set = al_get_timer_count(timer);
+		if (myGraph->vertexArray[player.curr_point].type == VERTEX_TYPE_BUILDING)
+		{
+			if (al_get_timer_count(timer) - chr_timer_set > 500) {
+				chr_timer_set = al_get_timer_count(timer);
+				player.image[player.current_image]->enable = false;
+				player.current_image = rand() % 3 + 1;
+				player.image[player.current_image]->enable = true;
+			}
+		}
+		else
+		{
 			player.image[player.current_image]->enable = false;
-			player.current_image = rand() % 3 + 1;
+			player.current_image = CHARACTER_IMAGE_COUNT - 1;
 			player.image[player.current_image]->enable = true;
 		}
 	}
@@ -800,7 +812,7 @@ int scene_4_update() {
 			player.next_point = -1;
 			//player.is_moving_now = false;
 
-			for (i = 0; i < 4; i++) {
+			for (i = 0; i < CHARACTER_IMAGE_COUNT; i++) {
 				player.image[i]->pos.x = end_point.x - image_x + (*map).pos.x;
 				player.image[i]->pos.y = end_point.y - image_y + (*map).pos.y;
 			}
