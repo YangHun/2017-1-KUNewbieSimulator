@@ -149,6 +149,8 @@ int scene_4_init() {
 
 	printf("Scene 4 start! \n");
 
+	// edge colors
+
 	edge_color_default = al_map_rgb(127, 127, 127);
 	edge_color_available = al_map_rgb(0, 255, 0);
 	edge_color_ready = al_map_rgb(255, 0, 0);
@@ -227,16 +229,6 @@ int scene_4_init() {
 		player.image[i]->enable = false;
 	} // 171 + (# of edges) +  0, 1, 2, 3 (current : ~177)
 
-	
-#define VERTICE myGraph->Num_of_Vertex
-#define EDGES myGraph->Num_of_Edge
-//#define EDGES 0
-//#define CHARACTER 4
-/*
-	current_state = VERTICE + EDGES + CHARACTER + 1;
-	Stack.objs[current_state].enable = true;
-	*/
-	
 	set_player_position_to_vertex(&player, 2);
 
 	int dx = -400;
@@ -491,7 +483,7 @@ void move_player(Character* chr, float x, float y) {
 
 }
 
-static double speed = 1000;
+static double speed = 500;
 
 void setting()
 {
@@ -511,7 +503,6 @@ void setting()
 		float vector_y = end_point.y - start_point.y;
 
 		move_player(&player, vector_x / (speed * current_edge_length), vector_y / (speed * current_edge_length));
-		printf("%f %d\n", player.pos.x, myGraph->vertexArray[player.next_point].loc.x - 1);
 		if (player.pos.x == myGraph->vertexArray[player.next_point].loc.x &&
 			player.pos.y == myGraph->vertexArray[player.next_point].loc.y ) {
 			
@@ -957,7 +948,7 @@ void calculate_second_per_period(schedule mySchedule) {
 	//int shuim = 20;
 	int gonggang = 10;
 	int su_up = 2;
-	int shuim = 20;
+	int shuim = 1000;
 	for (int i = 0; i < 9; i++) {
 
 		second_per_period[i] = (mySchedule.timeTable[today_of_week][i].index == -1) ? gonggang : su_up;
@@ -1003,7 +994,6 @@ void map_button_on_click_listener_func(object_t *o)
 	if (player.is_moving_now || stop_char_moving)
 		return;
 	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
-	printf("clicked! %d %d\n", player.curr_point, clicked_vertex_idx);
 	for (int i = 0; i < myGraph->Num_of_Edge; i++)
 	{
 		edge *e = &myGraph->edgeArray[i];
