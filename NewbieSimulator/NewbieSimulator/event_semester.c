@@ -25,6 +25,7 @@ static void Jongchong_10();
 static void sool_yak_1();
 static void mom_sal_2();
 static void bam_saem_3();
+static void game_4();
 
 
 
@@ -135,15 +136,18 @@ void prob_update(event_function sto_event_func[]) {
 	float prob_soolyak = ((social_point + 8) / 2);
 	float prob_momsal = ((-1) * (health_point) / 2);
 	float prob_bamsam = (social_point / 2);
+	float prob_game = ((social_point + 8) / 2);
 	sto_event_func[0].prob = (prob_soolyak >= 0) ? prob_soolyak : 0;
 	sto_event_func[1].prob = (prob_momsal >= 0) ? prob_momsal : 0;
 	sto_event_func[2].prob = (prob_bamsam >= 0) ? prob_bamsam : 0;
+	sto_event_func[3].prob = (prob_game >= 0) ? prob_game : 0;
 }
 
 void init_sto_event(event_function sto_event_func[]) {
 	sto_event_func[0].func = sool_yak_1;
 	sto_event_func[1].func = mom_sal_2;
 	sto_event_func[2].func = bam_saem_3;
+	sto_event_func[3].func = game_4;
 	for (int i = 0; i < STO_EVENTCOUNT; i++) {
 		sto_event_func[i].isStarted = false;
 	}
@@ -341,12 +345,20 @@ void sool_yak_1() {
 	for (int i = 0; i < 6; i++) {
 		Stack.objs[yes_or_no_UI_starting + i].enable = true;
 	}
-	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "soolyak_0");
-	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "soolyak_1");
+
+
+	char path[20] = "";
+	int r = (rand() % 15);
+
+	sprintf(path, "soolyak_%d_0", r);
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", path);
+	sprintf(path, "soolyak_%d_1", r);
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", path);
 	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = "";
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
+
 void mom_sal_2() {
 	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Momsal";
 	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Momsal";
@@ -366,6 +378,26 @@ void bam_saem_3() {
 	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_0");
 	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_1");
 	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", "bamsaem_2");
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
+	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
+}
+
+void game_4() {
+	Stack.objs[yes_or_no_UI_starting + 1].modifier.value.font_value.text = "Game";
+	Stack.objs[yes_or_no_UI_starting + 2].modifier.value.font_value.text = "Game";
+	for (int i = 0; i < 6; i++) {
+		Stack.objs[yes_or_no_UI_starting + i].enable = true;
+	}
+
+
+	char path[20] = "";
+	int r = (rand() % 17);
+
+	sprintf(path, "game_%d_0", r);
+	Stack.objs[yes_or_no_UI_starting + 3].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", path);
+	sprintf(path, "game_%d_1", r);
+	Stack.objs[yes_or_no_UI_starting + 4].modifier.value.font_value.text = al_get_config_value(conf_for_event, "message", path);
+	Stack.objs[yes_or_no_UI_starting + 5].modifier.value.font_value.text = "";
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 1], click_yes);
 	ui_set_on_click_listener(&Stack.objs[yes_or_no_UI_starting + 2], click_no);
 }
@@ -475,6 +507,14 @@ void click_yes(object_t* o) {
 			
 			return;
 		}
+		cases("Game") {
+			printf("Game yes \n");
+			social_point += 1;
+
+			int p = rand() & 1;
+			if (p) {
+			}
+		}
 		cases("Momsal") {
 			printf("Momsal yes \n");
 			social_point -= 0.5;
@@ -566,6 +606,14 @@ void click_no(object_t* o) {
 			printf("Jongchong no \n");
 			social_point -= 0.5;
 			return;
+		}
+		cases("Game") {
+			printf("Game yes \n");
+			social_point -= 0.3;
+
+			int p = rand() & 1;
+			if (p) {
+			}
 		}
 		cases("stodummy1") {
 			printf("dummy1 no \n");
