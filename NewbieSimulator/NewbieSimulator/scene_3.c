@@ -20,8 +20,8 @@ bool renew_timer_text = false;
 bool lecturerepeat;
 bool is_result = true;
 
-int timer_text_count;
 int lectureindex[6];
+int timer_text_count;
 
 void on_click_startbt(object_t *o);
 void pressed1(object_t *o);
