@@ -4,6 +4,7 @@
 #include "graph_manage.h"
 #include "event_semester.h"
 #include "xmlParser.h"
+#include "audio.h"
 // colors
 
 ALLEGRO_COLOR edge_color_default;
