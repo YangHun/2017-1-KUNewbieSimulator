@@ -184,7 +184,6 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(mySchedule);
-	xmlParse(lectureTable);
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");

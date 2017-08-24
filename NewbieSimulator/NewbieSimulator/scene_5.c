@@ -1,21 +1,21 @@
 #include "engine.h"
 #include "data.h"
-
-
-
+#include "xmlParser.h"
 void register_text_UI();
 void register_back_button();
-
 
 int scene_5_init() {
 
 	
 	Background = create_object("Resources\\UI\\result\\layout.jpg", 0, 0);
 	
+	//for test
+	xmlParse(lectureTable);
+
 	register_text_UI();
 	register_back_button();
 
-
+	
 
 	return 0;
 }
@@ -34,7 +34,7 @@ void register_text_UI() {
 	float grade_num[6];
 	char string_grade_num[6][20];
 	char string_grade[6][10];
-	char string_lecture_code[6][10];
+	char string_lecture_code[6][11];
 	char string_lecture_name[6][40];
 	
 	for (int i = 0; i < 6; i++) {
@@ -86,7 +86,7 @@ void register_text_UI() {
 		//todo : set lecture code
 		
 		//for test
-		sprintf(string_lecture_code[i], "COSE1010%d", i);
+		sprintf(string_lecture_code[i], "%s-0%d", lectureTable[i].identifyNumber, 0); // actually lectureindex[i]
 	}
 
 	for (int i = 0; i < 6; i++) {
@@ -94,7 +94,7 @@ void register_text_UI() {
 		//todo : set lecture name
 
 		//for test
-		sprintf(string_lecture_name[i], "This is Lecture Name - %c", (i+97));
+		sprintf(string_lecture_name[i], "%s - %c", lectureTable[i].name, (i+97));
 	}
 
 	// grade text
