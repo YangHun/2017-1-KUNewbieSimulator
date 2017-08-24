@@ -424,6 +424,7 @@ void sto_dummy_2() {
 }
 
 void click_yes(object_t* o) {
+	play_audiosample(0, false);
 	event_choose = true;
 	char compareText[40] = "";
 	strcpy(compareText, o->modifier.value.font_value.text);
@@ -548,6 +549,7 @@ void click_yes(object_t* o) {
 }
 
 void click_no(object_t* o) {
+	play_audiosample(0, false);
 	event_choose = true;
 	char compareText[40] = "";
 	strcpy(compareText, o->modifier.value.font_value.text);

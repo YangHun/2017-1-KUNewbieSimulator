@@ -149,6 +149,8 @@ char var[10];
 
 int scene_4_init() {
 
+	play_audiosample(2, true);
+
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	int i;
 	system("chcp 65001");
@@ -1033,6 +1035,8 @@ void init_schedule_data(void) {
 }
 void map_button_on_click_listener_func(object_t *o)
 {
+	play_audiosample(0, false);
+
 	if (player.is_moving_now || stop_char_moving)
 		return;
 	ptrdiff_t clicked_vertex_idx = o - &Stack.objs[vertex_object_starting];
@@ -1104,6 +1108,7 @@ int return_interval() {
 	if (target >= 426 && target <= 526) {
 		return 3;
 	}
+	if (target>=568 && target <= 668){
 		return 4;
 	}
 	if (target >= 710 && target <= 810) {
