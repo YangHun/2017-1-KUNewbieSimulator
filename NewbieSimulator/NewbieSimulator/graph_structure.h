@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
-
+#include "lectureInfo.h"
 typedef enum vertex_type{
 	VERTEX_TYPE_NONE,
 	VERTEX_TYPE_BUILDING,
@@ -23,6 +23,7 @@ typedef struct vertex {
 		} as_busroute;
 	} value;
 	char name[32];
+	roomNumber roomID;
 } vertex;
 
 typedef struct edge {

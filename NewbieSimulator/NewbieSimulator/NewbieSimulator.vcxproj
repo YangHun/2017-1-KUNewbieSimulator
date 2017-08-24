@@ -187,6 +187,8 @@
     <ClCompile Include="scene_3.c" />
     <ClCompile Include="scene_4.c" />
     <ClCompile Include="scene_5.c" />
+    <ClCompile Include="stringSwitch.c" />
+    <ClCompile Include="xmlParser.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

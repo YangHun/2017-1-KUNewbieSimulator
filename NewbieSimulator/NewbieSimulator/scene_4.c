@@ -3,6 +3,7 @@
 #include "data.h"
 #include "graph_manage.h"
 #include "event_semester.h"
+#include "xmlParser.h"
 // colors
 
 ALLEGRO_COLOR edge_color_default;
@@ -52,6 +53,7 @@ ALLEGRO_CONFIG *conf_for_event;
 
 bool stop_map_moving = false;
 bool stop_char_moving = false;
+bool first_update = true;
 // ------------------------------------
 // stat
 // ------------------------------------
@@ -94,8 +96,6 @@ bool test = false;
 ALLEGRO_TIMER *trafficlit_timer;
 static void update_trafficlit_objects();
 static void update_edge_objects();
-roomNumber destination_room;
-
 #define CHARACTER_IMAGE_COUNT 5
 
 typedef struct character {
@@ -149,7 +149,7 @@ int scene_4_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	int i;
-
+	system("chcp 65001");
 	printf("Scene 4 start! \n");
 
 	// edge colors
@@ -175,13 +175,8 @@ int scene_4_init() {
 	test_custom_schedule();
 	init_schedule_data();
 	calculate_second_per_period(customSchedule);
-	
-	if (customSchedule.timeTable[MON][0].index != 1) {
-		destination_room = lectureTable[customSchedule.timeTable[MON][0].index].room;
-	}
-	else {
-		destination_room = ROOM_DEFAULT;
-	}
+	xmlParse(lectureTable);
+
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
 	conf_lecture = al_load_config_file("Resources\\korean\\lecture_info.ini");
 	conf_for_event = al_load_config_file("Resources\\korean\\routegame.ini");
@@ -457,6 +452,7 @@ int scene_4_init() {
 	trafficlit_timer = al_create_timer(.001);
 	al_start_timer(trafficlit_timer);
 	
+	print_graph(myGraph);
 	return 0;
 }
 
@@ -824,19 +820,20 @@ int scene_4_update() {
 		
 	}
 	int interval_idx = return_interval();
-	if (pre_period != interval_idx) { // 구간 지남
+	if (pre_period != interval_idx || first_update) { // 구간 지남 or 처음 시작
+		/* 폐기처분 예정
 		if (interval_idx == 9) { // 새로 온 구간이 쉬는시간
 			stop_char_moving = false;
 			if (pre_period < 8) {
 				if (customSchedule.timeTable[today_of_week][pre_period + 1].index != -1) {
 					destination_room = lectureTable[customSchedule.timeTable[today_of_week][pre_period + 1].index].room;
-					
+
 				}
 				else {
 					destination_room = ROOM_DEFAULT;
 				}
 			}
-			else { 
+			else {
 				if (customSchedule.timeTable[today_of_week][0].index != -1) {
 					destination_room = lectureTable[customSchedule.timeTable[today_of_week][0].index].room;
 				}
@@ -845,16 +842,30 @@ int scene_4_update() {
 				}
 			}
 		}
-		else { // 새로 온 구간이 교시 구간
-			if (customSchedule.timeTable[today_of_week][interval_idx].index != -1) { // 수업이 있다면
-				time_attack_mode = true;
+		*/
+		if (interval_idx != 9) { // 새로 온 구간이 교시 구간
+			roomNumber dest_room;
+			int now_lecture_idx = customSchedule.timeTable[today_of_week][interval_idx].index;
+
+			if (now_lecture_idx != -1) {
+				dest_room = lectureTable[now_lecture_idx].room;
+			}
+			else {
+				dest_room = ROOM_DEFAULT;
+			}
+			if (dest_room != ROOM_DEFAULT) { // 공강시간이라면
+				if (player.curr_point != dest_room) { // 만약 공강이 아니고 현재 위치가 dest room이 아니라면
+					time_attack_mode = true; // 지각 or 결석
+					printf("time_attack \n");
+				}
+				else { // 공강이 아니고 현재 위치가 destroom 이라면
+					isArrived = true;
+					printf("arrived\n");
+				}
 			}
 		}
-		printf("%d \n", destination_room);
 	}
-	if (time_attack_mode) { // 이 곳이 지각과 결석을 판별하고 도착했는지 파악합니다
-
-	}
+	
 	if (isArrived) { // 도착하면 캐릭터가 굳어야합니다
 		stop_char_moving = true;
 	}
@@ -913,6 +924,7 @@ int scene_4_update() {
 		update_edge_objects();
 	}
 	pre_period = return_interval();
+	first_update = false;
 	re_draw();
 
 	return 0;
@@ -1065,7 +1077,7 @@ void edit_timebar_color(schedule mySchedule) {
 
 int return_interval() {
 	float target = Stack.objs[timebar_object_starting + 10].pos.x;
-	if (target >= 0 && target <= 100) {
+	if (target <= 100) {
 		return 0;
 	}
 	if (target >= 142 && target <= 242) {

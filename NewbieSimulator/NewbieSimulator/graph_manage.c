@@ -1,6 +1,7 @@
 #include"engine.h"
 #include"graph_structure.h"
 #include "graph_manage.h"
+#include "stringSwitch.h"
 //----------------------------------         //
 //Button, map moving setting By hasu & minkyu//
 //----------------------------------         //
@@ -96,6 +97,22 @@ void parse_graph(Graph_structure* result) {
 	current_graph = result;
 	qsort(result->edges_sorted_args, 2 * edge_count, sizeof(int), graph_edge_argcompare_totalorder);
 	current_graph = NULL;
+
+	for (int i = 0; i < vertex_count; i++)
+	{
+		vertex *v = &result->vertexArray[i];
+		if (v->name != NULL) {
+			v->roomID = getRoomMessage_little_change(v->name);
+		}
+		else {
+			v->roomID = ROOM_DEFAULT;
+		}
+	}
+	for (int i = 0; i < vertex_count; i++)
+	{
+		vertex *v = &result->vertexArray[i];
+		
+	}
 }
 
 int graph_edge_argcompare_totalorder(const void *a, const void *b)
@@ -197,7 +214,7 @@ void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { 
 
 void print_graph(Graph_structure* target) {
 	for (int i = 0; i < target->Num_of_Vertex; i++) {
-		printf("%d %d \n", target->vertexArray[i].loc.x, target->vertexArray[i].loc.y);
+		printf("%d %d %d \n", target->vertexArray[i].loc.x, target->vertexArray[i].loc.y, target->vertexArray[i].roomID);
 	}
 	printf("\n");
 	for (int i = 0; i < target->Num_of_Edge * 2; i++) {
