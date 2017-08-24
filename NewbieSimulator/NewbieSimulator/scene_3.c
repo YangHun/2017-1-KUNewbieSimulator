@@ -347,6 +347,7 @@ void reSchedule() {
 				newindex = j;
 				if (analyzeSchedule(lectureTable, mySchedule, newindex) == NO_OVERLAP) {
 					addLectureToSchedule(lectureTable, mySchedulePtr, newindex);
+					
 					break;
 				}
 			}			

@@ -41,6 +41,7 @@ int return_interval();
 bool block_timebar_early_start = false;
 bool isArrived = false;
 bool time_attack_mode = false;
+roomNumber dest_room;
 // ------------------------------------
 // event variable declaration
 // ------------------------------------
@@ -61,6 +62,8 @@ bool first_update = true;
 // stat
 // ------------------------------------
 float attendance_rate[6] = { 0, };
+int absent_lecture[6] = { 0, };
+int attend_lecture[6] = { 0, };
 int grade_point;
 
 bool ongoing1 = false, ongoing2 = false;
@@ -154,7 +157,7 @@ int scene_4_init() {
 
 	//해당 씬이 시작될 때, 딱 한 번 실행되는 함수
 	int i;
-	system("chcp 65001");
+
 	printf("Scene 4 start! \n");
 
 	// edge colors
@@ -180,7 +183,7 @@ int scene_4_init() {
 	today_weekOfMonth = 1;
 	test_custom_schedule();
 	init_schedule_data();
-	calculate_second_per_period(customSchedule);
+	calculate_second_per_period(mySchedule);
 	xmlParse(lectureTable);
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
@@ -314,8 +317,8 @@ int scene_4_init() {
 	for (i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
 			lecturerepeat = false;
-			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
-				int lectureid = mySchedule.timeTable[i][j].index;
+			if (customSchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
+				int lectureid = customSchedule.timeTable[i][j].index;
 				for (int x = 0; x < 6; x++) {
 					if (lectureid == lectureindex[x])
 						lecturerepeat = true;
@@ -448,7 +451,7 @@ int scene_4_init() {
 	object_t timebar = create_object("Resources\\UI\\routegame\\timebar.png", 0, 0);
 	Stack.push(&Stack, timebar);
 
-	edit_timebar_color(customSchedule);
+	edit_timebar_color(mySchedule);
 
 	object_t red = create_colored_object(al_map_rgb(255, 150, 145), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
@@ -457,8 +460,7 @@ int scene_4_init() {
 
 	trafficlit_timer = al_create_timer(.001);
 	al_start_timer(trafficlit_timer);
-	
-	print_graph(myGraph);
+
 	return 0;
 }
 
@@ -658,8 +660,8 @@ int scene_4_update() {
 		timebar_width = 0;
 		Stack.objs[timebar_object_starting + 10].pos.x = 0;
 		maingame_timer_set = 0;
-		edit_timebar_color(customSchedule);
-		calculate_second_per_period(customSchedule);
+		edit_timebar_color(mySchedule);
+		calculate_second_per_period(mySchedule);
 		printf("%d 월 %d 일 %d주 ", today_monthOfYear, today_dayOfMonth, today_weekOfMonth);
 		switch (today_dayOfWeek) {
 		case MON:
@@ -834,32 +836,12 @@ int scene_4_update() {
 		
 	}
 	int interval_idx = return_interval();
+	int now_lecture_idx;
 	if (pre_period != interval_idx || first_update) { // 구간 지남 or 처음 시작
-		/* 폐기처분 예정
-		if (interval_idx == 9) { // 새로 온 구간이 쉬는시간
-			stop_char_moving = false;
-			if (pre_period < 8) {
-				if (customSchedule.timeTable[today_dayOfWeek][pre_period + 1].index != -1) {
-					destination_room = lectureTable[customSchedule.timeTable[today_dayOfWeek][pre_period + 1].index].room;
-					
-				}
-				else {
-					destination_room = ROOM_DEFAULT;
-				}
-			}
-			else { 
-				if (customSchedule.timeTable[today_dayOfWeek][0].index != -1) {
-					destination_room = lectureTable[customSchedule.timeTable[today_dayOfWeek][0].index].room;
-				}
-				else {
-					destination_room = ROOM_DEFAULT;
-				}
-			}
-		}
-		*/
+
 		if (interval_idx != 9) { // 새로 온 구간이 교시 구간
-			roomNumber dest_room;
-			int now_lecture_idx = customSchedule.timeTable[today_dayOfWeek][interval_idx].index;
+
+			now_lecture_idx = mySchedule.timeTable[today_dayOfWeek][interval_idx].index;
 
 			if (now_lecture_idx != -1) {
 				dest_room = lectureTable[now_lecture_idx].room;
@@ -867,22 +849,55 @@ int scene_4_update() {
 			else {
 				dest_room = ROOM_DEFAULT;
 			}
-			if (dest_room != ROOM_DEFAULT) { // 공강시간이라면
-				if (player.curr_point != dest_room) { // 만약 공강이 아니고 현재 위치가 dest room이 아니라면
-					time_attack_mode = true; // 지각 or 결석
-					printf("time_attack \n");
+			if (dest_room != ROOM_DEFAULT) { // 공강시간이 아니라면
+				if (myGraph->vertexArray[player.curr_point].roomID != dest_room) { // 만약 공강이 아니고 현재 위치가 dest room이 아니라면
+					time_attack_mode = true; // 결석
+
 				}
 				else { // 공강이 아니고 현재 위치가 destroom 이라면
 					isArrived = true;
-					printf("arrived\n");
+					printf("제때 도착\n");
+					for (int i = 0; i < 6; i++) {
+						if (lectureindex[i] == now_lecture_idx) {
+							attend_lecture[i]++;
+							
+						}
+						printf("%d ", attend_lecture[i]);
+					}
+					printf("\n");
 				}
 			}
 		}
+		else { //쉬는시간
+
+			isArrived = false;
+			stop_char_moving = false;
+		}
 	}
-	
+	if (time_attack_mode) { // 결석임
+		time_attack_mode = false;
+		printf("결석! \n");
+		for (int i = 0; i < 6; i++) {
+			if (lectureindex[i] == now_lecture_idx) {
+				absent_lecture[i]++;
+			}
+			printf("%d ", absent_lecture[i]);
+		}
+		printf("\n");
+	}
 	if (isArrived) { // 도착하면 캐릭터가 굳어야합니다
 		stop_char_moving = true;
 	}
+	/*
+	for (int i = 0; i < 6; i++) {
+		if (attend_lecture[i] + absent_lecture[i] == 0) {
+			attendance_rate[i] = 0;
+		}
+		else {
+			attendance_rate[i] = attend_lecture[i] / (attend_lecture[i] + absent_lecture[i]);
+		}
+	}
+	*/
 	//--------------------------//
 	//map moving setting By hasu//
 	//--------------------------//
@@ -969,14 +984,14 @@ void calculate_second_per_day() {
 	int num_of_lecture = 0;
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 9; j++) {
-			if (customSchedule.timeTable[i][j].isEmptyBit == EMPTY && lecture_cursor != -1) {
+			if (mySchedule.timeTable[i][j].isEmptyBit == EMPTY && lecture_cursor != -1) {
 				num_of_lecture++; 
 				lecture_cursor = -1;
 			}
 			else {
-				if (lecture_cursor != customSchedule.timeTable[i][j].index) {
+				if (lecture_cursor != mySchedule.timeTable[i][j].index) {
 					num_of_lecture++;
-					lecture_cursor = customSchedule.timeTable[i][j].index;
+					lecture_cursor = mySchedule.timeTable[i][j].index;
 				}
 			}
 		}
@@ -990,10 +1005,10 @@ void calculate_second_per_day() {
 void calculate_second_per_period(schedule mySchedule) {
 	//int gonggang = 10;
 	//int su_up = 2;
-	//int shuim = 20;
+	//int shuim = 1000;
 	int gonggang = 10;
-	int su_up = 2;
-	int shuim = 1000;
+	int su_up = 20;
+	int shuim = 20;
 	for (int i = 0; i < 9; i++) {
 
 		second_per_period[i] = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? gonggang : su_up;
@@ -1096,7 +1111,7 @@ void edit_timebar_color(schedule mySchedule) {
 }
 
 int return_interval() {
-	float target = Stack.objs[timebar_object_starting + 10].pos.x;
+	float target = Stack.objs[timebar_object_starting + 10].pos.x + 10;
 	if (target <= 100) {
 		return 0;
 	}
