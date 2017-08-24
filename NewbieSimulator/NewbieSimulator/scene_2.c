@@ -73,6 +73,7 @@ int colorArray[7]; // -1 미사용 index 사용중
 int selectedLectureIndex;
 int majorStart, majorEnd, coreStart, coreEnd, selectiveStart, selectiveEnd;
 int grayblockNumber;
+
 int grayblockindex = -1;
 typedef enum _KLUElecture { KLUE_HONEY, KLUE_BOMB, KLUE_NORMAL } KLUElecture;
 ALLEGRO_TIMER* sugang_timer;
@@ -362,15 +363,7 @@ int scene_2_init() {
 	ui_set_text(&lecture_Distance, al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "", 25);
 	Stack.push(&Stack, lecture_Distance); //176
 
-	//------------------------------------------------
-	// CampusMap
-	//------------------------------------------------
-
-	object_t campus_map_screen = create_object("Resources\\UI\\enroll\\campus_map.jpg", 0, 0);
-	ui_set_button(&campus_map_screen);
-	ui_set_on_click_listener(&campus_map_screen, on_click_map_screen);
-	Stack.push(&Stack, campus_map_screen); //177
-	Stack.objs[177].enable = false;
+	
 
 	// audio
 	play_audiosample(2, true);
@@ -468,10 +461,14 @@ void on_click_campus_map(object_t *o) {
 	if (protectOverlapClick_Map == 0) {
 		printf("on green \n");
 		protectOverlapClick_Map = 1;
-		Stack.objs[177].enable = true;
 		CAMPUS_MAP.enable = false;
+		object_t campus_map_screen;
+		campus_map_screen = create_object("Resources\\UI\\enroll\\campus_map.jpg", 0, 0);
+		ui_set_button(&campus_map_screen);
+		ui_set_on_click_listener(&campus_map_screen, on_click_map_screen);
+		Stack.push(&Stack, campus_map_screen);
 		for (int i = 0; i < grayblockNumber; i++) {
-			Stack.objs[Stack.counter - 1 - i].enable = false;
+			Stack.objs[Stack.counter - 2 - i].enable = false;
 		}
 	}
 	else {
@@ -486,7 +483,7 @@ void on_click_map_screen(object_t *o) {
 		printf("on red \n");
 		protectOverlapClick_Map = 1;
 		CAMPUS_MAP.enable = true;
-		Stack.objs[177].enable = false;
+		Stack.pull(&Stack);
 		for (int i = 0; i < grayblockNumber; i++) {
 			Stack.objs[Stack.counter - 1 - i].enable = true;
 		}
