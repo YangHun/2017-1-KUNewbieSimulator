@@ -41,7 +41,11 @@ int return_interval();
 bool block_timebar_early_start = false;
 bool isArrived = false;
 bool time_attack_mode = false;
+bool dont_have_to_display = true;
 roomNumber dest_room;
+int now_lecture_idx;
+int next_lecture_index;
+int my_little_idx;
 // ------------------------------------
 // event variable declaration
 // ------------------------------------
@@ -53,7 +57,7 @@ int event_timer_clock = 0;
 bool event_choose = false;
 bool is_seq_triggered;
 ALLEGRO_CONFIG *conf_for_event;
-
+vertex* dest_vertex;
 bool stop_map_moving = false;
 bool stop_traffic_light = true;
 bool stop_char_moving = false;
@@ -183,6 +187,9 @@ int scene_4_init() {
 	today_weekOfMonth = 1;
 	test_custom_schedule();
 	init_schedule_data();
+
+
+
 	calculate_second_per_period(mySchedule);
 
 	conf = al_load_config_file("Resources\\korean\\routegame.ini");
@@ -316,8 +323,8 @@ int scene_4_init() {
 	for (i = 0; i < 5; i++) {
 		for (int j = 0; j < 10; j++) {
 			lecturerepeat = false;
-			if (customSchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
-				int lectureid = customSchedule.timeTable[i][j].index;
+			if (mySchedule.timeTable[i][j].isEmptyBit == NONEMPTY) {
+				int lectureid = mySchedule.timeTable[i][j].index;
 				for (int x = 0; x < 6; x++) {
 					if (lectureid == lectureindex[x])
 						lecturerepeat = true;
@@ -835,7 +842,7 @@ int scene_4_update() {
 		
 	}
 	int interval_idx = return_interval();
-	int now_lecture_idx;
+	int dest_idx;
 	if (pre_period != interval_idx || first_update) { // 구간 지남 or 처음 시작
 
 		if (interval_idx != 9) { // 새로 온 구간이 교시 구간
@@ -871,7 +878,40 @@ int scene_4_update() {
 
 			isArrived = false;
 			stop_char_moving = false;
+			int pre_period_idx = mySchedule.timeTable[today_dayOfWeek][pre_period].index;
+			if (pre_period_idx != -1) {
+				for (int i = 0; i < myGraph->Num_of_Vertex; i++) {
+
+					if (lectureTable[pre_period_idx].room == myGraph->vertexArray[i].roomID) {
+						al_destroy_bitmap((*map_button_ptr)[i].image);
+						(*map_button_ptr)[i].image = al_load_bitmap("Resources\\UI\\routegame\\v_building.png");
+					}
+				}
+			}
+			for (my_little_idx = pre_period + 1; my_little_idx < 9; my_little_idx++) {
+				if (mySchedule.timeTable[today_dayOfWeek][my_little_idx].index != -1) {
+					dest_idx = mySchedule.timeTable[today_dayOfWeek][my_little_idx].index;
+					dont_have_to_display = false;
+					break;
+				}
+			}
+			
+			if (my_little_idx == 9) {
+				dont_have_to_display = true;
+			}
+
+
 		}
+		printf("%d %d \n ", myGraph->vertexArray[player.curr_point].roomID, dest_room);
+	}
+	if (!dont_have_to_display) {
+		for (int i = 0; i < myGraph->Num_of_Vertex; i++) {
+			if (lectureTable[dest_idx].room == myGraph->vertexArray[i].roomID) {
+				al_destroy_bitmap((*map_button_ptr)[i].image);
+				(*map_button_ptr)[i].image = al_load_bitmap("Resources\\UI\\routegame\\v_destination.png");
+			}
+		}
+		dont_have_to_display = true;
 	}
 	if (time_attack_mode) { // 결석임
 		time_attack_mode = false;
@@ -1006,8 +1046,8 @@ void calculate_second_per_period(schedule mySchedule) {
 	//int su_up = 2;
 	//int shuim = 1000;
 	int gonggang = 10;
-	int su_up = 20;
-	int shuim = 20;
+	int su_up = 2;
+	int shuim = 1000;
 	for (int i = 0; i < 9; i++) {
 
 		second_per_period[i] = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? gonggang : su_up;
@@ -1135,7 +1175,7 @@ int return_interval() {
 	if (target >= 994 && target <= 1094) {
 		return 7;
 	}
-	if (target >= 1136) {
+	if (target >= 1136 && target <= 1236) {
 		return 8;
 	}
 	return 9;

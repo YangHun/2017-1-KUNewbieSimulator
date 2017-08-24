@@ -214,7 +214,7 @@ void make_vertex_objects(Graph_structure* target, object_t*** map_button_ptr) { 
 
 void print_graph(Graph_structure* target) {
 	for (int i = 0; i < target->Num_of_Vertex; i++) {
-		printf("%d %d %d \n", target->vertexArray[i].loc.x, target->vertexArray[i].loc.y, target->vertexArray[i].roomID);
+		printf("%d %d %d %d \n", i, target->vertexArray[i].loc.x, target->vertexArray[i].loc.y, target->vertexArray[i].roomID);
 	}
 	printf("\n");
 	for (int i = 0; i < target->Num_of_Edge * 2; i++) {

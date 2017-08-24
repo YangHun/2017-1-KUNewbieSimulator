@@ -616,6 +616,7 @@ void click_no(object_t* o) {
 			int p = rand() & 1;
 			if (p) {
 			}
+			return;
 		}
 		cases("stodummy1") {
 			printf("dummy1 no \n");

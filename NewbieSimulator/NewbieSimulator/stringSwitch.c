@@ -104,6 +104,8 @@ int getRoomMessage(char* name) {
 			return GYM_HALL;
 		cases(u8"국제관")
 			return GLOBAL_HALL;
+		cases(u8"생명서관")
+			return BIO_HALL;
 		defaults
 			return ROOM_DEFAULT;
 	} switchs_end;
@@ -116,32 +118,44 @@ int getRoomMessage_little_change(char* name) {
 			return EDUCATE;
 		cases(u8"우당교양관정문")
 			return REFINEMENT;
+		cases(u8"우당교양관통로")
+			return REFINEMENT;
 		cases(u8"정보관")
 			return INFORMATICS;
-		cases(u8"과학도서관")
+		cases(u8"과학도서관정문")
+			return SCI_LIBRARY;
+		cases(u8"과학도서관후문")
 			return SCI_LIBRARY;
 		cases(u8"아산이학관")
 			return SCIENCE_HALL;
-		cases(u8"법학관신관")
+		cases(u8"법학신관")
 			return NEW_LAW_HALL;
 		cases(u8"L-P관")
 			return LP_HALL;
-		cases(u8"서관")
+		cases(u8"서관서문")
 			return WEST_HALL;
-		cases(u8"정경관")
+		cases(u8"서관동문")
+			return WEST_HALL;
+		cases(u8"정경관정문")
 			return POLITIC;
 		cases(u8"창의관")
 			return CREATIVE;
 		cases(u8"미래융합관")
 			return FUSION;
-		cases(u8"법학관구관")
+		cases(u8"법학구관서문")
+			return OLD_LAW_HALL;
+		cases(u8"법학구관동문")
 			return OLD_LAW_HALL;
 		cases(u8"하나과학관")
 			return HANA_SCIENCE;
 		cases(u8"화정체육관")
 			return GYM_HALL;
-		cases(u8"국제관")
+		cases(u8"국제관정문")
 			return GLOBAL_HALL;
+		cases(u8"국제관후문")
+			return GLOBAL_HALL;
+		cases(u8"생명과학서관")
+			return BIO_HALL;
 		defaults
 			return ROOM_DEFAULT;
 	} switchs_end;
