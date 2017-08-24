@@ -887,7 +887,7 @@ int scene_4_update() {
 	if (isArrived) { // 도착하면 캐릭터가 굳어야합니다
 		stop_char_moving = true;
 	}
-	/*
+	
 	for (int i = 0; i < 6; i++) {
 		if (attend_lecture[i] + absent_lecture[i] == 0) {
 			attendance_rate[i] = 0;
@@ -896,7 +896,7 @@ int scene_4_update() {
 			attendance_rate[i] = attend_lecture[i] / (attend_lecture[i] + absent_lecture[i]);
 		}
 	}
-	*/
+	
 	//--------------------------//
 	//map moving setting By hasu//
 	//--------------------------//

@@ -11,6 +11,12 @@ int scene_5_init() {
 	
 	//for test
 	xmlParse(lectureTable);
+	attendance_rate[0] = 0.93;
+	attendance_rate[1] = 0.15;
+	attendance_rate[2] = 0.57;
+	attendance_rate[3] = 0.68;
+	attendance_rate[4] = 0.89;
+	attendance_rate[5] = 0.91;
 
 	register_text_UI();
 	register_back_button();
@@ -36,11 +42,40 @@ void register_text_UI() {
 	char string_grade[6][10];
 	char string_lecture_code[6][11];
 	char string_lecture_name[6][40];
-	
+	int credit_of_F = 0;
+	int num_of_F = 0;
 	for (int i = 0; i < 6; i++) {
 
 		//todo : calculate each grade of lecture with attendance rate
-		grade_num[i] = 4.5 - 0.5 * i;
+		if (attendance_rate[i] > 0.9) {
+			grade_num[i] = 4.5;
+		}
+		else if (attendance_rate[i] > 0.8) {
+			grade_num[i] = 4.0;
+		}
+		else if (attendance_rate[i] > 0.7) {
+			grade_num[i] = 3.5;
+		}
+		else if (attendance_rate[i] > 0.6) {
+			grade_num[i] = 3.0;
+		}
+		else if (attendance_rate[i] > 0.5) {
+			grade_num[i] = 2.5;
+		}
+		else if (attendance_rate[i] > 0.4) {
+			grade_num[i] = 2.0;
+		}
+		else if (attendance_rate[i] > 0.3) {
+			grade_num[i] = 1.5; //D+
+		}
+		else if (attendance_rate[i] > 0.2) {
+			grade_num[i] = 1.0; //D
+		}
+		else { // F
+			grade_num[i] = 0.0;
+			credit_of_F += lectureTable[lectureindex[i]].credit;
+			num_of_F++;
+		}
 	}
 
 	for (int i = 0; i < 6; i++) {
@@ -77,6 +112,7 @@ void register_text_UI() {
 		}
 		else if (n == 0.0) {
 			sprintf(string_grade[i], "F");
+			
 		}
 
 	}
@@ -86,7 +122,7 @@ void register_text_UI() {
 		//todo : set lecture code
 		
 		//for test
-		sprintf(string_lecture_code[i], "%s-0%d", lectureTable[i].identifyNumber, 0); // actually lectureindex[i]
+		sprintf(string_lecture_code[i], "%s-0%d", lectureTable[lectureindex[i]].identifyNumber, 0);
 	}
 
 	for (int i = 0; i < 6; i++) {
@@ -94,7 +130,7 @@ void register_text_UI() {
 		//todo : set lecture name
 
 		//for test
-		sprintf(string_lecture_name[i], "%s - %c", lectureTable[i].name, (i+97));
+		sprintf(string_lecture_name[i], "%s", lectureTable[i].name);
 	}
 
 	// grade text
@@ -129,10 +165,17 @@ void register_text_UI() {
 
 	// calculate total grade data
 	// TODO
-	int credit_start = 16;
-	int credit_end = 19;
-	float grade_num_except_f = 4.5;
-	float grade_num_total = 3.5;
+	int credit_start = mySchedule.credit;
+	int credit_end = (credit_start - credit_of_F >= 0) ? credit_start - credit_of_F : 0;
+
+	float creditsum = 0;
+	
+	for (int i = 0; i < 6; i++) {
+		creditsum += grade_num[i];
+	}
+
+	float grade_num_except_f = (num_of_F != 6) ? creditsum / (6 - num_of_F) : 0;
+	float grade_num_total = creditsum / 6;
 	
 	char string_credit_start[20] = "";
 	sprintf(string_credit_start, "%d", credit_start);

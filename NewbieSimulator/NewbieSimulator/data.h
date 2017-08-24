@@ -16,4 +16,5 @@ extern int lectureindex[6];
 //scene 4
 extern ALLEGRO_CONFIG *conf_for_event;
 extern int lectureindex[6];
+extern float attendance_rate[6];
 //extern void stat_update();
