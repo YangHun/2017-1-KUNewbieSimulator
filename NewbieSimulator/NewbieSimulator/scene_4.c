@@ -412,7 +412,7 @@ int scene_4_init() {
 	al_start_timer(maingame_timer);
 	timebar_object_starting = Stack.counter;
 
-	object_t bar_bg_yel = create_colored_object(al_map_rgb(238, 238, 0), 1280, 17, 0, 0);
+	object_t bar_bg_yel = create_colored_object(al_map_rgb(255,228,145), 1280, 17, 0, 0);
 	Stack.push(&Stack, bar_bg_yel);
 
 	object_t bar_bg0 = create_colored_object(al_map_rgb(8, 238, 238), 100, 17, 0, 0);
@@ -447,7 +447,7 @@ int scene_4_init() {
 
 	edit_timebar_color(customSchedule);
 
-	object_t red = create_colored_object(al_map_rgb(161, 20, 8), 0, 17, 0, 0);
+	object_t red = create_colored_object(al_map_rgb(255, 150, 145), 0, 17, 0, 0);
 	Stack.push(&Stack, red); 
 
 	// Traffic light timer
@@ -1086,7 +1086,7 @@ void letscontinue()
 
 void edit_timebar_color(schedule mySchedule) {
 	for (int i = 0; i < 9; i++) {
-		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? al_map_rgb(0, 238, 0) : al_map_rgb(238, 0, 0);
+		Stack.objs[timebar_object_starting + 1 + i].color = (mySchedule.timeTable[today_dayOfWeek][i].index == -1) ? al_map_rgb(171,218,139) : al_map_rgb(255,150,145);
 	}
 }
 
@@ -1104,7 +1104,6 @@ int return_interval() {
 	if (target >= 426 && target <= 526) {
 		return 3;
 	}
-	if (target >= 568 && target <= 668) {
 		return 4;
 	}
 	if (target >= 710 && target <= 810) {
