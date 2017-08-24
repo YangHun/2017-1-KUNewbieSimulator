@@ -53,6 +53,7 @@ bool is_seq_triggered;
 ALLEGRO_CONFIG *conf_for_event;
 
 bool stop_map_moving = false;
+bool stop_traffic_light = true;
 bool stop_char_moving = false;
 bool first_update = true;
 // ------------------------------------
@@ -335,11 +336,11 @@ int scene_4_init() {
 	object_t lecture_att[6];
 	for (i = 0; i < 6; i++) {
 		char att_str[10];
-		lecture_att[i] = create_object(NULL, 30, 310 + i * 70);
+		lecture_att[i] = create_object(NULL, 200, 310 + i * 70);
 		sprintf(att_str, "%0.1f", attendance_rate[i]);
 		
 		if (lectureindex[i] == -1)
-			ui_set_text(&lecture_att[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "empty", 24);
+			ui_set_text(&lecture_att[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, "100%", 24);
 		else
 			ui_set_text(&lecture_att[i], al_map_rgb(0, 0, 0), "Resources\\font\\BMDOHYEON.ttf", ALLEGRO_ALIGN_LEFT, att_str, 24);
 		Stack.push(&Stack, lecture_att[i]);
@@ -760,6 +761,7 @@ int scene_4_update() {
 			al_stop_timer(event_timer);
 			stop_map_moving = true;
 			stop_char_moving = true;
+			stop_traffic_light = true;
 		}
 	}
 	
@@ -776,6 +778,7 @@ int scene_4_update() {
 		block_timebar_early_start = true;
 		stop_map_moving = false;
 		stop_char_moving = false;
+		stop_traffic_light = false;
 	}
 	
 	if (!player.is_moving_now) {
@@ -907,31 +910,35 @@ int scene_4_update() {
 
 	int trafficlit_tickcnt = al_get_timer_count(trafficlit_timer);
 	bool changed = false;
-	for (int i = 0; i < trafficlit_count; i++)
-	{
-		if ((trafficlit_tickcnt - trafficlit_offset[i]) % trafficlit_period[i] < trafficlit_ontimecut[i])
+
+	if (stop_traffic_light != true) {
+
+		for (int i = 0; i < trafficlit_count; i++)
 		{
-			if (trafficlit_go[i] != true)
+			if ((trafficlit_tickcnt - trafficlit_offset[i]) % trafficlit_period[i] < trafficlit_ontimecut[i])
 			{
-				trafficlit_go[i] = true;
-				changed = true;
+				if (trafficlit_go[i] != true)
+				{
+					trafficlit_go[i] = true;
+					changed = true;
+				}
+			}
+			else
+			{
+				if (trafficlit_go[i] != false)
+				{
+					trafficlit_go[i] = false;
+					changed = true;
+				}
 			}
 		}
-		else
+		if (changed)
 		{
-			if (trafficlit_go[i] != false)
-			{
-				trafficlit_go[i] = false;
-				changed = true;
-			}
+			update_trafficlit_objects();
+			update_edge_objects();
 		}
+		pre_period = return_interval();
 	}
-	if (changed)
-	{
-		update_trafficlit_objects();
-		update_edge_objects();
-	}
-	pre_period = return_interval();
 	first_update = false;
 	re_draw();
 
